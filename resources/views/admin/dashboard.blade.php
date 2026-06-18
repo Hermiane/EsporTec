@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - EsporTec Admin</title>
+    <title>Visão Geral - EsporTec Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -46,19 +46,20 @@
     <aside class="sidebar">
         <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
         <nav>
-            <a href="/admin/dashboard" class="nav-link active"><i class="bi bi-grid"></i> Dashboard</a>
+            <a href="/admin/dashboard" class="nav-link active"><i class="bi bi-grid"></i> Visão Geral</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
             <a href="/admin/pessoas" class="nav-link"><i class="bi bi-people"></i> Usuários</a>
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
+            <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
     
     <main class="main">
         <div class="header">
-            <h1>📊 Dashboard Administrativo</h1>
-            <p class="text-muted">Visão geral do sistema - Junho 2026</p>
+            <h1><i class="bi bi-speedometer2 me-2"></i>Visão Geral do Sistema</h1>
+            <p class="text-muted">Resumo operacional - Junho 2026</p>
         </div>
 
         <div class="stats-grid">
@@ -91,7 +92,7 @@
         <div class="row g-3">
             <div class="col-lg-8">
                 <div class="recent-section">
-                    <div class="section-title">📅 Próximas Reservas</div>
+                    <div class="section-title"><i class="bi bi-calendar-event me-2"></i>Próximas Reservas</div>
                     <table class="table table-borderless mb-0">
                         <thead><tr><th>Horário</th><th>Quadra</th><th>Cliente</th><th>Status</th></tr></thead>
                         <tbody>
@@ -104,7 +105,7 @@
             </div>
             <div class="col-lg-4">
                 <div class="recent-section">
-                    <div class="section-title">🔔 Atividade Recente</div>
+                    <div class="section-title"><i class="bi bi-bell me-2"></i>Atividade Recente</div>
                     <div class="activity-item">
                         <div class="activity-icon" style="background:#DBEAFE; color:#3B82F6;"><i class="bi bi-person-plus"></i></div>
                         <div class="activity-info">

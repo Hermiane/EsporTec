@@ -13,12 +13,20 @@
         .layout { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: var(--admin-dark); color: white; padding: 1.5rem; }
         .sidebar-brand { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; margin-bottom: 2rem; display: block; }
-        .nav-link { color: #94A3B8; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; text-decoration: none; transition: 0.2s; }
+        .nav-link { color: #94A3B8; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
         .main { flex: 1; padding: 2rem; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
         .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--admin-dark); margin: 0; }
         .card-custom { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-box { padding: 1.2rem; border-radius: 12px; color: white; display: flex; align-items: center; gap: 1rem; }
+        .stat-box.total { background: linear-gradient(135deg, var(--primary), #60A5FA); }
+        .stat-box.pending { background: linear-gradient(135deg, var(--warning), #FCD34D); color: #1F2937; }
+        .stat-box.confirmed { background: linear-gradient(135deg, var(--success), #34D399); }
+        .stat-box.cancelled { background: linear-gradient(135deg, var(--danger), #F87171); }
+        .stat-value { font-size: 2rem; font-weight: 700; }
+        .stat-label { font-size: 0.9rem; opacity: 0.95; }
         .table-custom { width: 100%; border-collapse: collapse; }
         .table-custom th { text-align: left; padding: 1rem; background: #F1F5F9; color: #64748B; font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #E2E8F0; }
         .table-custom td { padding: 1rem; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
@@ -27,7 +35,7 @@
         .badge-confirmada { background: #D1FAE5; color: #065F46; }
         .badge-cancelada { background: #FEE2E2; color: #991B1B; }
         .badge-concluida { background: #DBEAFE; color: #1E40AF; }
-        .btn-action { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; border: none; cursor: pointer; margin-right: 0.3rem; font-weight: 600; }
+        .btn-action { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; border: none; cursor: pointer; margin-right: 0.3rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem; }
         .btn-confirm { background: rgba(16,185,129,0.1); color: var(--success); }
         .btn-confirm:hover { background: var(--success); color: white; }
         .btn-cancel { background: rgba(239,68,68,0.1); color: var(--danger); }
@@ -42,21 +50,58 @@
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="#" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
+        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
         <nav>
+            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-grid"></i> Visão Geral</a>
             <a href="/admin/agendamentos" class="nav-link active"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
-            <a href="/admin/pessoas" class="nav-link"><i class="bi bi-people"></i> Pessoas</a>
+            <a href="/admin/pessoas" class="nav-link"><i class="bi bi-people"></i> Usuários</a>
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
+            <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
     <main class="main">
         <div class="header">
-            <h1>📋 Gestão de Agendamentos</h1>
-            <button class="btn-primary-admin" data-bs-toggle="modal" data-bs-target="#modalReserva"><i class="bi bi-plus-lg me-2"></i>Nova Reserva</button>
+            <h1><i class="bi bi-calendar-check me-2"></i>Gestão de Agendamentos</h1>
+            <button class="btn-primary-admin" data-bs-toggle="modal" data-bs-target="#modalReserva">
+                <i class="bi bi-plus-lg me-2"></i>Nova Reserva
+            </button>
         </div>
         
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-box total">
+                <i class="bi bi-calendar-event fs-1"></i>
+                <div>
+                    <div class="stat-value">45</div>
+                    <div class="stat-label">Total do Mês</div>
+                </div>
+            </div>
+            <div class="stat-box pending">
+                <i class="bi bi-clock-history fs-1"></i>
+                <div>
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Pendentes</div>
+                </div>
+            </div>
+            <div class="stat-box confirmed">
+                <i class="bi bi-check-circle fs-1"></i>
+                <div>
+                    <div class="stat-value">38</div>
+                    <div class="stat-label">Confirmadas</div>
+                </div>
+            </div>
+            <div class="stat-box cancelled">
+                <i class="bi bi-x-circle fs-1"></i>
+                <div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Canceladas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
         <div class="filter-bar">
             <input type="date" class="form-control" style="width: 200px;">
             <select class="form-select" style="width: 200px;">
@@ -75,10 +120,20 @@
             <input type="text" placeholder="Buscar cliente..." class="form-control" style="width: 250px;">
         </div>
 
+        <!-- Tabela -->
         <div class="card-custom">
             <table class="table-custom">
                 <thead>
-                    <tr><th>ID</th><th>Data/Hora</th><th>Quadra</th><th>Cliente</th><th>Telefone</th><th>Valor</th><th>Status</th><th>Ações</th></tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data/Hora</th>
+                        <th>Quadra</th>
+                        <th>Cliente</th>
+                        <th>Telefone</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -90,8 +145,8 @@
                         <td>R$ 225,00</td>
                         <td><span class="badge-status badge-confirmada">Confirmada</span></td>
                         <td>
-                            <button class="btn-action btn-edit" onclick="alert('Editar reserva #1234')"><i class="bi bi-pencil"></i></button>
-                            <button class="btn-action btn-cancel" onclick="alert('Cancelar reserva #1234')"><i class="bi bi-x-circle"></i></button>
+                            <button class="btn-action btn-edit"><i class="bi bi-pencil"></i></button>
+                            <button class="btn-action btn-cancel"><i class="bi bi-x-circle"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -103,7 +158,7 @@
                         <td>R$ 120,00</td>
                         <td><span class="badge-status badge-pendente">Pendente</span></td>
                         <td>
-                            <button class="btn-action btn-confirm" onclick="alert('Confirmar reserva #1235')"><i class="bi bi-check-circle"></i></button>
+                            <button class="btn-action btn-confirm"><i class="bi bi-check-circle"></i></button>
                             <button class="btn-action btn-edit"><i class="bi bi-pencil"></i></button>
                             <button class="btn-action btn-cancel"><i class="bi bi-x-circle"></i></button>
                         </td>
@@ -117,8 +172,8 @@
                         <td>R$ 100,00</td>
                         <td><span class="badge-status badge-concluida">Concluída</span></td>
                         <td>
-                            <button class="btn-action btn-edit" disabled><i class="bi bi-pencil"></i></button>
-                            <button class="btn-action btn-cancel" disabled><i class="bi bi-x-circle"></i></button>
+                            <button class="btn-action btn-edit" disabled style="opacity:0.5"><i class="bi bi-pencil"></i></button>
+                            <button class="btn-action btn-cancel" disabled style="opacity:0.5"><i class="bi bi-x-circle"></i></button>
                         </td>
                     </tr>
                 </tbody>
@@ -127,23 +182,54 @@
     </main>
 </div>
 
+<!-- Modal Nova Reserva -->
 <div class="modal fade" id="modalReserva" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header"><h5 class="modal-title fw-bold">Nova Reserva Manual</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="mb-3"><label class="form-label fw-medium">Cliente</label><input type="text" class="form-control" placeholder="Nome do cliente"></div>
-                <div class="row g-3 mb-3">
-                    <div class="col-6"><label class="form-label fw-medium">Quadra</label><select class="form-select"><option>Society Premium</option><option>Futsal Arena</option><option>Beach Tennis #1</option></select></div>
-                    <div class="col-6"><label class="form-label fw-medium">Data</label><input type="date" class="form-control"></div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-6"><label class="form-label fw-medium">Hora Início</label><input type="time" class="form-control"></div>
-                    <div class="col-6"><label class="form-label fw-medium">Hora Fim</label><input type="time" class="form-control"></div>
-                </div>
-                <div class="mb-3"><label class="form-label fw-medium">Valor (R$)</label><input type="number" step="0.01" class="form-control" placeholder="0,00"></div>
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2"></i>Nova Reserva Manual</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button><button type="button" class="btn-primary-admin" onclick="alert('Reserva criada!');bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide()">Criar Reserva</button></div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Cliente</label>
+                    <input type="text" class="form-control" placeholder="Nome do cliente">
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-medium">Quadra</label>
+                        <select class="form-select">
+                            <option>Society Premium</option>
+                            <option>Futsal Arena</option>
+                            <option>Beach Tennis #1</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-medium">Data</label>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-medium">Hora Início</label>
+                        <input type="time" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-medium">Hora Fim</label>
+                        <input type="time" class="form-control">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Valor (R$)</label>
+                    <input type="number" step="0.01" class="form-control" placeholder="0,00">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="alert('Reserva criada!');bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide()">
+                    <i class="bi bi-check-circle"></i> Criar Reserva
+                </button>
+            </div>
         </div>
     </div>
 </div>

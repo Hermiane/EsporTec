@@ -33,7 +33,7 @@
         .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin: 0.5rem 0; }
         .stat-label { font-size: 0.85rem; color: #64748B; font-weight: 500; }
         
-        .agenda-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .agenda-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
         .table-custom { width: 100%; border-collapse: collapse; }
         .table-custom th { text-align: left; padding: 1rem; color: #64748B; font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #E2E8F0; }
         .table-custom td { padding: 1rem; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
@@ -42,11 +42,17 @@
         .dot-yellow { background: #F59E0B; }
         .dot-red { background: #EF4444; }
         
-        .btn-action { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; border: none; cursor: pointer; font-weight: 600; margin-right: 0.3rem; }
+        .btn-action { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; border: none; cursor: pointer; font-weight: 600; margin-right: 0.3rem; display: inline-flex; align-items: center; gap: 0.3rem; }
         .btn-checkin { background: rgba(16, 185, 129, 0.1); color: var(--accent); }
         .btn-checkin:hover { background: var(--accent); color: white; }
         .btn-report { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
         .btn-report:hover { background: #EF4444; color: white; }
+        .btn-pay { background: rgba(59,130,246,0.1); color: var(--secondary); }
+        .btn-pay:hover { background: var(--secondary); color: white; }
+        
+        .badge-payment { padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .badge-paid { background: rgba(16,185,129,0.15); color: var(--accent); }
+        .badge-pending { background: rgba(245,158,11,0.15); color: #F59E0B; }
         
         @media (max-width: 992px) { .sidebar { display: none; } }
     </style>
@@ -56,12 +62,12 @@
 <div class="layout">
     <!-- Sidebar -->
     <aside class="sidebar">
-        <a href="/painel-funcionario" class="sidebar-brand">EsporTec <span style="font-size:0.8rem; opacity:0.7;">Staff</span></a>
+        <a href="/painel-funcionario" class="sidebar-brand">EsporTec <span style="font-size:0.8rem; opacity:0.7;">Área do Funcionário</span></a>
         <nav>
             <a href="/painel-funcionario" class="nav-link active"><i class="bi bi-grid"></i> Agenda do Dia</a>
             <a href="/funcionario/perfil" class="nav-link"><i class="bi bi-person"></i> Meu Perfil</a>
-            <a href="#" class="nav-link" onclick="alert('📅 Agenda Completa: Filtro por data/mês será integrado ao backend')"><i class="bi bi-calendar-check"></i> Agenda Completa</a>
-            <a href="#" class="nav-link" onclick="alert('👥 Lista de Clientes: Será puxada da tabela users (role=cliente)')"><i class="bi bi-people"></i> Clientes</a>
+            <a href="#" class="nav-link" onclick="alert('Agenda Completa: Filtro por data/mês será integrado ao backend')"><i class="bi bi-calendar-check"></i> Agenda Completa</a>
+            <a href="#" class="nav-link" onclick="alert('Lista de Clientes: Será puxada da tabela users (role=cliente)')"><i class="bi bi-people"></i> Clientes</a>
             <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#modalManutencao"><i class="bi bi-tools"></i> Manutenção</a>
         </nav>
         <div style="margin-top: auto;">
@@ -94,7 +100,7 @@
             <div class="stat-card">
                 <div class="stat-label">Quadras Ativas</div>
                 <div class="stat-value">3/4</div>
-                <small class="text-warning">1 em manutenção</small>
+                <small class="text-warning"><i class="bi bi-wrench"></i> 1 em manutenção</small>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Próximo Check-in</div>
@@ -103,7 +109,7 @@
             </div>
         </div>
 
-        <!-- Agenda do Dia -->
+        <!-- Agenda do Dia (RF10: Coluna Pagamento) -->
         <div class="agenda-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0">Partidas de Hoje</h4>
@@ -120,6 +126,7 @@
                             <th>Quadra</th>
                             <th>Cliente</th>
                             <th>Status</th>
+                            <th>Pagamento</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -134,8 +141,11 @@
                                 </div>
                             </td>
                             <td><span class="status-dot dot-green"></span> Em Jogo</td>
+                            <td><span class="badge-payment badge-paid">Pago (PIX)</span></td>
                             <td>
-                                <button class="btn-action btn-report" onclick="alert('Relatório de manutenção aberto para Futsal Arena.')">🔧 Manutenção</button>
+                                <button class="btn-action btn-report" onclick="alert('Relatório de manutenção aberto para Futsal Arena.')">
+                                    <i class="bi bi-tools"></i> Manutenção
+                                </button>
                             </td>
                         </tr>
                         <tr>
@@ -149,7 +159,12 @@
                             </td>
                             <td><span class="status-dot dot-yellow"></span> Pendente</td>
                             <td>
-                                <button class="btn-action btn-checkin" onclick="checkin(this)">✅ Check-in</button>
+                                <span class="badge-payment badge-pending" id="pag-status-123">Pendente (Dinheiro)</span>
+                            </td>
+                            <td>
+                                <button class="btn-action btn-pay" onclick="atualizarPagamento('123')">
+                                    <i class="bi bi-check-circle"></i> Confirmar Pgto
+                                </button>
                             </td>
                         </tr>
                         <tr>
@@ -162,8 +177,11 @@
                                 </div>
                             </td>
                             <td><span class="status-dot dot-green"></span> Confirmada</td>
+                            <td><span class="badge-payment badge-paid">Pago (Cartão)</span></td>
                             <td>
-                                <button class="btn-action btn-checkin" onclick="checkin(this)">✅ Check-in</button>
+                                <button class="btn-action btn-checkin" onclick="checkin(this)">
+                                    <i class="bi bi-check-circle"></i> Confirmar Chegada
+                                </button>
                             </td>
                         </tr>
                         <tr>
@@ -171,9 +189,47 @@
                             <td class="text-muted">Society Premium</td>
                             <td class="text-muted">João Silva</td>
                             <td><span class="status-dot" style="background:#CBD5E1;"></span> Agendado</td>
+                            <td><span class="badge-payment badge-pending">Pendente (PIX)</span></td>
                             <td>
                                 <button class="btn-action btn-checkin" style="opacity:0.5; cursor:not-allowed;">Aguardando</button>
                             </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Feedbacks dos Clientes (RF11) -->
+        <div class="agenda-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0"><i class="bi bi-chat-square-text me-2"></i>Feedbacks Recebidos</h4>
+                <span class="badge bg-secondary">Últimos 7 dias</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Quadra/Data</th>
+                            <th>Nota</th>
+                            <th>Comentário</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>João Silva</td>
+                            <td>Society Premium<br><small class="text-muted">14/06</small></td>
+                            <td><span class="text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></span></td>
+                            <td>"Gramado impecável e iluminação excelente. Voltaremos semana que vem!"</td>
+                            <td><button class="btn btn-sm btn-outline-primary" onclick="alert('Campo de resposta será implementado no backend.')">Responder</button></td>
+                        </tr>
+                        <tr>
+                            <td>Ana Lima</td>
+                            <td>Beach Tennis #1<br><small class="text-muted">10/06</small></td>
+                            <td><span class="text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i></span></td>
+                            <td>"Ótima quadra, mas o bebedouro estava sem água no último jogo."</td>
+                            <td><button class="btn btn-sm btn-outline-primary" onclick="alert('Campo de resposta será implementado no backend.')">Responder</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -187,7 +243,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold">🔧 Reportar Problema / Manutenção</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-tools me-2"></i>Reportar Problema / Manutenção</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -216,7 +272,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="alert('✅ Solicitação de manutenção registrada!');bootstrap.Modal.getInstance(document.getElementById('modalManutencao')).hide()">Registrar</button>
+                <button type="button" class="btn btn-primary" onclick="alert('Solicitação de manutenção registrada!');bootstrap.Modal.getInstance(document.getElementById('modalManutencao')).hide()">
+                    <i class="bi bi-check-circle"></i> Registrar
+                </button>
             </div>
         </div>
     </div>
@@ -227,7 +285,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold">📋 Nova Reserva Manual</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-clipboard me-2"></i>Nova Reserva Manual</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -270,7 +328,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="alert('✅ Reserva criada com sucesso!');bootstrap.Modal.getInstance(document.getElementById('modalReservaManual')).hide()">Criar Reserva</button>
+                <button type="button" class="btn btn-primary" onclick="alert('Reserva criada com sucesso!');bootstrap.Modal.getInstance(document.getElementById('modalReservaManual')).hide()">
+                    <i class="bi bi-check-circle"></i> Criar Reserva
+                </button>
             </div>
         </div>
     </div>
@@ -288,9 +348,18 @@
             const actionsCell = row.cells[4];
             const finishBtn = document.createElement('button');
             finishBtn.className = 'btn-action btn-report';
-            finishBtn.textContent = '🏁 Finalizar';
+            finishBtn.innerHTML = '<i class="bi bi-flag"></i> Finalizar';
             finishBtn.onclick = function() { alert('Jogo finalizado. Quadra liberada.'); };
             actionsCell.appendChild(finishBtn);
+        }
+    }
+
+    function atualizarPagamento(id) {
+        if(confirm('Confirmar recebimento do pagamento?')) {
+            const badge = document.getElementById('pag-status-' + id);
+            badge.className = 'badge-payment badge-paid';
+            badge.textContent = 'Pago (Confirmado)';
+            event.target.style.display = 'none';
         }
     }
 </script>

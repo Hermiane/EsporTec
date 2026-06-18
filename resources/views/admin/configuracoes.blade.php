@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --admin-dark: #0F172A; --primary: #3B82F6; --success: #10B981; --bg: #F8FAFC; }
+        :root { --admin-dark: #0F172A; --primary: #3B82F6; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; --bg: #F8FAFC; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; margin: 0; }
         .layout { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: var(--admin-dark); color: white; padding: 1.5rem; }
@@ -16,16 +16,16 @@
         .nav-link { color: #94A3B8; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
         .main { flex: 1; padding: 2rem; }
-        .header { margin-bottom: 2rem; }
-        .header h1 { font-size: 1.6rem; font-weight: 700; margin: 0; }
-        .settings-container { max-width: 900px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--admin-dark); margin: 0; }
+        .settings-container { max-width: 1000px; }
         .settings-card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
-        .settings-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #F1F5F9; }
+        .settings-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #F1F5F9; display: flex; align-items: center; gap: 0.5rem; }
         .form-label { font-weight: 500; margin-bottom: 0.5rem; }
         .form-control, .form-select { border-radius: 8px; padding: 0.7rem; border: 1px solid #E2E8F0; }
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
         .help-text { font-size: 0.85rem; color: #64748B; margin-top: 0.3rem; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
         .btn-save:hover { background: #2563EB; }
         .toggle-switch { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #F1F5F9; }
         .toggle-switch:last-child { border-bottom: none; }
@@ -38,7 +38,7 @@
     <aside class="sidebar">
         <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
         <nav>
-            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-grid"></i> Dashboard</a>
+            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-grid"></i> Visão Geral</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
             <a href="/admin/pessoas" class="nav-link"><i class="bi bi-people"></i> Usuários</a>
@@ -47,17 +47,17 @@
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
-    
+
     <main class="main">
         <div class="header">
-            <h1>⚙️ Configurações do Sistema</h1>
-            <p class="text-muted">Personalize o sistema conforme suas necessidades</p>
+            <h1><i class="bi bi-gear-wide-connected me-2"></i>Configurações do Sistema</h1>
+            <span class="badge bg-secondary">Super Admin</span>
         </div>
 
         <div class="settings-container">
-            <!-- Configurações da Arena -->
+            <!-- Dados da Arena -->
             <div class="settings-card">
-                <div class="settings-title">🏟️ Dados da Arena</div>
+                <div class="settings-title"><i class="bi bi-building"></i> Dados da Arena</div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Nome da Arena</label>
@@ -86,7 +86,7 @@
 
             <!-- Horários de Funcionamento -->
             <div class="settings-card">
-                <div class="settings-title">🕐 Horários de Funcionamento</div>
+                <div class="settings-title"><i class="bi bi-clock"></i> Horários de Funcionamento</div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Horário de Abertura</label>
@@ -114,7 +114,7 @@
 
             <!-- Regras de Reserva -->
             <div class="settings-card">
-                <div class="settings-title">📋 Regras de Reserva</div>
+                <div class="settings-title"><i class="bi bi-calendar3"></i> Regras de Reserva</div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Antecedência Mínima (horas)</label>
@@ -140,9 +140,9 @@
                 </div>
             </div>
 
-            <!-- Configurações de Pagamento -->
+            <!-- Configurações Financeiras e Pagamento -->
             <div class="settings-card">
-                <div class="settings-title">💳 Formas de Pagamento</div>
+                <div class="settings-title"><i class="bi bi-credit-card"></i> Formas de Pagamento e PIX</div>
                 <div class="toggle-switch">
                     <div>
                         <div class="fw-medium">Aceitar PIX</div>
@@ -173,7 +173,7 @@
 
             <!-- Notificações -->
             <div class="settings-card">
-                <div class="settings-title">🔔 Notificações</div>
+                <div class="settings-title"><i class="bi bi-bell"></i> Notificações e Feedback</div>
                 <div class="toggle-switch">
                     <div>
                         <div class="fw-medium">Enviar Confirmação por E-mail</div>
@@ -184,23 +184,52 @@
                 <div class="toggle-switch">
                     <div>
                         <div class="fw-medium">Lembrete Automático</div>
-                        <div class="help-text">Enviar lembrete X horas antes da partida</div>
+                        <div class="help-text">Enviar lembrete antes da partida</div>
                     </div>
                     <input type="checkbox" class="form-check-input" checked>
                 </div>
                 <div class="toggle-switch">
                     <div>
-                        <div class="fw-medium">Feedback Pós-Jogo</div>
-                        <div class="help-text">Solicitar avaliação após a partida</div>
+                        <div class="fw-medium">Solicitar Feedback Pós-Jogo</div>
+                        <div class="help-text">Envia formulário de avaliação após a partida</div>
                     </div>
                     <input type="checkbox" class="form-check-input" checked>
                 </div>
             </div>
 
+            <!-- Segurança -->
+            <div class="settings-card">
+                <div class="settings-title"><i class="bi bi-shield-lock"></i> Segurança e Acesso</div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Tempo de Expiração do Código (minutos)</label>
+                        <input type="number" class="form-control" value="15" min="5" max="60">
+                        <div class="help-text">Tempo válido para redefinição de senha</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Máximo de Tentativas de Login</label>
+                        <input type="number" class="form-control" value="5" min="1" max="10">
+                        <div class="help-text">Bloqueia a conta após X tentativas falhas</div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Tempo de Bloqueio (minutos)</label>
+                        <input type="number" class="form-control" value="15" min="5">
+                        <div class="help-text">Duração do bloqueio após muitas tentativas</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Duração da Sessão (dias)</label>
+                        <input type="number" class="form-control" value="30" min="1">
+                        <div class="help-text">Tempo até exigir novo login</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Botão Salvar -->
-            <div class="text-end">
-                <button class="btn-save" onclick="alert('✅ Configurações salvas com sucesso! (Simulação)')">
-                    <i class="bi bi-check-lg me-2"></i>Salvar Configurações
+            <div class="text-end mt-4">
+                <button class="btn-save" onclick="alert('Configurações salvas com sucesso! (Simulação de integração com tabela configuracoes)')">
+                    <i class="bi bi-check-lg"></i> Salvar Configurações
                 </button>
             </div>
         </div>

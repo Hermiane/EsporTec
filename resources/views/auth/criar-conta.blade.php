@@ -44,6 +44,12 @@
                     <input type="date" class="form-control">
                 </div>
             </div>
+            <!-- Campo Endereço (RF02) -->
+            <div class="mb-3">
+                <label class="form-label fw-medium">Endereço Completo</label>
+                <input type="text" class="form-control" placeholder="Rua, Nº, Bairro, Cidade" required>
+                <small class="text-muted">Necessário para envio de ofertas e notificações.</small>
+            </div>
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Senha</label>
