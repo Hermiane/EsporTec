@@ -8,7 +8,7 @@
     <div class="container py-5">
         <h1 class="mb-4">🎯 EsporTec - Menu de Testes</h1>
         <p class="lead mb-4">Selecione um perfil para navegar:</p>
-        
+
         <div class="row g-4">
             <!-- Área Pública -->
             <div class="col-md-4">
@@ -39,7 +39,7 @@
 
             <!-- Área do Funcionário -->
 
-            
+
             <div class="col-md-4">
                 <div class="card h-100 border-primary">
                     <div class="card-body">
@@ -68,7 +68,7 @@
         </div>
 
         <div class="alert alert-info mt-4">
-            <strong>💡 Dica:</strong> Quando o backend estiver pronto, você fará login e será redirecionado automaticamente!
+            <strong>Navegação:</strong> Use esta tela para conferir rapidamente os principais módulos do sistema.
         </div>
     </div>
 </body>

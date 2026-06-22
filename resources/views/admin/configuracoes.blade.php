@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -38,12 +38,15 @@
     <aside class="sidebar">
         <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
         <nav>
-            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-grid"></i> Visão Geral</a>
+            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
-            <a href="/admin/pessoas" class="nav-link"><i class="bi bi-people"></i> Usuários</a>
+            <a href="/admin/quadras" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Quadras</a>
+            <a href="/admin/equipe" class="nav-link"><i class="bi bi-person-badge"></i> Equipe</a>
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
+            <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link active"><i class="bi bi-gear"></i> Configurações</a>
+            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
@@ -228,13 +231,31 @@
 
             <!-- Botão Salvar -->
             <div class="text-end mt-4">
-                <button class="btn-save" onclick="alert('Configurações salvas com sucesso! (Simulação de integração com tabela configuracoes)')">
+                <button class="btn-save" id="btnSalvarConfiguracoes">
                     <i class="bi bi-check-lg"></i> Salvar Configurações
                 </button>
+            </div>
+            <div class="alert alert-success mt-3 d-none" id="configResumo">
+                <i class="bi bi-check-circle me-2"></i>Configurações aplicadas nesta tela.
             </div>
         </div>
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
+<script>
+    document.getElementById('btnSalvarConfiguracoes').addEventListener('click', () => {
+        const button = document.getElementById('btnSalvarConfiguracoes');
+        const original = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-hourglass-split"></i> Salvando...';
+        setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = original;
+            document.getElementById('configResumo').classList.remove('d-none');
+            esportecToast('Configurações aplicadas.', 'success');
+        }, 600);
+    });
+</script>
 </body>
 </html>

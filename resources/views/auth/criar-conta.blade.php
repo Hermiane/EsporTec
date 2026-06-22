@@ -24,7 +24,7 @@
             <h2 class="fw-bold" style="color: var(--primary);">Criar Conta</h2>
             <p class="text-muted">Preencha seus dados para começar</p>
         </div>
-        <form>
+        <form id="createAccountForm">
             @csrf
             <div class="mb-3">
                 <label class="form-label fw-medium">Nome Completo</label>
@@ -53,11 +53,11 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Senha</label>
-                    <input type="password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" class="form-control" id="senha" placeholder="••••••••" required minlength="6">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Confirmar Senha</label>
-                    <input type="password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" class="form-control" id="confirmarSenha" placeholder="••••••••" required minlength="6">
                 </div>
             </div>
             <div class="form-check mb-4">
@@ -72,5 +72,18 @@
             <p class="mb-0">Já tem conta? <a href="/login" class="auth-link">Entrar</a></p>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/esportec-ui.js"></script>
+    <script>
+        document.getElementById('createAccountForm').addEventListener('submit', event => {
+            event.preventDefault();
+            if (document.getElementById('senha').value !== document.getElementById('confirmarSenha').value) {
+                esportecToast('As senhas precisam ser iguais.', 'warning');
+                return;
+            }
+            esportecToast('Conta criada com sucesso.', 'success');
+            setTimeout(() => window.location.href = '/painel', 800);
+        });
+    </script>
 </body>
 </html>

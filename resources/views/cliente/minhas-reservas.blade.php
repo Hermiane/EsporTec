@@ -14,26 +14,27 @@
         .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
         .btn-back { width: 40px; height: 40px; border-radius: 10px; background: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
         .btn-back:hover { background: var(--light); }
-        
+
         /* Abas */
         .tabs-container { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: white; padding: 0.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .tab-btn { flex: 1; padding: 0.8rem; border: none; background: transparent; border-radius: 8px; font-weight: 600; color: var(--gray); cursor: pointer; transition: all 0.2s; font-family: inherit; }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(45,129,93,0.3); }
-        
+
         /* Cards de Reserva */
         .reserva-card { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.04); display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
         .reserva-info { flex: 1; min-width: 200px; }
         .reserva-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.3rem; }
         .reserva-meta { font-size: 0.9rem; color: var(--gray); display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
         .reserva-meta i { margin-right: 0.3rem; }
-        
+
         /* Badges de Status */
         .badge-status { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
         .badge-pendente { background: rgba(249,168,37,0.15); color: #F9A825; }
         .badge-confirmada { background: rgba(45,129,93,0.15); color: var(--primary); }
+        .badge-pago { background: rgba(21,101,192,0.15); color: #1565C0; }
         .badge-cancelada { background: rgba(211,47,47,0.15); color: #D32F2F; }
         .badge-concluida { background: rgba(21,101,192,0.15); color: #1565C0; }
-        
+
         .reserva-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .btn-action { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
@@ -42,11 +43,11 @@
         .btn-outline:hover { background: #F1F5F9; }
         .btn-danger { background: rgba(239,68,68,0.1); color: #EF4444; }
         .btn-danger:hover { background: rgba(239,68,68,0.2); }
-        
+
         .tab-content { display: none; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
+
         .empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray); }
         .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
     </style>
@@ -76,12 +77,13 @@
                     <span><i class="bi bi-clock"></i> 19:00 - 20:30</span>
                     <span><i class="bi bi-cash-stack"></i> R$ 225,00</span>
                 </div>
-                <span class="badge-status badge-pendente">Pendente</span>
+                <span class="badge-status badge-confirmada">Reserva confirmada</span>
+                <span class="badge-status badge-pendente ms-2">Pagamento pendente</span>
             </div>
             <div class="reserva-actions">
                 <button class="btn-action btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes"><i class="bi bi-eye"></i> Detalhes</button>
                 <a href="#" class="btn-action btn-outline" onclick="compartilhar('Society Premium - 14/06 19:00')"><i class="bi bi-whatsapp"></i> Compartilhar</a>
-                <button class="btn-action btn-danger" onclick="confirmarCancelamento()"><i class="bi bi-x-circle"></i> Cancelar</button>
+                <button class="btn-action btn-danger" onclick="confirmarCancelamento(this)"><i class="bi bi-x-circle"></i> Cancelar</button>
             </div>
         </div>
 
@@ -93,7 +95,8 @@
                     <span><i class="bi bi-clock"></i> 16:00 - 17:00</span>
                     <span><i class="bi bi-cash-stack"></i> R$ 120,00</span>
                 </div>
-                <span class="badge-status badge-confirmada">Confirmada</span>
+                <span class="badge-status badge-confirmada">Reserva confirmada</span>
+                <span class="badge-status badge-pago ms-2">Pagamento pago</span>
             </div>
             <div class="reserva-actions">
                 <button class="btn-action btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes"><i class="bi bi-eye"></i> Detalhes</button>
@@ -106,7 +109,7 @@
     <div id="passadas" class="tab-content">
         <div class="reserva-card">
             <div class="reserva-info">
-                <div class="reserva-title">Beach Tennis #2</div>
+                <div class="reserva-title">Quadra Society Descoberta</div>
                 <div class="reserva-meta">
                     <span><i class="bi bi-calendar3"></i> 10/06/2026</span>
                     <span><i class="bi bi-clock"></i> 10:00 - 11:00</span>
@@ -135,7 +138,7 @@
             </div>
             <div class="reserva-actions">
                 <button class="btn-action btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes"><i class="bi bi-eye"></i> Detalhes</button>
-                <a href="#" class="btn-action btn-outline" onclick="alert('Reagendamento não disponível para reservas canceladas. Faça uma nova reserva.')"><i class="bi bi-arrow-repeat"></i> Reagendar</a>
+                <a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>
             </div>
         </div>
     </div>
@@ -184,7 +187,7 @@
                     <div class="col-12">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Forma de Pagamento</small>
-                            <strong><i class="bi bi-qr-code me-2"></i>PIX</strong>
+                            <strong><i class="bi bi-cash-coin me-2"></i>Dinheiro - pagamento pendente</strong>
                         </div>
                     </div>
                     <div class="col-12">
@@ -194,7 +197,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mt-4 p-3 border rounded">
                     <strong class="d-block mb-2">📍 Localização:</strong>
                     <p class="mb-1">Rua dos Esportes, 123 - São Paulo, SP</p>
@@ -203,10 +206,10 @@
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-danger" onclick="alert('Cancelar reserva')">
+                <button type="button" class="btn btn-danger" onclick="confirmarCancelamento(document.querySelector('#proximas .reserva-card'))">
                     <i class="bi bi-x-circle me-2"></i>Cancelar Reserva
                 </button>
-                <button type="button" class="btn btn-success" onclick="alert('Compartilhar no WhatsApp')">
+                <button type="button" class="btn btn-success" onclick="compartilhar('Society Premium - 14/06 19:00')">
                     <i class="bi bi-whatsapp me-2"></i>Compartilhar
                 </button>
             </div>
@@ -224,7 +227,7 @@
             </div>
             <div class="modal-body text-center">
                 <p class="text-muted mb-3">Como foi sua experiência na <strong>Society Premium</strong>?</p>
-                
+
                 <div class="mb-4">
                     <div class="d-flex justify-content-center gap-2 mb-3" id="stars">
                         <i class="bi bi-star fs-1 text-warning" style="cursor: pointer;" onclick="setRating(1)"></i>
@@ -235,12 +238,12 @@
                     </div>
                     <input type="hidden" id="rating" value="0">
                 </div>
-                
+
                 <div class="mb-3">
                     <label class="form-label fw-medium">Comentário (opcional)</label>
                     <textarea class="form-control" rows="3" placeholder="Conte-nos como foi sua experiência..."></textarea>
                 </div>
-                
+
                 <div class="form-check text-start mb-3">
                     <input type="checkbox" class="form-check-input" id="recomendar">
                     <label class="form-check-label" for="recomendar">Recomendaria para outros jogadores</label>
@@ -257,6 +260,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
 <script>
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -270,9 +274,17 @@
         window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 
-    function confirmarCancelamento() {
-        if(confirm('Tem certeza que deseja cancelar esta reserva? O valor será estornado conforme a política.')) {
-            alert('✅ Reserva cancelada com sucesso.');
+    function confirmarCancelamento(trigger) {
+        if(confirm('Tem certeza que deseja cancelar esta reserva?')) {
+            const card = trigger.closest ? trigger.closest('.reserva-card') : trigger;
+            if (card) {
+                card.querySelectorAll('.badge-status').forEach(badge => badge.remove());
+                card.querySelector('.reserva-info').insertAdjacentHTML('beforeend', '<span class="badge-status badge-cancelada">Cancelada</span>');
+                card.querySelector('.reserva-actions').innerHTML = '<a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>';
+                document.getElementById('canceladas').prepend(card);
+            }
+            bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
+            esportecToast('Reserva cancelada e movida para a aba Canceladas.', 'success');
         }
     }
 
@@ -294,10 +306,12 @@
     function submitAvaliacao() {
         const rating = document.getElementById('rating').value;
         if (rating == 0) {
-            alert('Por favor, selecione uma nota de 1 a 5 estrelas');
+            esportecToast('Selecione uma nota de 1 a 5 estrelas.', 'warning');
             return;
         }
-        alert('✅ Avaliação enviada com sucesso! Obrigado pelo feedback.');
+        esportecToast('Avaliação enviada com sucesso. Obrigado pelo feedback.', 'success');
+        document.querySelector('[data-bs-target="#modalAvaliacao"]').innerHTML = '<i class="bi bi-check2"></i> Avaliada';
+        document.querySelector('[data-bs-target="#modalAvaliacao"]').disabled = true;
         bootstrap.Modal.getInstance(document.getElementById('modalAvaliacao')).hide();
     }
 </script>

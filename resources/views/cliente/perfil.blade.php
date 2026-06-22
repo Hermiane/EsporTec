@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
         .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
         .btn-back { width: 40px; height: 40px; border-radius: 10px; background: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
         .btn-back:hover { background: var(--light); }
-        
+
         /* Card de Perfil */
         .profile-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
         .profile-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
@@ -25,28 +25,28 @@
         .profile-info h3 { font-weight: 700; margin: 0 0 0.3rem 0; }
         .profile-info p { color: var(--gray); margin: 0; }
         .badge-member { background: var(--light); color: var(--primary); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-top: 0.5rem; }
-        
+
         /* Formulário */
         .form-section { margin-bottom: 2rem; }
         .form-section-title { font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #E2E8F0; }
         .form-control, .form-select { border-radius: 10px; padding: 0.8rem; border: 1px solid #E2E8F0; }
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45,129,93,0.15); }
         .form-text { font-size: 0.8rem; color: var(--gray); }
-        
+
         /* Toggle Switch */
         .form-check-switch { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #F1F5F9; }
         .form-check-switch:last-child { border-bottom: none; }
         .form-check-input { width: 40px; height: 22px; margin: 0; }
         .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
-        
+
         /* Botões */
         .btn-save { background: var(--primary); color: white; border: none; padding: 0.8rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-save:hover { background: var(--dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(45,129,93,0.3); }
         .btn-cancel { background: #F1F5F9; color: var(--gray); border: none; padding: 0.8rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; margin-right: 0.5rem; }
         .btn-cancel:hover { background: #E2E8F0; }
-        
+
         .btn-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 2rem; }
-        
+
         @media (max-width: 576px) {
             .profile-header { flex-direction: column; text-align: center; }
             .btn-actions { flex-direction: column; }
@@ -157,17 +157,18 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
 <script>
     function salvarPerfil() {
         // Simulação de salvamento
         const btn = document.querySelector('.btn-save');
         const originalText = btn.innerHTML;
-        
+
         btn.disabled = true;
         btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Salvando...';
-        
+
         setTimeout(() => {
-            alert('✅ Perfil atualizado com sucesso!');
+            esportecToast('Perfil atualizado com sucesso.', 'success');
             btn.disabled = false;
             btn.innerHTML = originalText;
         }, 1200);
@@ -175,7 +176,11 @@
 
     // Simular upload de avatar
     document.querySelector('.avatar-btn').addEventListener('click', function() {
-        alert('📷 Funcionalidade de upload de foto será implementada na versão final.');
+        const avatar = document.querySelector('.avatar-circle, .avatar');
+        if (avatar) {
+            avatar.src = 'https://ui-avatars.com/api/?name=Foto+Atualizada&background=1F5C42&color=fff&size=200';
+        }
+        esportecToast('Foto de perfil selecionada para pré-visualização.', 'success');
     });
 </script>
 </body>

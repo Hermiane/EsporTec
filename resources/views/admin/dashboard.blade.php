@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --admin-dark: #0F172A; --primary: #3B82F6; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; --bg: #F8FAFC; }
+        :root { --admin-dark: #1F5C42; --primary: #2D815D; --success: #2D815D; --warning: #F9A825; --danger: #D32F2F; --bg: #F8FAFC; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; margin: 0; }
         .layout { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: var(--admin-dark); color: white; padding: 1.5rem; }
@@ -46,16 +46,19 @@
     <aside class="sidebar">
         <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
         <nav>
-            <a href="/admin/dashboard" class="nav-link active"><i class="bi bi-grid"></i> Visão Geral</a>
+            <a href="/admin/dashboard" class="nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
-            <a href="/admin/pessoas" class="nav-link"><i class="bi bi-people"></i> Usuários</a>
+            <a href="/admin/quadras" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Quadras</a>
+            <a href="/admin/equipe" class="nav-link"><i class="bi bi-person-badge"></i> Equipe</a>
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
+            <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
+            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
-    
+
     <main class="main">
         <div class="header">
             <h1><i class="bi bi-speedometer2 me-2"></i>Visão Geral do Sistema</h1>
@@ -140,5 +143,6 @@
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
 </body>
 </html>

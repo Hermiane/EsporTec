@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -93,7 +93,7 @@
         <span class="badge-info">💡 Iluminação LED</span>
     </div>
     <p class="description">
-        Quadra society com grama sintética de última geração, marcações oficiais e iluminação LED de alta performance. 
+        Quadra society com grama sintética de última geração, marcações oficiais e iluminação LED de alta performance.
         Ideal para campeonatos, treinos intensos e partidas entre amigos. Dispõe de vestiários, bebedouro e estacionamento gratuito.
     </p>
 
@@ -111,7 +111,9 @@
         <div class="price-value">R$ 150,00</div>
         <small class="text-muted">Pagamento via PIX ou Cartão</small>
     </div>
-    <a href="/nova-reserva" class="btn-reserve text-center d-block text-decoration-none">Reservar Agora</a>
+    <a href="/nova-reserva" class="btn btn-success w-100 py-3 mt-3">
+    Reservar esta Quadra
+</a>
 
     <!-- Avaliações -->
     <h4 class="fw-bold mt-5 mb-3">⭐ Avaliações dos Jogadores</h4>
@@ -142,16 +144,17 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
 <script>
     // Gerar grade de horários
     const grid = document.getElementById('grade-horarios');
     const hours = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
-    
+
     hours.forEach(hour => {
         const slot = document.createElement('div');
         slot.className = 'time-slot time-available';
         slot.textContent = hour;
-        
+
         // Simular ocupados aleatoriamente
         if (Math.random() > 0.75) {
             slot.className = 'time-slot time-busy';

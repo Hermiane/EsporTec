@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -38,7 +38,7 @@
             <a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a>
         </nav>
     </aside>
-    
+
     <main class="main">
         <div class="profile-card">
             <div class="profile-header">
@@ -47,7 +47,7 @@
                 <span class="badge-role">👨‍💼 Funcionário</span>
                 <p class="text-muted mt-2 mb-0">Matrícula: FUNC-2024-089</p>
             </div>
-            
+
             <div class="info-row">
                 <span class="info-label">📧 E-mail</span>
                 <span class="info-value">maria.silva@esportec.com.br</span>
@@ -80,13 +80,49 @@
                 <span class="info-label">🔐 Permissões</span>
                 <span class="info-value">Agendar, Confirmar, Cancelar</span>
             </div>
-            
-            <button class="btn-edit" onclick="alert('✏️ Edição de perfil será implementada com o backend')">
+
+            <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
                 <i class="bi bi-pencil me-2"></i>Editar Perfil
             </button>
         </div>
     </main>
 </div>
+<div class="modal fade" id="modalEditarPerfil" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Editar perfil profissional</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Telefone</label>
+                <input class="form-control mb-3" id="funcTelefone" value="(11) 98765-4321">
+                <label class="form-label">Turno</label>
+                <select class="form-select mb-3" id="funcTurno">
+                    <option>Tarde (12:00 - 20:00)</option>
+                    <option>Manhã (07:00 - 15:00)</option>
+                    <option>Noite (15:00 - 23:00)</option>
+                </select>
+                <label class="form-label">Permissões</label>
+                <input class="form-control" id="funcPermissoes" value="Agendar, Confirmar, Cancelar">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" id="btnSalvarPerfilFuncionario">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
+<script>
+    document.getElementById('btnSalvarPerfilFuncionario').addEventListener('click', () => {
+        document.querySelectorAll('.info-row')[1].querySelector('.info-value').textContent = document.getElementById('funcTelefone').value;
+        document.querySelectorAll('.info-row')[4].querySelector('.info-value').textContent = document.getElementById('funcTurno').value;
+        document.querySelectorAll('.info-row')[7].querySelector('.info-value').textContent = document.getElementById('funcPermissoes').value;
+        bootstrap.Modal.getInstance(document.getElementById('modalEditarPerfil')).hide();
+        esportecToast('Perfil profissional atualizado.', 'success');
+    });
+</script>
 </body>
 </html>

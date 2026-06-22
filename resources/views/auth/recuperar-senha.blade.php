@@ -95,16 +95,18 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/esportec-ui.js"></script>
     <script>
         function nextStep(step) {
             // Esconde todos os passos
             document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.step-dot').forEach(el => el.classList.remove('active'));
-            
+
             // Mostra o passo atual
             document.getElementById('step-' + step).classList.add('active');
             document.getElementById('dot-' + step).classList.add('active');
-            
+
             // Inicia timer se for passo 2
             if (step === 2) startTimer();
         }
@@ -125,7 +127,7 @@
         }
 
         function resendCode() {
-            alert('Código reenviado! Verifique seu e-mail.');
+            esportecToast('Código reenviado. Verifique seu e-mail.', 'success');
             startTimer();
         }
 
@@ -146,7 +148,7 @@
         // Submit do último passo
         document.getElementById('form-step-3').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('✅ Senha alterada com sucesso! Redirecionando para login...');
+            esportecToast('Senha alterada com sucesso. Redirecionando para login...', 'success');
             setTimeout(() => window.location.href = '/login', 1500);
         });
     </script>

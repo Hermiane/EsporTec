@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -42,12 +42,15 @@
     <aside class="sidebar">
         <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
         <nav>
-            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-grid"></i> Visão Geral</a>
+            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
-            <a href="/admin/pessoas" class="nav-link active"><i class="bi bi-people"></i> Usuários</a>
+            <a href="/admin/quadras" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Quadras</a>
+            <a href="/admin/equipe" class="nav-link"><i class="bi bi-person-badge"></i> Equipe</a>
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
+            <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
+            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
@@ -61,7 +64,7 @@
 
         <div class="card-custom">
             <h5 class="fw-bold mb-3">Administradores e Funcionários</h5>
-            
+
             <!-- Usuário Super Admin (Protegido) -->
             <div class="user-card">
                 <div class="user-avatar" style="background:#DC2626; color:white;">SA</div>
@@ -71,8 +74,7 @@
                 </div>
                 <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>
                 <!-- Botões desativados pois Super Admin não é editável -->
-                <button class="btn-action btn-edit" disabled style="opacity: 0.5;"><i class="bi bi-pencil"></i></button>
-                <button class="btn-action btn-inactive" disabled style="opacity: 0.5;"><i class="bi bi-ban"></i></button>
+                <button class="btn-action btn-edit" disabled style="opacity: 0.5;"><i class="bi bi-lock"></i> Protegido</button>
             </div>
 
             <!-- Usuário Admin -->
@@ -83,8 +85,8 @@
                     <div class="user-email">maria@esportec.com.br</div>
                 </div>
                 <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>
-                <button class="btn-action btn-edit"><i class="bi bi-pencil"></i></button>
-                <button class="btn-action btn-inactive"><i class="bi bi-ban"></i></button>
+                <button class="btn-action btn-edit" data-person-action="editar"><i class="bi bi-pencil"></i> Editar</button>
+                <button class="btn-action btn-inactive" data-person-action="toggle"><i class="bi bi-ban"></i> Inativar</button>
             </div>
 
             <!-- Usuário Funcionário -->
@@ -95,8 +97,8 @@
                     <div class="user-email">joao.silva@esportec.com.br</div>
                 </div>
                 <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>
-                <button class="btn-action btn-edit"><i class="bi bi-pencil"></i></button>
-                <button class="btn-action btn-inactive"><i class="bi bi-ban"></i></button>
+                <button class="btn-action btn-edit" data-person-action="editar"><i class="bi bi-pencil"></i> Editar</button>
+                <button class="btn-action btn-inactive" data-person-action="toggle"><i class="bi bi-ban"></i> Inativar</button>
             </div>
 
             <!-- Usuário Inativo -->
@@ -107,8 +109,8 @@
                     <div class="user-email">ana.lima@esportec.com.br</div>
                 </div>
                 <span class="badge-inactive"><i class="bi bi-x-circle me-1"></i>Inativo</span>
-                <button class="btn-action btn-edit"><i class="bi bi-pencil"></i></button>
-                <button class="btn-action btn-inactive" style="background:rgba(16,185,129,0.1); color:var(--success);"><i class="bi bi-check"></i> Reativar</button>
+                <button class="btn-action btn-edit" data-person-action="editar"><i class="bi bi-pencil"></i> Editar</button>
+                <button class="btn-action btn-inactive" data-person-action="toggle" style="background:rgba(16,185,129,0.1); color:var(--success);"><i class="bi bi-check"></i> Reativar</button>
             </div>
         </div>
     </main>
@@ -125,11 +127,11 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label fw-medium">Nome Completo</label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control" id="pessoaNome">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium">E-mail</label>
-                    <input type="email" class="form-control">
+                    <input type="email" class="form-control" id="pessoaEmail">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium">CPF</label>
@@ -137,7 +139,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium">Perfil</label>
-                    <select class="form-select">
+                    <select class="form-select" id="pessoaPerfil">
                         <option value="admin">Administrador</option>
                         <option value="funcionario">Funcionário</option>
                     </select>
@@ -155,7 +157,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="alert('Usuário criado com sucesso!');bootstrap.Modal.getInstance(document.getElementById('modalNovoUsuario')).hide()">
+                <button type="button" class="btn btn-primary" id="btnCriarUsuario">
                     <i class="bi bi-check-circle"></i> Criar Usuário
                 </button>
             </div>
@@ -164,5 +166,46 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
+<script>
+    const modalNovoUsuario = document.getElementById('modalNovoUsuario');
+
+    document.querySelectorAll('[data-person-action]').forEach(button => {
+        button.addEventListener('click', () => {
+            if (button.dataset.personAction === 'editar') {
+                bootstrap.Modal.getOrCreateInstance(modalNovoUsuario).show();
+                return;
+            }
+
+            const card = button.closest('.user-card');
+            const badge = card.querySelector('.badge-active, .badge-inactive');
+            const reativando = button.textContent.trim() === 'Reativar';
+            badge.className = reativando ? 'badge-active' : 'badge-inactive';
+            badge.innerHTML = reativando ? '<i class="bi bi-check-circle me-1"></i>Ativo' : '<i class="bi bi-x-circle me-1"></i>Inativo';
+            button.innerHTML = reativando ? '<i class="bi bi-ban"></i> Inativar' : '<i class="bi bi-check"></i> Reativar';
+            esportecToast(reativando ? 'Pessoa reativada.' : 'Pessoa inativada.', 'success');
+        });
+    });
+
+    document.getElementById('btnCriarUsuario').addEventListener('click', () => {
+        const nome = document.getElementById('pessoaNome').value.trim() || 'Novo usuário';
+        const email = document.getElementById('pessoaEmail').value.trim() || 'novo@esportec.com.br';
+        const perfil = document.getElementById('pessoaPerfil').value;
+        const iniciais = nome.split(' ').map(parte => parte[0]).join('').slice(0, 2).toUpperCase();
+        document.querySelector('.card-custom').insertAdjacentHTML('beforeend', `
+            <div class="user-card">
+                <div class="user-avatar" style="background:#10B981; color:white;">${iniciais}</div>
+                <div class="user-info">
+                    <div class="user-name">${nome} <span class="user-role ${perfil === 'admin' ? 'role-admin' : 'role-funcionario'}">${perfil === 'admin' ? 'ADMIN' : 'FUNCIONÁRIO'}</span></div>
+                    <div class="user-email">${email}</div>
+                </div>
+                <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>
+                <button class="btn-action btn-edit" disabled><i class="bi bi-check2"></i> Criado</button>
+            </div>
+        `);
+        esportecToast('Usuário criado na lista de pessoas.', 'success');
+        bootstrap.Modal.getInstance(modalNovoUsuario).hide();
+    });
+</script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -35,6 +35,7 @@
         .badge-confirmada { background: #D1FAE5; color: #065F46; }
         .badge-cancelada { background: #FEE2E2; color: #991B1B; }
         .badge-concluida { background: #DBEAFE; color: #1E40AF; }
+        .badge-pago { background: #DBEAFE; color: #1E40AF; }
         .btn-action { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; border: none; cursor: pointer; margin-right: 0.3rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem; }
         .btn-confirm { background: rgba(16,185,129,0.1); color: var(--success); }
         .btn-confirm:hover { background: var(--success); color: white; }
@@ -45,6 +46,14 @@
         .filter-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .filter-bar input, .filter-bar select { padding: 0.6rem; border: 1px solid #E2E8F0; border-radius: 8px; }
         .btn-primary-admin { background: var(--primary); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        @media (max-width: 992px) {
+            .layout { display: block; }
+            .sidebar { width: 100%; }
+            .main { padding: 1rem; }
+            .card-custom { overflow-x: auto; }
+            .table-custom { min-width: 980px; }
+            .filter-bar input, .filter-bar select { width: 100% !important; }
+        }
     </style>
 </head>
 <body>
@@ -52,12 +61,15 @@
     <aside class="sidebar">
         <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
         <nav>
-            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-grid"></i> Visão Geral</a>
+            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link active"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
-            <a href="/admin/pessoas" class="nav-link"><i class="bi bi-people"></i> Usuários</a>
+            <a href="/admin/quadras" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Quadras</a>
+            <a href="/admin/equipe" class="nav-link"><i class="bi bi-person-badge"></i> Equipe</a>
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
+            <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
+            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
@@ -68,7 +80,7 @@
                 <i class="bi bi-plus-lg me-2"></i>Nova Reserva
             </button>
         </div>
-        
+
         <!-- Stats -->
         <div class="stats-row">
             <div class="stat-box total">
@@ -132,6 +144,7 @@
                         <th>Telefone</th>
                         <th>Valor</th>
                         <th>Status</th>
+                        <th>Pagamento</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -144,9 +157,12 @@
                         <td>(11) 99999-9999</td>
                         <td>R$ 225,00</td>
                         <td><span class="badge-status badge-confirmada">Confirmada</span></td>
+                        <td><span class="badge-status badge-pendente">Dinheiro pendente</span></td>
                         <td>
-                            <button class="btn-action btn-edit"><i class="bi bi-pencil"></i></button>
-                            <button class="btn-action btn-cancel"><i class="bi bi-x-circle"></i></button>
+                            <button class="btn-action btn-confirm" data-action="confirmar-pagamento"><i class="bi bi-cash-coin"></i> Pgto</button>
+                            <button class="btn-action btn-edit" data-action="ver-comprovante"><i class="bi bi-file-earmark-image"></i> Comprovante</button>
+                            <button class="btn-action btn-edit" data-action="editar-reserva"><i class="bi bi-pencil"></i> Editar</button>
+                            <button class="btn-action btn-cancel" data-action="cancelar-reserva"><i class="bi bi-x-circle"></i> Cancelar</button>
                         </td>
                     </tr>
                     <tr>
@@ -157,10 +173,12 @@
                         <td>(11) 98888-8888</td>
                         <td>R$ 120,00</td>
                         <td><span class="badge-status badge-pendente">Pendente</span></td>
+                        <td><span class="badge-status badge-pendente">PIX pendente</span></td>
                         <td>
-                            <button class="btn-action btn-confirm"><i class="bi bi-check-circle"></i></button>
-                            <button class="btn-action btn-edit"><i class="bi bi-pencil"></i></button>
-                            <button class="btn-action btn-cancel"><i class="bi bi-x-circle"></i></button>
+                            <button class="btn-action btn-confirm" data-action="confirmar-reserva"><i class="bi bi-check-circle"></i> Confirmar</button>
+                            <button class="btn-action btn-confirm" data-action="confirmar-pagamento"><i class="bi bi-cash-coin"></i> Pgto</button>
+                            <button class="btn-action btn-edit" data-action="editar-reserva"><i class="bi bi-pencil"></i> Editar</button>
+                            <button class="btn-action btn-cancel" data-action="cancelar-reserva"><i class="bi bi-x-circle"></i> Cancelar</button>
                         </td>
                     </tr>
                     <tr>
@@ -171,9 +189,9 @@
                         <td>(11) 97777-7777</td>
                         <td>R$ 100,00</td>
                         <td><span class="badge-status badge-concluida">Concluída</span></td>
+                        <td><span class="badge-status badge-pago">Pago</span></td>
                         <td>
-                            <button class="btn-action btn-edit" disabled style="opacity:0.5"><i class="bi bi-pencil"></i></button>
-                            <button class="btn-action btn-cancel" disabled style="opacity:0.5"><i class="bi bi-x-circle"></i></button>
+                            <button class="btn-action btn-edit" disabled style="opacity:0.5"><i class="bi bi-lock"></i> Fechada</button>
                         </td>
                     </tr>
                 </tbody>
@@ -226,7 +244,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="alert('Reserva criada!');bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide()">
+                <button type="button" class="btn btn-primary" id="btnSalvarReserva">
                     <i class="bi bi-check-circle"></i> Criar Reserva
                 </button>
             </div>
@@ -235,5 +253,75 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/esportec-ui.js"></script>
+<script>
+    const modalReserva = document.getElementById('modalReserva');
+    const tableBody = document.querySelector('.table-custom tbody');
+
+    document.querySelectorAll('[data-action="editar-reserva"]').forEach(button => {
+        button.addEventListener('click', () => {
+            bootstrap.Modal.getOrCreateInstance(modalReserva).show();
+        });
+    });
+
+    document.querySelectorAll('[data-action="confirmar-reserva"]').forEach(button => {
+        button.addEventListener('click', () => {
+            const row = button.closest('tr');
+            row.querySelector('.badge-status').className = 'badge-status badge-confirmada';
+            row.querySelector('.badge-status').textContent = 'Confirmada';
+            button.remove();
+            esportecToast('Reserva confirmada.', 'success');
+        });
+    });
+
+    document.querySelectorAll('[data-action="confirmar-pagamento"]').forEach(button => {
+        button.addEventListener('click', () => {
+            const row = button.closest('tr');
+            const paymentBadge = row.children[7].querySelector('.badge-status');
+            paymentBadge.className = 'badge-status badge-pago';
+            paymentBadge.textContent = 'Pago';
+            button.remove();
+            esportecToast('Pagamento confirmado.', 'success');
+        });
+    });
+
+    document.querySelectorAll('[data-action="ver-comprovante"]').forEach(button => {
+        button.addEventListener('click', () => {
+            esportecToast('Comprovante aberto para conferência.', 'info');
+        });
+    });
+
+    document.querySelectorAll('[data-action="cancelar-reserva"]').forEach(button => {
+        button.addEventListener('click', () => {
+            if (!confirm('Cancelar esta reserva?')) {
+                return;
+            }
+            const row = button.closest('tr');
+            row.querySelector('.badge-status').className = 'badge-status badge-cancelada';
+            row.querySelector('.badge-status').textContent = 'Cancelada';
+            row.querySelectorAll('button').forEach(action => action.disabled = true);
+            esportecToast('Reserva cancelada.', 'success');
+        });
+    });
+
+    document.getElementById('btnSalvarReserva').addEventListener('click', () => {
+        const id = `#${Math.floor(2000 + Math.random() * 7000)}`;
+        tableBody.insertAdjacentHTML('afterbegin', `
+            <tr>
+                <td>${id}</td>
+                <td>Hoje<br><small>19:00 - 20:00</small></td>
+                <td>Society Premium</td>
+                <td>Reserva manual</td>
+                <td>(11) 99999-9999</td>
+                <td>R$ 150,00</td>
+                <td><span class="badge-status badge-confirmada">Confirmada</span></td>
+                <td><span class="badge-status badge-pendente">Pendente</span></td>
+                <td><button class="btn-action btn-edit" disabled><i class="bi bi-check2"></i> Criada</button></td>
+            </tr>
+        `);
+        esportecToast('Reserva manual criada na tabela.', 'success');
+        bootstrap.Modal.getInstance(modalReserva).hide();
+    });
+</script>
 </body>
 </html>
