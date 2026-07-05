@@ -61,8 +61,18 @@
 
     <main class="main">
         <div class="header">
-            <h1><i class="bi bi-speedometer2 me-2"></i>Visão Geral do Sistema</h1>
-            <p class="text-muted">Resumo operacional - Junho 2026</p>
+            <div>
+                <h1><i class="bi bi-speedometer2 me-2"></i>Visão Geral do Sistema</h1>
+                <p class="text-muted mb-0">Resumo operacional - Junho 2026</p>
+            </div>
+            <div>
+                <label class="form-label small text-muted mb-1">Arena ativa</label>
+                <select class="form-select" id="arenaAtiva">
+                    <option>EsporTec Arena</option>
+                    <option>Arena Society Cametá</option>
+                    <option>Unidade Zona Norte</option>
+                </select>
+            </div>
         </div>
 
         <div class="stats-grid">
@@ -144,5 +154,12 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script>
+    document.getElementById('arenaAtiva').addEventListener('change', event => {
+        esportecMockApi('admin.dashboard.changeArena', { arena: event.target.value }).then(() => {
+            esportecToast(`Dashboard atualizado para ${event.target.value}.`, 'success');
+        });
+    });
+</script>
 </body>
 </html>

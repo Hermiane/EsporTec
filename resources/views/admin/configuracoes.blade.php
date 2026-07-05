@@ -71,11 +71,31 @@
                         <input type="text" class="form-control" placeholder="00.000.000/0001-00">
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Endereço Completo</label>
-                    <input type="text" class="form-control" value="Rua dos Esportes, 123 - São Paulo, SP">
-                </div>
                 <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label">Logradouro</label>
+                        <input type="text" class="form-control" value="Rua dos Esportes">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Número</label>
+                        <input type="text" class="form-control" value="123">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Bairro</label>
+                        <input type="text" class="form-control" value="Centro">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Cidade</label>
+                        <input type="text" class="form-control" value="São Paulo">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">UF</label>
+                        <input type="text" class="form-control" value="SP" maxlength="2">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Ponto de referência</label>
+                        <input type="text" class="form-control" placeholder="Ex: próximo ao ginásio">
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label">Telefone</label>
                         <input type="text" class="form-control" value="(11) 99999-9999">
@@ -162,15 +182,34 @@
                 </div>
                 <div class="toggle-switch">
                     <div>
+                        <div class="fw-medium">Aceitar Cartão de Débito</div>
+                        <div class="help-text">Pagamento presencial na arena</div>
+                    </div>
+                    <input type="checkbox" class="form-check-input" checked>
+                </div>
+                <div class="toggle-switch">
+                    <div>
                         <div class="fw-medium">Aceitar Dinheiro</div>
                         <div class="help-text">Pagamento em espécie no local</div>
                     </div>
                     <input type="checkbox" class="form-check-input" checked>
                 </div>
-                <div class="mt-3">
-                    <label class="form-label">Chave PIX</label>
-                    <input type="text" class="form-control" placeholder="CNPJ, e-mail ou telefone">
-                    <div class="help-text">Chave para recebimento via PIX</div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo da chave PIX</label>
+                        <select class="form-select">
+                            <option>CNPJ</option>
+                            <option>CPF</option>
+                            <option>E-mail</option>
+                            <option>Telefone</option>
+                            <option>Aleatória</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Chave PIX</label>
+                        <input type="text" class="form-control" placeholder="CNPJ, e-mail ou telefone">
+                        <div class="help-text">Chave para recebimento via PIX</div>
+                    </div>
                 </div>
             </div>
 

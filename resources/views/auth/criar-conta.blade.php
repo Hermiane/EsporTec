@@ -31,24 +31,23 @@
                 <input type="text" class="form-control" placeholder="Seu nome" required>
             </div>
             <div class="mb-3">
+                <label class="form-label fw-medium">Nome de usuário</label>
+                <input type="text" class="form-control" placeholder="Ex: joao.silva" required>
+                <small class="text-muted">Campo obrigatório no banco para identificar sua conta.</small>
+            </div>
+            <div class="mb-3">
                 <label class="form-label fw-medium">E-mail</label>
                 <input type="email" class="form-control" placeholder="seu@email.com" required>
             </div>
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Telefone</label>
-                    <input type="tel" class="form-control" placeholder="(00) 00000-0000">
+                    <input type="tel" class="form-control" placeholder="(00) 00000-0000" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Data de Nascimento</label>
-                    <input type="date" class="form-control">
+                    <input type="date" class="form-control" required>
                 </div>
-            </div>
-            <!-- Campo Endereço (RF02) -->
-            <div class="mb-3">
-                <label class="form-label fw-medium">Endereço Completo</label>
-                <input type="text" class="form-control" placeholder="Rua, Nº, Bairro, Cidade" required>
-                <small class="text-muted">Necessário para envio de ofertas e notificações.</small>
             </div>
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -63,7 +62,7 @@
             <div class="form-check mb-4">
                 <input type="checkbox" class="form-check-input" id="lgpd" required>
                 <label class="form-check-label small text-muted" for="lgpd">
-                    Quero receber ofertas por e-mail e aceito a <a href="#" class="auth-link">Política de Privacidade</a> (LGPD).
+                    Quero receber ofertas por e-mail e aceito a <a href="#modalPrivacidade" class="auth-link" data-bs-toggle="modal" data-bs-target="#modalPrivacidade">Política de Privacidade</a> (LGPD).
                 </label>
             </div>
             <button type="submit" class="btn btn-primary-custom text-white">Cadastrar</button>
@@ -72,18 +71,38 @@
             <p class="mb-0">Já tem conta? <a href="/login" class="auth-link">Entrar</a></p>
         </div>
     </div>
+    <div class="modal fade" id="modalPrivacidade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Política de Privacidade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-0">Seus dados serão usados para cadastro, reservas, notificações e ofertas autorizadas, respeitando a LGPD.</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-primary-custom text-white" data-bs-dismiss="modal">Entendi</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/esportec-ui.js"></script>
     <script>
         document.getElementById('createAccountForm').addEventListener('submit', event => {
             event.preventDefault();
+            const submitButton = event.submitter;
             if (document.getElementById('senha').value !== document.getElementById('confirmarSenha').value) {
                 esportecToast('As senhas precisam ser iguais.', 'warning');
                 return;
             }
-            esportecToast('Conta criada com sucesso.', 'success');
-            setTimeout(() => window.location.href = '/painel', 800);
+            esportecWithLoading(submitButton, 'Cadastrando...', () => esportecMockApi('usuarios.criar')).then(() => {
+                sessionStorage.setItem('esportecRole', 'cliente');
+                esportecToast('Conta criada com sucesso.', 'success');
+                setTimeout(() => window.location.href = '/painel', 600);
+            });
         });
-    </script>
+</script>
 </body>
 </html>

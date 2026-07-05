@@ -170,8 +170,12 @@
 <script>
     const modalNovoUsuario = document.getElementById('modalNovoUsuario');
 
-    document.querySelectorAll('[data-person-action]').forEach(button => {
-        button.addEventListener('click', () => {
+    document.addEventListener('click', event => {
+        const button = event.target.closest('[data-person-action]');
+        if (!button) {
+            return;
+        }
+
             if (button.dataset.personAction === 'editar') {
                 bootstrap.Modal.getOrCreateInstance(modalNovoUsuario).show();
                 return;
@@ -184,7 +188,6 @@
             badge.innerHTML = reativando ? '<i class="bi bi-check-circle me-1"></i>Ativo' : '<i class="bi bi-x-circle me-1"></i>Inativo';
             button.innerHTML = reativando ? '<i class="bi bi-ban"></i> Inativar' : '<i class="bi bi-check"></i> Reativar';
             esportecToast(reativando ? 'Pessoa reativada.' : 'Pessoa inativada.', 'success');
-        });
     });
 
     document.getElementById('btnCriarUsuario').addEventListener('click', () => {
@@ -200,7 +203,8 @@
                     <div class="user-email">${email}</div>
                 </div>
                 <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>
-                <button class="btn-action btn-edit" disabled><i class="bi bi-check2"></i> Criado</button>
+                <button class="btn-action btn-edit" data-person-action="editar"><i class="bi bi-pencil"></i> Editar</button>
+                <button class="btn-action btn-inactive" data-person-action="toggle"><i class="bi bi-ban"></i> Inativar</button>
             </div>
         `);
         esportecToast('Usuário criado na lista de pessoas.', 'success');

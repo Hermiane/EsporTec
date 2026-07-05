@@ -85,17 +85,16 @@
                     <input type="text" class="form-control" value="João Silva">
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label fw-medium">Nome de usuário</label>
+                    <input type="text" class="form-control" value="joao.silva">
+                </div>
+                <div class="col-md-6">
                     <label class="form-label fw-medium">Data de Nascimento</label>
                     <input type="date" class="form-control" value="1990-05-15">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Telefone</label>
                     <input type="tel" class="form-control" value="(11) 99999-9999">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-medium">CPF</label>
-                    <input type="text" class="form-control" value="123.456.789-00" disabled>
-                    <small class="form-text">CPF não pode ser alterado por segurança</small>
                 </div>
             </div>
         </div>
@@ -128,20 +127,6 @@
                     <small class="form-text">Promoções exclusivas e novidades</small>
                 </div>
                 <input type="checkbox" class="form-check-input" checked>
-            </div>
-            <div class="form-check-switch">
-                <div>
-                    <label class="fw-medium d-block">Receber notificações por WhatsApp</label>
-                    <small class="form-text">Lembretes de reserva e confirmações</small>
-                </div>
-                <input type="checkbox" class="form-check-input" checked>
-            </div>
-            <div class="form-check-switch">
-                <div>
-                    <label class="fw-medium d-block">Perfil público para outros jogadores</label>
-                    <small class="form-text">Permitir que outros usuários vejam seu nome em partidas</small>
-                </div>
-                <input type="checkbox" class="form-check-input">
             </div>
             <div class="alert mt-3" style="background: var(--light); color: var(--primary); border-radius: 10px; font-size: 0.9rem;">
                 <i class="bi bi-shield-check me-2"></i> Seus dados são protegidos pela <strong>LGPD</strong>. Você pode solicitar exclusão a qualquer momento.

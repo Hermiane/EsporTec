@@ -766,7 +766,7 @@
     <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
 
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="/">
             EsporTec
         </a>
 
@@ -778,7 +778,7 @@
 
             <ul class="navbar-nav mx-auto text-center">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link active" href="/">
                         Início
                     </a>
                 </li>
@@ -830,7 +830,7 @@
 
             <div class="search-pill">
                 <input type="text" id="buscarQuadra" placeholder="Buscar quadras...">
-                <a href="/nova-reserva" class="btn btn-reserve text-decoration-none">
+                <a href="/login?redirect=/nova-reserva" class="btn btn-reserve text-decoration-none">
     Reservar Quadra
 </a>
     <a href="/cadastrar-arena" class="btn btn-register text-decoration-none">
@@ -1187,15 +1187,32 @@
         <div class="container text-center">
             <div class="footer-brand">EsporTec</div>
             <div class="footer-links mb-3">
-                <a href="#">Início</a>
+                <a href="/">Início</a>
                 <a href="#quadras">Quadras</a>
                 <a href="#sobre">Sobre</a>
                 <a href="#contato">Contato</a>
-                <a href="#">Política de Privacidade</a>
+                <a href="#modalPrivacidade" data-bs-toggle="modal" data-bs-target="#modalPrivacidade">Política de Privacidade</a>
             </div>
             <p class="mb-0 opacity-75">&copy; 2026 EsporTec - Gestão de Espaços Esportivos | Reservas, agenda e pagamentos em um só lugar</p>
         </div>
     </footer>
+
+    <div class="modal fade" id="modalPrivacidade" tabindex="-1" aria-labelledby="modalPrivacidadeLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" id="modalPrivacidadeLabel">Política de Privacidade</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-0">A EsporTec usa os dados informados apenas para cadastro, reservas, notificações e contato com o cliente, conforme a LGPD.</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-primary-custom" data-bs-dismiss="modal">Entendi</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1204,8 +1221,11 @@
     <!-- Script para interatividade -->
     <script>
         // Smooth scroll para links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        document.querySelectorAll('a[href^="#"]:not([data-bs-toggle])').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                if (this.getAttribute('href') === '#') {
+                    return;
+                }
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {

@@ -68,7 +68,7 @@
             <a href="/funcionario/perfil" class="nav-link"><i class="bi bi-person"></i> Meu Perfil</a>
             <a href="/funcionario/agenda" class="nav-link"><i class="bi bi-calendar-check"></i> Agenda</a>
             <a href="#feedbacksClientes" class="nav-link"><i class="bi bi-people"></i> Clientes</a>
-            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#modalManutencao"><i class="bi bi-tools"></i> Manutenção</a>
+            <a href="#modalManutencao" class="nav-link" data-bs-toggle="modal" data-bs-target="#modalManutencao"><i class="bi bi-tools"></i> Manutenção</a>
         </nav>
         <div style="margin-top: auto;">
             <a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a>
@@ -191,7 +191,7 @@
                             <td><span class="status-dot" style="background:#CBD5E1;"></span> Agendado</td>
                             <td><span class="badge-payment badge-pending">Pendente (PIX)</span></td>
                             <td>
-                                <button class="btn-action btn-checkin" style="opacity:0.5; cursor:not-allowed;">Aguardando</button>
+                                <button type="button" class="btn-action btn-checkin" disabled style="opacity:0.5; cursor:not-allowed;">Aguardando</button>
                             </td>
                         </tr>
                     </tbody>

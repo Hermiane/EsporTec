@@ -102,8 +102,12 @@
 <script>
     const modalEquipe = document.getElementById('modalEquipe');
 
-    document.querySelectorAll('[data-team-action]').forEach(button => {
-        button.addEventListener('click', () => {
+    document.addEventListener('click', event => {
+        const button = event.target.closest('[data-team-action]');
+        if (!button) {
+            return;
+        }
+
             if (button.dataset.teamAction === 'editar') {
                 bootstrap.Modal.getOrCreateInstance(modalEquipe).show();
                 return;
@@ -117,7 +121,6 @@
             button.className = reativando ? 'btn btn-sm btn-outline-danger' : 'btn btn-sm btn-outline-success';
             button.innerHTML = reativando ? '<i class="bi bi-ban"></i> Inativar' : '<i class="bi bi-check2"></i> Reativar';
             esportecToast(reativando ? 'Usuário reativado.' : 'Usuário inativado.', 'success');
-        });
     });
 
     document.getElementById('btnSalvarEquipe').addEventListener('click', () => {
@@ -133,7 +136,10 @@
             <tr>
                 <td>${nome}</td><td>${cpf}</td><td>${email}</td><td>${roleCell}</td>
                 <td><span class="badge bg-success">Ativo</span></td>
-                <td><button class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-check2"></i> Criado</button></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-success" data-team-action="editar"><i class="bi bi-pencil"></i> Editar</button>
+                    <button class="btn btn-sm btn-outline-danger" data-team-action="toggle"><i class="bi bi-ban"></i> Inativar</button>
+                </td>
             </tr>
         `);
         esportecToast('Usuário da equipe adicionado na lista.', 'success');

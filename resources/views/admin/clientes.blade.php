@@ -216,7 +216,7 @@
             <label class="form-label fw-semibold">Mensagem da oferta</label>
             <textarea class="form-control" rows="4">Olá! A EsporTec preparou uma condição especial para sua próxima reserva. Aproveite esta semana.</textarea>
             <div class="row g-3 mt-2">
-                <div class="col-md-6"><label class="form-label">Canal</label><select class="form-select"><option>E-mail</option><option>WhatsApp</option><option>Notificação</option></select></div>
+                <div class="col-md-6"><label class="form-label">Canal</label><select class="form-select"><option>E-mail</option><option>Notificação do sistema</option></select></div>
                 <div class="col-md-6"><label class="form-label">Público</label><select class="form-select"><option>Clientes visíveis</option><option>Clientes VIP</option><option>Aniversariantes</option></select></div>
             </div>
         `;

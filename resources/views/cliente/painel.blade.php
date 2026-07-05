@@ -28,8 +28,12 @@
         .header-start { gap: 1.35rem !important; }
         .menu-toggle { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 10px; border: 1px solid rgba(45,129,93,0.25); background: white; color: var(--primary); display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(45,129,93,0.12); }
         .menu-toggle:hover { background: var(--primary); color: white; }
-        .avatar-badge { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--primary); color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
-        .avatar-badge:hover { background: var(--dark); }
+        .account-button { border: 1px solid rgba(45,129,93,0.22); background: white; color: var(--text); border-radius: 999px; padding: 0.35rem 0.45rem 0.35rem 0.4rem; display: inline-flex; align-items: center; gap: 0.55rem; box-shadow: 0 4px 14px rgba(15,23,42,0.06); transition: all 0.2s ease; }
+        .account-button:hover, .account-button.active { border-color: var(--primary); background: var(--light); color: var(--primary); box-shadow: 0 6px 18px rgba(45,129,93,0.14); }
+        .account-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; }
+        .account-name { font-weight: 600; font-size: 0.92rem; line-height: 1; }
+        .account-button .bi-chevron-down { font-size: 0.85rem; transition: transform 0.2s ease; }
+        .account-button.active .bi-chevron-down { transform: rotate(180deg); }
         .nav-item { margin-bottom: 0.5rem; }
         .nav-link { color: var(--gray); font-weight: 500; padding: 0.8rem 1rem; border-radius: 10px; display: flex; align-items: center; gap: 0.8rem; transition: all 0.2s; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: var(--light); color: var(--primary); }
@@ -42,7 +46,14 @@
         .header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; }
         .header p { color: var(--gray); margin: 0; }
         .top-panel { background: white; border-radius: 12px; padding: 1rem; margin-top: -1rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
-        .profile-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .profile-menu { max-width: 420px; margin-left: auto; border: 1px solid rgba(45,129,93,0.12); }
+        .profile-menu-header { display: flex; align-items: center; gap: 0.85rem; padding-bottom: 0.9rem; border-bottom: 1px solid #E2E8F0; margin-bottom: 0.85rem; }
+        .profile-menu-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+        .profile-actions { display: grid; gap: 0.5rem; }
+        .profile-action { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.8rem 0.9rem; border-radius: 10px; text-decoration: none; color: var(--text); border: 1px solid #E2E8F0; background: white; font-weight: 600; transition: all 0.2s ease; }
+        .profile-action:hover { background: var(--light); border-color: rgba(45,129,93,0.25); color: var(--primary); }
+        .profile-action.danger { color: #D32F2F; }
+        .profile-action.danger:hover { background: rgba(211,47,47,0.08); border-color: rgba(211,47,47,0.25); color: #D32F2F; }
 
         /* Cards */
         .card-custom { background: white; border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.04); padding: 1.5rem; margin-bottom: 1.5rem; }
@@ -85,6 +96,8 @@
             .mobile-nav i { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
             .main { padding: 1.5rem; padding-bottom: 5rem; }
             .quadra-img { height: 180px; }
+            .account-name { display: none; }
+            .account-button { padding-right: 0.45rem; gap: 0.35rem; }
         }
         @media (min-width: 993px) { .mobile-nav { display: none; } }
     </style>
@@ -121,7 +134,11 @@
             <div class="d-flex gap-2 align-items-center">
                 <button type="button" class="btn btn-light" id="searchToggle" aria-label="Buscar"><i class="bi bi-search"></i></button>
                 <a href="/notificacoes" class="btn btn-light" aria-label="Notificações"><i class="bi bi-bell"></i></a>
-                <button type="button" class="avatar-badge" id="profileToggle" aria-label="Abrir perfil">JS</button>
+                <button type="button" class="account-button" id="profileToggle" aria-label="Abrir menu da conta" aria-expanded="false">
+                    <span class="account-avatar">JS</span>
+                    <span class="account-name">João</span>
+                    <i class="bi bi-chevron-down"></i>
+                </button>
             </div>
         </div>
 
@@ -134,12 +151,27 @@
             </div>
         </div>
 
-        <div id="profilePanel" class="top-panel d-none">
-            <h6 class="fw-bold mb-3">João Silva</h6>
+        <div id="profilePanel" class="top-panel profile-menu d-none">
+            <div class="profile-menu-header">
+                <span class="profile-menu-avatar">JS</span>
+                <div>
+                    <h6 class="fw-bold mb-1">João Silva</h6>
+                    <small class="text-muted">Cliente EsporTec</small>
+                </div>
+            </div>
             <div class="profile-actions">
-                <a href="/perfil" class="btn btn-outline-success"><i class="bi bi-person me-2"></i>Meu Perfil</a>
-                <a href="/minhas-reservas" class="btn btn-outline-success"><i class="bi bi-list-check me-2"></i>Minhas Reservas</a>
-                <a href="/login" class="btn btn-outline-danger"><i class="bi bi-box-arrow-left me-2"></i>Sair</a>
+                <a href="/perfil" class="profile-action">
+                    <span><i class="bi bi-person me-2"></i>Meu perfil</span>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                <a href="/notificacoes" class="profile-action">
+                    <span><i class="bi bi-bell me-2"></i>Notificações</span>
+                    <span class="badge bg-danger rounded-pill">3</span>
+                </a>
+                <a href="/login" class="profile-action danger">
+                    <span><i class="bi bi-box-arrow-left me-2"></i>Sair da conta</span>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
             </div>
         </div>
 
@@ -363,9 +395,6 @@
                 <a href="/minhas-reservas" class="btn btn-outline-success">
                     <i class="bi bi-list-check me-2"></i>Ver no histórico
                 </a>
-                <button type="button" class="btn btn-success" id="btnCompartilharProxima">
-                    <i class="bi bi-whatsapp me-2"></i>Compartilhar
-                </button>
             </div>
         </div>
     </div>
@@ -392,7 +421,6 @@
     const clientSearch = document.getElementById('clientSearch');
     const goSearch = document.getElementById('goSearch');
     const emptySearch = document.getElementById('emptySearch');
-    const btnCompartilharProxima = document.getElementById('btnCompartilharProxima');
     const topPanels = [searchPanel, profilePanel];
 
     function openSidebar() {
@@ -418,6 +446,13 @@
             }
         });
         panel.classList.toggle('d-none');
+        syncProfileButtonState();
+    }
+
+    function syncProfileButtonState() {
+        const isOpen = !profilePanel.classList.contains('d-none');
+        profileToggle.classList.toggle('active', isOpen);
+        profileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     }
 
     searchToggle.addEventListener('click', () => {
@@ -428,6 +463,14 @@
     });
 
     profileToggle.addEventListener('click', () => toggleTopPanel(profilePanel));
+
+    document.addEventListener('click', event => {
+        const clickedTopAction = event.target.closest('#profileToggle, #searchToggle, #profilePanel, #searchPanel');
+        if (!clickedTopAction) {
+            topPanels.forEach(panel => panel.classList.add('d-none'));
+            syncProfileButtonState();
+        }
+    });
 
     function filterCourtCards() {
         const term = clientSearch.value.trim().toLowerCase();
@@ -470,15 +513,10 @@
     });
     goSearch.addEventListener('click', goToSearchResult);
 
-    btnCompartilharProxima.addEventListener('click', () => {
-        const message = encodeURIComponent('Minha próxima partida na EsporTec: Quadra Society Premium, hoje às 19:00.');
-        window.open(`https://wa.me/?text=${message}`, '_blank');
-        esportecToast('Link de compartilhamento aberto.', 'success');
-    });
-
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape') {
             topPanels.forEach(panel => panel.classList.add('d-none'));
+            syncProfileButtonState();
             closeSidebar();
         }
     });

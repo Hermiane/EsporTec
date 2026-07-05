@@ -191,8 +191,9 @@
     const modalQuadra = document.getElementById('modalQuadra');
     const modalBloqueio = document.getElementById('modalBloqueio');
 
-    document.querySelectorAll('[data-court-action]').forEach(button => {
-        button.addEventListener('click', () => {
+    document.addEventListener('click', event => {
+        const button = event.target.closest('[data-court-action]');
+        if (button) {
             const action = button.dataset.courtAction;
             if (action === 'editar') {
                 bootstrap.Modal.getOrCreateInstance(modalQuadra).show();
@@ -212,17 +213,17 @@
                 button.className = activating ? 'btn btn-sm btn-outline-danger' : 'btn btn-sm btn-outline-success';
                 button.innerHTML = activating ? '<i class="bi bi-ban"></i> Inativar' : '<i class="bi bi-check2"></i> Ativar';
             }
-        });
-    });
+        }
 
-    document.querySelectorAll('[data-unblock]').forEach(button => {
-        button.addEventListener('click', () => {
-            const row = button.closest('tr');
+        const unblockButton = event.target.closest('[data-unblock]');
+        if (unblockButton) {
+            const row = unblockButton.closest('tr');
             row.querySelector('.badge').className = 'badge badge-on';
             row.querySelector('.badge').textContent = 'Liberada';
-            button.textContent = 'Liberada';
-            button.disabled = true;
-        });
+            unblockButton.textContent = 'Liberada';
+            unblockButton.disabled = true;
+            esportecToast('Bloqueio liberado.', 'success');
+        }
     });
 
     document.getElementById('btnSalvarQuadra').addEventListener('click', () => {
@@ -242,7 +243,12 @@
                         </div>
                         <p class="text-muted small mb-2">${tipo} • ${cobertura} • ${capacidade}</p>
                         <strong class="text-success">R$ ${valor}/hora</strong>
-                        <div class="d-flex flex-wrap gap-2 mt-3"><button class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-check2"></i> Criada</button></div>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <button class="btn btn-sm btn-outline-success" data-court-action="editar"><i class="bi bi-pencil"></i> Editar</button>
+                            <button class="btn btn-sm btn-outline-success" data-court-action="horarios"><i class="bi bi-clock"></i> Horários</button>
+                            <button class="btn btn-sm btn-outline-secondary" data-court-action="bloqueios"><i class="bi bi-slash-circle"></i> Bloqueios</button>
+                            <button class="btn btn-sm btn-outline-danger" data-court-action="toggle"><i class="bi bi-ban"></i> Inativar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -255,7 +261,7 @@
         const data = document.getElementById('bloqueioDataAdmin').value || 'Hoje';
         const quadra = document.getElementById('bloqueioQuadraAdmin').value;
         const motivo = document.getElementById('bloqueioMotivoAdmin').value.trim() || 'Bloqueio operacional';
-        document.querySelector('#secaoBloqueios tbody').insertAdjacentHTML('afterbegin', `<tr><td>${data}</td><td>${quadra}</td><td>${motivo}</td><td><span class="badge badge-off">Bloqueada</span></td><td><button class="btn btn-sm btn-outline-success" disabled>Registrado</button></td></tr>`);
+        document.querySelector('#secaoBloqueios tbody').insertAdjacentHTML('afterbegin', `<tr><td>${data}</td><td>${quadra}</td><td>${motivo}</td><td><span class="badge badge-off">Bloqueada</span></td><td><button class="btn btn-sm btn-outline-success" data-unblock>Desbloquear</button></td></tr>`);
         esportecToast('Bloqueio registrado na tabela.', 'success');
         bootstrap.Modal.getInstance(modalBloqueio).hide();
     });

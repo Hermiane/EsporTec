@@ -70,7 +70,7 @@
                 </div>
                 <button type="button" class="btn btn-primary-custom text-white" onclick="nextStep(3)">Verificar Código</button>
                 <div class="text-center mt-3">
-                    <a href="#" class="auth-link small" onclick="resendCode()">Reenviar código</a>
+                    <button type="button" class="btn btn-link auth-link small p-0" onclick="resendCode()">Reenviar código</button>
                 </div>
             </form>
         </div>

@@ -121,8 +121,12 @@
 
         document.getElementById('loginForm').addEventListener('submit', event => {
             event.preventDefault();
+            const submitButton = event.submitter;
+            const redirectTo = new URLSearchParams(window.location.search).get('redirect');
+            const clientRoutes = ['/painel', '/nova-reserva', '/minhas-reservas', '/notificacoes', '/perfil'];
+            const safeClientRedirect = clientRoutes.includes(redirectTo) ? redirectTo : '/painel';
             const routes = {
-                cliente: '/painel',
+                cliente: safeClientRedirect,
                 funcionario: '/painel-funcionario',
                 admin: '/admin/dashboard'
             };
@@ -132,8 +136,11 @@
                 esportecToast('Preencha os dados profissionais para continuar.', 'warning');
                 return;
             }
-            esportecToast('Login validado. Redirecionando...', 'success');
-            setTimeout(() => window.location.href = routes[perfil], 700);
+            esportecWithLoading(submitButton, 'Entrando...', () => esportecMockApi('auth.login', { perfil })).then(() => {
+                sessionStorage.setItem('esportecRole', perfil);
+                esportecToast('Login validado. Redirecionando...', 'success');
+                setTimeout(() => window.location.href = routes[perfil], 500);
+            });
         });
     </script>
 </body>
