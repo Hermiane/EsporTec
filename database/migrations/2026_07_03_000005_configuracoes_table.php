@@ -31,7 +31,7 @@ return new class extends Migration
             |--------------------------------------------------------------------------
             */
 
-            $table->string('chave', 255);
+            $table->string('chave', 50);
 
             $table->text('valor');
 

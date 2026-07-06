@@ -29,7 +29,7 @@ return new class extends Migration
             /**
              * E-mail que receberá o convite.
              */
-            $table->string('email');
+            $table->string('email', 191);
 
             /**
              * Token único utilizado para validar

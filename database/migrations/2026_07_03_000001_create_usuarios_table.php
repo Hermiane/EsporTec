@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('nome_usuario',50)->unique();
 
             // Email principal
-            $table->string('email')->unique();
+            $table->string('email', 191)->unique();
 
             // Senha criptografada
             $table->string('senha_hash');

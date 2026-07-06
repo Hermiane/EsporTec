@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -95,14 +96,12 @@ return new class extends Migration
                 'ativo',
                 'valida_ate'
             ]);
-
-            /**
-             * Percentual permitido.
-             */
-            $table->check(
-                'desconto_percent > 0 AND desconto_percent <= 100'
-            );
+            
         });
+        /**
+         * Percentual permitido.
+         */
+        DB::statement("ALTER TABLE ofertas ADD CONSTRAINT chk_ofertas_desconto_percent CHECK (desconto_percent BETWEEN 0 AND 100)");
     }
 
     public function down(): void

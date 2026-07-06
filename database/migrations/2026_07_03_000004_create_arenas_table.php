@@ -3,80 +3,139 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     /**
-     * Administradores das arenas.
-     *
-     * Cada arena pode possuir um ou mais administradores.
-     * Um administrador pode administrar várias arenas.
-     * Apenas um vínculo entre usuário e arena é permitido.
+     * Executa a criação da tabela de arenas.
      */
     public function up(): void
     {
-        Schema::create('admins_arenas', function (Blueprint $table) {
+        Schema::create('arenas', function (Blueprint $table) {
 
-            // Identificador único
             $table->id();
 
-            /**
-             * Arena administrada.
-             */
-            $table->foreignId('arenas_id')
-                ->constrained('arenas')
-                ->cascadeOnDelete();
+            /*
+            |--------------------------------------------------------------------------
+            | Relacionamentos
+            |--------------------------------------------------------------------------
+            */
 
-            /**
-             * Usuário administrador.
-             */
-            $table->foreignId('usuarios_id')
-                ->constrained('usuarios')
-                ->restrictOnDelete();
-
-            /**
-             * Quem cadastrou este administrador.
-             * Pode ser um Super Admin ou outro administrador.
-             */
             $table->foreignId('criado_por')
                 ->nullable()
                 ->constrained('usuarios')
                 ->nullOnDelete();
 
-            /**
-             * Cargo exercido.
-             *
-             * Ex:
-             * Administrador Geral
-             * Financeiro
-             * Operacional
-             */
-            $table->string('cargo',50);
+            /*
+            |--------------------------------------------------------------------------
+            | Dados da Arena
+            |--------------------------------------------------------------------------
+            */
 
-            /**
-             * Define se este administrador é o proprietário
-             * oficial da arena.
-             */
-            $table->boolean('is_dono')
-                ->default(false);
+            $table->string('nome', 50);
 
-            /**
-             * Controle lógico.
-             */
+            $table->string('cnpj', 18)
+                ->unique();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Endereço
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string('logradouro', 60);
+
+            $table->string('bairro', 20);
+
+            $table->string('numero', 10)
+                ->nullable();
+
+            $table->string('ponto_referencia', 100)
+                ->nullable();
+
+            $table->string('cidade', 32);
+
+            $table->string('estado', 2);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Contato
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string('telefone', 11);
+
+            $table->string('email', 50)
+                ->unique();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Informações da Arena
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string('foto_capa')
+                ->nullable();
+
+            $table->text('descricao');
+
+            /*
+            |--------------------------------------------------------------------------
+            | PIX
+            |--------------------------------------------------------------------------
+            */
+
+            $table->enum('pix_tipo', [
+                'cpf',
+                'cnpj',
+                'email',
+                'telefone',
+                'aleatoria'
+            ]);
+
+            $table->string('pix_chave');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Controle
+            |--------------------------------------------------------------------------
+            */
+
             $table->boolean('ativo')
                 ->default(true);
 
+            /*
+            |--------------------------------------------------------------------------
+            | Auditoria
+            |--------------------------------------------------------------------------
+            */
+
             $table->timestamps();
 
-            /**
-             * Um usuário não pode ser administrador
-             * duas vezes da mesma arena.
-             */
-            $table->unique([
-                'arenas_id',
-                'usuarios_id'
-            ]);
+            /*
+            |--------------------------------------------------------------------------
+            | Índices
+            |--------------------------------------------------------------------------
+            */
+
+            $table->index(
+                ['cidade', 'estado'],
+                'idx_arenas_cidade_estado'
+            );
         });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Constraints (CHECK)
+        |--------------------------------------------------------------------------
+        */
+
+        DB::statement("
+            ALTER TABLE arenas
+            ADD CONSTRAINT chk_arenas_ativo
+            CHECK (ativo IN (0,1))
+        ");
     }
 
     /**
@@ -84,6 +143,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('admins_arenas');
+        Schema::dropIfExists('arenas');
     }
 };

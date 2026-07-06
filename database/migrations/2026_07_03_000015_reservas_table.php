@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
@@ -109,17 +109,21 @@ return new class extends Migration
                 'status'
             ]);
 
-            /**
-             * Garante que o horário inicial
-             * seja menor que o horário final.
-             */
-            $table->check('hora_inicio < hora_fim');
-
-            /**
-             * Valor nunca pode ser negativo.
-             */
-            $table->check('valor_total >= 0');
+            
         });
+
+        /**
+         * Garante que o horário inicial
+         * seja menor que o horário final.
+         */
+        DB::statement("ALTER TABLE reservas ADD CONSTRAINT chk_reservas_horario CHECK (hora_inicio < hora_fim) 
+            ");
+
+        /**
+         * Valor nunca pode ser negativo.
+         */
+        DB::statement("ALTER TABLE reservas ADD CONSTRAINT chk_reservas_valor_total CHECK (valor_total >= 0)
+            ");
     }
 
     public function down(): void

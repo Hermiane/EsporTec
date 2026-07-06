@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
@@ -68,11 +68,11 @@ return new class extends Migration
                 'usuarios_id'
             ]);
 
-            /**
-             * Validação do telefone.
-             */
-            $table->check('CHAR_LENGTH(contato) = 11 OR contato IS NULL');
         });
+        /**
+         * Validação do telefone.
+         */
+        DB::statement("ALTER TABLE jogadores_partidas ADD CONSTRAINT chk_jogadores_partidas_contato CHECK (CHAR_LENGTH(contato) = 11 OR contato IS NULL)");
     }
 
     /**

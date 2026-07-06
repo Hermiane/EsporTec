@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
@@ -98,11 +98,11 @@ return new class extends Migration
                 'visivel'
             ]);
 
-            /**
-             * Nota permitida entre 1 e 5.
-             */
-            $table->check('nota BETWEEN 1 AND 5');
         });
+        /**
+         * Nota permitida entre 1 e 5.
+         */
+        DB::statement("ALTER TABLE feedbacks ADD CONSTRAINT chk_feedbacks_nota CHECK (nota BETWEEN 1 AND 5)");
     }
 
     public function down(): void

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -33,7 +34,7 @@ return new class extends Migration
              * Exemplo:
              * https://esportec.com/partida/ABC123
              */
-            $table->string('link_partida')
+            $table->string('link_partida', 191)
                 ->unique();
 
             /**
@@ -56,11 +57,12 @@ return new class extends Migration
              */
             $table->index('reservas_id');
 
-            /**
-             * Quantidade máxima precisa ser positiva.
-             */
-            $table->check('max_jogador > 0');
+            
         });
+        /**
+         * Quantidade máxima precisa ser positiva.
+         */
+        DB::statement("ALTER TABLE partidas ADD CONSTRAINT chk_partidas_max_jogador CHECK (max_jogador > 0) ");
     }
 
     /**
