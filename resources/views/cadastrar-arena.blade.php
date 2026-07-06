@@ -156,6 +156,11 @@
                         </div>
 
                         <div class="col-md-6">
+                            <label class="form-label fw-semibold">CNPJ</label>
+                            <input type="text" class="form-control" placeholder="00.000.000/0001-00" required>
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">Responsável</label>
                             <input type="text" class="form-control" placeholder="Nome do responsável" required>
                         </div>
@@ -170,9 +175,34 @@
                             <input type="email" class="form-control" placeholder="arena@email.com" required>
                         </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Endereço</label>
-                            <input type="text" class="form-control" placeholder="Rua, número, bairro e cidade" required>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Logradouro</label>
+                            <input type="text" class="form-control" placeholder="Rua ou avenida" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Número</label>
+                            <input type="text" class="form-control" placeholder="123">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Bairro</label>
+                            <input type="text" class="form-control" placeholder="Centro" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Cidade</label>
+                            <input type="text" class="form-control" placeholder="Cametá" required>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">UF</label>
+                            <input type="text" class="form-control" placeholder="PA" maxlength="2" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Ponto de referência</label>
+                            <input type="text" class="form-control" placeholder="Próximo ao ginásio">
                         </div>
                     </div>
                 </div>
@@ -235,23 +265,47 @@
 
                     <div class="row g-3">
                         <div class="col-md-4">
+                            <label class="form-label fw-semibold">Tipo da chave PIX</label>
+                            <select class="form-select" required>
+                                <option value="">Selecione</option>
+                                <option>CPF</option>
+                                <option>CNPJ</option>
+                                <option>E-mail</option>
+                                <option>Telefone</option>
+                                <option>Aleatória</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Chave PIX</label>
+                            <input type="text" class="form-control" placeholder="Chave usada para receber pagamentos" required>
+                        </div>
+
+                        <div class="col-md-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" checked>
                                 <label class="form-check-label">PIX</label>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox">
                                 <label class="form-check-label">Dinheiro</label>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox">
-                                <label class="form-check-label">Cartão</label>
+                                <label class="form-check-label">Cartão crédito</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox">
+                                <label class="form-check-label">Cartão débito</label>
                             </div>
                         </div>
                     </div>
@@ -346,8 +400,10 @@
     formArena.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const modal = new bootstrap.Modal(document.getElementById('sucessoModal'));
-        modal.show();
+        esportecWithLoading(event.submitter, 'Enviando...', () => esportecMockApi('arenas.solicitarCadastro')).then(() => {
+            const modal = new bootstrap.Modal(document.getElementById('sucessoModal'));
+            modal.show();
+        });
     });
 </script>
 

@@ -111,7 +111,7 @@
         <div class="price-value">R$ 150,00</div>
         <small class="text-muted">Pagamento via PIX ou Cartão</small>
     </div>
-    <a href="/nova-reserva" class="btn btn-success w-100 py-3 mt-3">
+    <a href="/login?redirect=/nova-reserva" class="btn btn-success w-100 py-3 mt-3">
     Reservar esta Quadra
 </a>
 

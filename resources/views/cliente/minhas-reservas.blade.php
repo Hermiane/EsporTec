@@ -69,7 +69,7 @@
 
     <!-- Conteúdo: Próximas -->
     <div id="proximas" class="tab-content active">
-        <div class="reserva-card">
+        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="Dinheiro - pagamento pendente" data-observacoes="Reserva para campeonato interno. Precisamos de 2 bolas extras.">
             <div class="reserva-info">
                 <div class="reserva-title">Quadra Society Premium</div>
                 <div class="reserva-meta">
@@ -81,13 +81,13 @@
                 <span class="badge-status badge-pendente ms-2">Pagamento pendente</span>
             </div>
             <div class="reserva-actions">
-                <button class="btn-action btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes"><i class="bi bi-eye"></i> Detalhes</button>
-                <a href="#" class="btn-action btn-outline" onclick="compartilhar('Society Premium - 14/06 19:00')"><i class="bi bi-whatsapp"></i> Compartilhar</a>
+                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
+                <button class="btn-action btn-outline" onclick="abrirRemarcacao(this)"><i class="bi bi-calendar2-week"></i> Remarcar</button>
                 <button class="btn-action btn-danger" onclick="confirmarCancelamento(this)"><i class="bi bi-x-circle"></i> Cancelar</button>
             </div>
         </div>
 
-        <div class="reserva-card">
+        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="Cartão de débito - pago" data-observacoes="Reserva individual sem observações adicionais.">
             <div class="reserva-info">
                 <div class="reserva-title">Quadra Futsal Arena</div>
                 <div class="reserva-meta">
@@ -99,15 +99,15 @@
                 <span class="badge-status badge-pago ms-2">Pagamento pago</span>
             </div>
             <div class="reserva-actions">
-                <button class="btn-action btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes"><i class="bi bi-eye"></i> Detalhes</button>
-                <a href="#" class="btn-action btn-outline" onclick="compartilhar('Futsal Arena - 16/06 16:00')"><i class="bi bi-whatsapp"></i> Compartilhar</a>
+                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
+                <button class="btn-action btn-outline" onclick="abrirRemarcacao(this)"><i class="bi bi-calendar2-week"></i> Remarcar</button>
             </div>
         </div>
     </div>
 
     <!-- Conteúdo: Passadas -->
     <div id="passadas" class="tab-content">
-        <div class="reserva-card">
+        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="PIX - confirmado" data-observacoes="Partida concluída sem pendências.">
             <div class="reserva-info">
                 <div class="reserva-title">Quadra Society Descoberta</div>
                 <div class="reserva-meta">
@@ -118,7 +118,7 @@
                 <span class="badge-status badge-concluida">Concluída</span>
             </div>
             <div class="reserva-actions">
-                <button class="btn-action btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes"><i class="bi bi-eye"></i> Detalhes</button>
+                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
                 <button class="btn-action btn-outline" data-bs-toggle="modal" data-bs-target="#modalAvaliacao"><i class="bi bi-star"></i> Avaliar</button>
             </div>
         </div>
@@ -126,7 +126,7 @@
 
     <!-- Conteúdo: Canceladas -->
     <div id="canceladas" class="tab-content">
-        <div class="reserva-card">
+        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="Dinheiro - cancelado" data-observacoes="Reserva cancelada pelo cliente.">
             <div class="reserva-info">
                 <div class="reserva-title">Quadra Society Premium</div>
                 <div class="reserva-meta">
@@ -137,7 +137,7 @@
                 <span class="badge-status badge-cancelada">Cancelada</span>
             </div>
             <div class="reserva-actions">
-                <button class="btn-action btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes"><i class="bi bi-eye"></i> Detalhes</button>
+                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
                 <a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>
             </div>
         </div>
@@ -157,43 +157,49 @@
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Quadra</small>
-                            <strong class="fs-5">Society Premium</strong>
+                            <strong class="fs-5" id="detalhe-quadra">Society Premium</strong>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Data</small>
-                            <strong class="fs-5">14/06/2026</strong>
+                            <strong class="fs-5" id="detalhe-data">14/06/2026</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Responsável pela reserva</small>
+                            <strong class="fs-5" id="detalhe-responsavel">João Silva</strong>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Horário</small>
-                            <strong class="fs-5">19:00 - 20:30</strong>
+                            <strong class="fs-5" id="detalhe-horario">19:00 - 20:30</strong>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Valor Total</small>
-                            <strong class="fs-5 text-success">R$ 225,00</strong>
+                            <strong class="fs-5 text-success" id="detalhe-valor">R$ 225,00</strong>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Status</small>
-                            <span class="badge bg-success bg-opacity-10 text-success fs-6">Confirmada</span>
+                            <span class="badge bg-success bg-opacity-10 text-success fs-6" id="detalhe-status">Confirmada</span>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Forma de Pagamento</small>
-                            <strong><i class="bi bi-cash-coin me-2"></i>Dinheiro - pagamento pendente</strong>
+                            <strong><i class="bi bi-cash-coin me-2"></i><span id="detalhe-pagamento">Dinheiro - pagamento pendente</span></strong>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Observações</small>
-                            <p class="mb-0 mt-1">Reserva para campeonato interno. Precisamos de 2 bolas extras.</p>
+                            <p class="mb-0 mt-1" id="detalhe-observacoes">Reserva para campeonato interno. Precisamos de 2 bolas extras.</p>
                         </div>
                     </div>
                 </div>
@@ -206,11 +212,11 @@
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-danger" onclick="confirmarCancelamento(document.querySelector('#proximas .reserva-card'))">
-                    <i class="bi bi-x-circle me-2"></i>Cancelar Reserva
+                <button type="button" class="btn btn-outline-success" onclick="abrirRemarcacao(reservaEmDetalhe)">
+                    <i class="bi bi-calendar2-week me-2"></i>Remarcar
                 </button>
-                <button type="button" class="btn btn-success" onclick="compartilhar('Society Premium - 14/06 19:00')">
-                    <i class="bi bi-whatsapp me-2"></i>Compartilhar
+                <button type="button" class="btn btn-danger" onclick="confirmarCancelamento(reservaEmDetalhe)">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar Reserva
                 </button>
             </div>
         </div>
@@ -259,9 +265,49 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalRemarcacao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Remarcar reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success bg-success bg-opacity-10 text-success border-0">
+                    Escolha uma nova data e horário. A alteração fica registrada como remarcação no histórico.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Nova data</label>
+                    <input type="date" class="form-control" id="novaDataReserva">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Novo horário</label>
+                    <select class="form-select" id="novoHorarioReserva">
+                        <option value="">Selecione</option>
+                        <option>16:00 - 17:00</option>
+                        <option>18:00 - 19:00</option>
+                        <option>20:00 - 21:30</option>
+                    </select>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label fw-medium">Motivo da remarcação</label>
+                    <textarea class="form-control" id="motivoRemarcacao" rows="3" placeholder="Ex: precisei alterar o horário do grupo"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="confirmarRemarcacao()">Confirmar remarcação</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
 <script>
+    let reservaEmRemarcacao = null;
+    let reservaEmDetalhe = null;
+
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -269,9 +315,22 @@
         btn.classList.add('active');
     }
 
-    function compartilhar(texto) {
-        const msg = encodeURIComponent(`Olá! Bora jogar no EsporTec?\n🏟️ ${texto}\n📲 Reserve aqui: http://127.0.0.1:8000`);
-        window.open(`https://wa.me/?text=${msg}`, '_blank');
+    function abrirDetalhesReserva(trigger) {
+        const card = trigger.closest('.reserva-card');
+        reservaEmDetalhe = card;
+        const metaItems = card.querySelectorAll('.reserva-meta span');
+        const badges = [...card.querySelectorAll('.badge-status')].map(badge => badge.textContent.trim()).join(' / ');
+
+        document.getElementById('detalhe-quadra').textContent = card.querySelector('.reserva-title').textContent.trim();
+        document.getElementById('detalhe-data').textContent = metaItems[0]?.textContent.trim() || '-';
+        document.getElementById('detalhe-horario').textContent = metaItems[1]?.textContent.trim() || '-';
+        document.getElementById('detalhe-valor').textContent = metaItems[2]?.textContent.trim() || '-';
+        document.getElementById('detalhe-responsavel').textContent = card.dataset.responsavel || 'João Silva';
+        document.getElementById('detalhe-status').textContent = badges || 'Confirmada';
+        document.getElementById('detalhe-pagamento').textContent = card.dataset.pagamento || 'Pagamento pendente';
+        document.getElementById('detalhe-observacoes').textContent = card.dataset.observacoes || 'Sem observações.';
+
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalhes')).show();
     }
 
     function confirmarCancelamento(trigger) {
@@ -286,6 +345,32 @@
             bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
             esportecToast('Reserva cancelada e movida para a aba Canceladas.', 'success');
         }
+    }
+
+    function abrirRemarcacao(trigger) {
+        reservaEmRemarcacao = trigger.closest ? trigger.closest('.reserva-card') : trigger;
+        bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRemarcacao')).show();
+    }
+
+    function confirmarRemarcacao() {
+        const data = document.getElementById('novaDataReserva').value;
+        const horario = document.getElementById('novoHorarioReserva').value;
+        if (!data || !horario) {
+            esportecToast('Escolha a nova data e o novo horário.', 'warning');
+            return;
+        }
+
+        if (reservaEmRemarcacao) {
+            const metaItems = reservaEmRemarcacao.querySelectorAll('.reserva-meta span');
+            metaItems[0].innerHTML = `<i class="bi bi-calendar3"></i> ${data.split('-').reverse().join('/')}`;
+            metaItems[1].innerHTML = `<i class="bi bi-clock"></i> ${horario}`;
+            reservaEmRemarcacao.querySelectorAll('.badge-status').forEach(badge => badge.remove());
+            reservaEmRemarcacao.querySelector('.reserva-info').insertAdjacentHTML('beforeend', '<span class="badge-status badge-confirmada">Remarcada</span>');
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById('modalRemarcacao')).hide();
+        esportecToast('Reserva remarcada com sucesso.', 'success');
     }
 
     // Funções do Modal de Avaliação

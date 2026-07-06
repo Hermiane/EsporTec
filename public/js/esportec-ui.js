@@ -40,4 +40,58 @@
     window.alert = function esportecAlert(message) {
         window.esportecToast(String(message), 'info');
     };
+
+    window.esportecMockApi = function esportecMockApi(action, payload = {}) {
+        // Futuro backend: trocar este helper por fetch/axios mantendo action + payload.
+        return new Promise(resolve => {
+            setTimeout(() => resolve({ ok: true, action, payload }), 450);
+        });
+    };
+
+    window.esportecWithLoading = function esportecWithLoading(button, label, callback) {
+        if (!button) {
+            return callback();
+        }
+
+        const original = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>${label}`;
+
+        return Promise.resolve(callback())
+            .finally(() => {
+                button.disabled = false;
+                button.innerHTML = original;
+            });
+    };
+
+    document.addEventListener('click', event => {
+        const logoutLink = event.target.closest('a');
+        if (logoutLink && logoutLink.textContent.trim().toLowerCase().includes('sair')) {
+            sessionStorage.removeItem('esportecRole');
+        }
+    });
+
+    const publicRoutes = ['/', '/login', '/criar-conta', '/recuperar-senha', '/detalhes-quadra', '/cadastrar-arena', '/teste'];
+    const path = window.location.pathname;
+    const isPublic = publicRoutes.includes(path) || path.startsWith('/partida');
+    const isAdmin = path.startsWith('/admin');
+    const isStaff = path.startsWith('/funcionario') || path === '/painel-funcionario';
+    const isClient = ['/painel', '/nova-reserva', '/minhas-reservas', '/notificacoes', '/perfil'].includes(path);
+
+    if (!isPublic && (isAdmin || isStaff || isClient)) {
+        const role = sessionStorage.getItem('esportecRole');
+        const allowed =
+            (isAdmin && role === 'admin') ||
+            (isStaff && (role === 'funcionario' || role === 'admin')) ||
+            (isClient && role === 'cliente');
+
+        if (!role) {
+            window.location.href = `/login?redirect=${encodeURIComponent(path)}`;
+            return;
+        }
+
+        if (!allowed) {
+            window.location.href = role === 'admin' ? '/admin/dashboard' : role === 'funcionario' ? '/painel-funcionario' : '/painel';
+        }
+    }
 })();

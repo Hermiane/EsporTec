@@ -258,41 +258,39 @@
     const modalReserva = document.getElementById('modalReserva');
     const tableBody = document.querySelector('.table-custom tbody');
 
-    document.querySelectorAll('[data-action="editar-reserva"]').forEach(button => {
-        button.addEventListener('click', () => {
-            bootstrap.Modal.getOrCreateInstance(modalReserva).show();
-        });
-    });
+    function executarAcaoAgendamento(button) {
+        const action = button.dataset.action;
 
-    document.querySelectorAll('[data-action="confirmar-reserva"]').forEach(button => {
-        button.addEventListener('click', () => {
+        if (action === 'editar-reserva') {
+            bootstrap.Modal.getOrCreateInstance(modalReserva).show();
+            return;
+        }
+
+        if (action === 'confirmar-reserva') {
             const row = button.closest('tr');
             row.querySelector('.badge-status').className = 'badge-status badge-confirmada';
             row.querySelector('.badge-status').textContent = 'Confirmada';
             button.remove();
             esportecToast('Reserva confirmada.', 'success');
-        });
-    });
+            return;
+        }
 
-    document.querySelectorAll('[data-action="confirmar-pagamento"]').forEach(button => {
-        button.addEventListener('click', () => {
+        if (action === 'confirmar-pagamento') {
             const row = button.closest('tr');
             const paymentBadge = row.children[7].querySelector('.badge-status');
             paymentBadge.className = 'badge-status badge-pago';
             paymentBadge.textContent = 'Pago';
             button.remove();
             esportecToast('Pagamento confirmado.', 'success');
-        });
-    });
+            return;
+        }
 
-    document.querySelectorAll('[data-action="ver-comprovante"]').forEach(button => {
-        button.addEventListener('click', () => {
+        if (action === 'ver-comprovante') {
             esportecToast('Comprovante aberto para conferência.', 'info');
-        });
-    });
+            return;
+        }
 
-    document.querySelectorAll('[data-action="cancelar-reserva"]').forEach(button => {
-        button.addEventListener('click', () => {
+        if (action === 'cancelar-reserva') {
             if (!confirm('Cancelar esta reserva?')) {
                 return;
             }
@@ -301,8 +299,36 @@
             row.querySelector('.badge-status').textContent = 'Cancelada';
             row.querySelectorAll('button').forEach(action => action.disabled = true);
             esportecToast('Reserva cancelada.', 'success');
-        });
+        }
+    }
+
+    tableBody.addEventListener('click', event => {
+        const button = event.target.closest('[data-action]');
+        if (button) {
+            executarAcaoAgendamento(button);
+        }
     });
+
+    document.querySelectorAll('.filter-bar input, .filter-bar select').forEach(filter => {
+        filter.addEventListener('input', filtrarAgendamentos);
+        filter.addEventListener('change', filtrarAgendamentos);
+    });
+
+    function filtrarAgendamentos() {
+        const filtros = [...document.querySelectorAll('.filter-bar input, .filter-bar select')]
+            .map(input => {
+                if (input.type === 'date' && input.value) {
+                    return input.value.split('-').reverse().join('/');
+                }
+                return input.value.trim().toLowerCase();
+            })
+            .filter(value => value && !value.startsWith('todas') && !value.startsWith('todos'));
+
+        tableBody.querySelectorAll('tr').forEach(row => {
+            const texto = row.textContent.toLowerCase();
+            row.classList.toggle('d-none', filtros.some(filtro => !texto.includes(filtro)));
+        });
+    }
 
     document.getElementById('btnSalvarReserva').addEventListener('click', () => {
         const id = `#${Math.floor(2000 + Math.random() * 7000)}`;
@@ -316,7 +342,11 @@
                 <td>R$ 150,00</td>
                 <td><span class="badge-status badge-confirmada">Confirmada</span></td>
                 <td><span class="badge-status badge-pendente">Pendente</span></td>
-                <td><button class="btn-action btn-edit" disabled><i class="bi bi-check2"></i> Criada</button></td>
+                <td>
+                    <button class="btn-action btn-confirm" data-action="confirmar-pagamento"><i class="bi bi-cash-coin"></i> Pgto</button>
+                    <button class="btn-action btn-edit" data-action="editar-reserva"><i class="bi bi-pencil"></i> Editar</button>
+                    <button class="btn-action btn-cancel" data-action="cancelar-reserva"><i class="bi bi-x-circle"></i> Cancelar</button>
+                </td>
             </tr>
         `);
         esportecToast('Reserva manual criada na tabela.', 'success');

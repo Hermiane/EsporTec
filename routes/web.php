@@ -41,6 +41,9 @@ Route::get('/funcionario/agenda', function () {
 Route::get('/funcionario/perfil', function () {
     return view('funcionario.perfil'); });
 
+Route::get('/funcionario/notificacoes', function () {
+    return view('funcionario.notificacoes'); });
+
 Route::get('/admin/agendamentos', function () {
      return view('admin.agendamentos'); });
 

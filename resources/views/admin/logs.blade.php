@@ -46,7 +46,7 @@
         </div>
         <section class="card-soft p-4">
             <div class="row g-3 mb-3">
-                <div class="col-md-3"><input type="date" class="form-control"></div>
+                <div class="col-md-3"><input type="date" class="form-control" id="dataLog"></div>
                 <div class="col-md-3"><select class="form-select" id="tipoLog"><option value="">Todas as ações</option><option>Login</option><option>Reserva</option><option>Pagamento</option><option>Usuário</option><option>Equipe</option></select></div>
                 <div class="col-md-4"><input class="form-control" id="buscarLog" placeholder="Buscar usuário ou descrição"></div>
                 <div class="col-md-2"><button class="btn btn-success w-100" id="btnFiltrarLogs"><i class="bi bi-search me-1"></i>Filtrar</button></div>
@@ -55,12 +55,17 @@
                 <table class="table align-middle">
                     <thead><tr><th>Data</th><th>Usuário</th><th>Ação</th><th>Descrição</th><th>IP</th></tr></thead>
                     <tbody>
-                        <tr><td>21/06/2026 15:42</td><td>Maria Admin</td><td><span class="badge bg-success">Pagamento</span></td><td>Confirmou pagamento da reserva #1235.</td><td>192.168.0.14</td></tr>
-                        <tr><td>21/06/2026 14:18</td><td>João Funcionário</td><td><span class="badge bg-primary">Reserva</span></td><td>Alterou horário da reserva #1234.</td><td>192.168.0.22</td></tr>
-                        <tr><td>21/06/2026 09:10</td><td>Super Admin</td><td><span class="badge bg-warning text-dark">Equipe</span></td><td>Inativou funcionário Ana Lima.</td><td>192.168.0.10</td></tr>
-                        <tr><td>20/06/2026 20:05</td><td>Pedro Cliente</td><td><span class="badge bg-secondary">Login</span></td><td>Acessou a área do cliente.</td><td>189.88.12.40</td></tr>
+                        <tr data-log-date="2026-06-21"><td>21/06/2026 15:42</td><td>Maria Admin</td><td><span class="badge bg-success">Pagamento</span></td><td>Confirmou pagamento da reserva #1235.</td><td>192.168.0.14</td></tr>
+                        <tr data-log-date="2026-06-21"><td>21/06/2026 14:18</td><td>João Funcionário</td><td><span class="badge bg-primary">Reserva</span></td><td>Alterou horário da reserva #1234.</td><td>192.168.0.22</td></tr>
+                        <tr data-log-date="2026-06-21"><td>21/06/2026 09:10</td><td>Super Admin</td><td><span class="badge bg-warning text-dark">Equipe</span></td><td>Inativou funcionário Ana Lima.</td><td>192.168.0.10</td></tr>
+                        <tr data-log-date="2026-06-20"><td>20/06/2026 20:05</td><td>Pedro Cliente</td><td><span class="badge bg-secondary">Login</span></td><td>Acessou a área do cliente.</td><td>189.88.12.40</td></tr>
                     </tbody>
                 </table>
+            </div>
+            <div id="logsEmpty" class="text-center py-5 d-none">
+                <i class="bi bi-search fs-1 text-success"></i>
+                <h5 class="fw-bold mt-3">Nenhum log encontrado</h5>
+                <p class="text-muted mb-0">Tente mudar a data, ação ou termo pesquisado.</p>
             </div>
         </section>
     </main>
@@ -71,17 +76,26 @@
     function filtrarLogs() {
         const tipo = document.getElementById('tipoLog').value.toLowerCase();
         const termo = document.getElementById('buscarLog').value.trim().toLowerCase();
+        const data = document.getElementById('dataLog').value;
+        let visiveis = 0;
         document.querySelectorAll('tbody tr').forEach(row => {
             const texto = row.textContent.toLowerCase();
             const bateTipo = !tipo || texto.includes(tipo);
             const bateBusca = !termo || texto.includes(termo);
-            row.classList.toggle('d-none', !(bateTipo && bateBusca));
+            const bateData = !data || row.dataset.logDate === data;
+            const mostrar = bateTipo && bateBusca && bateData;
+            row.classList.toggle('d-none', !mostrar);
+            if (mostrar) {
+                visiveis += 1;
+            }
         });
+        document.getElementById('logsEmpty').classList.toggle('d-none', visiveis > 0);
     }
 
     document.getElementById('btnFiltrarLogs').addEventListener('click', filtrarLogs);
     document.getElementById('buscarLog').addEventListener('input', filtrarLogs);
     document.getElementById('tipoLog').addEventListener('change', filtrarLogs);
+    document.getElementById('dataLog').addEventListener('change', filtrarLogs);
 </script>
 </body>
 </html>

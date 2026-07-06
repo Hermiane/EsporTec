@@ -38,7 +38,7 @@
         <nav>
             <a href="/painel-funcionario" class="nav-link"><i class="bi bi-grid"></i> Painel</a>
             <a href="/funcionario/agenda" class="nav-link active"><i class="bi bi-calendar-week"></i> Agenda</a>
-            <a href="/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
+            <a href="/funcionario/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/funcionario/perfil" class="nav-link"><i class="bi bi-person"></i> Perfil</a>
         </nav>
     </aside>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -227,12 +227,23 @@
                 </label>
 
                 <label class="payment-option">
-                    <input type="radio" name="forma-pagamento" value="cartao">
+                    <input type="radio" name="forma-pagamento" value="cartao_credito">
                     <span class="payment-card">
                         <i class="bi bi-credit-card"></i>
                         <span>
-                            <strong>Cartão</strong>
-                            <small>Pagar na arena</small>
+                            <strong>Cartão crédito</strong>
+                            <small>Presencial na arena</small>
+                        </span>
+                    </span>
+                </label>
+
+                <label class="payment-option">
+                    <input type="radio" name="forma-pagamento" value="cartao_debito">
+                    <span class="payment-card">
+                        <i class="bi bi-credit-card-2-front"></i>
+                        <span>
+                            <strong>Cartão débito</strong>
+                            <small>Presencial na arena</small>
                         </span>
                     </span>
                 </label>
@@ -265,7 +276,7 @@
             </div>
 
             <div id="cartao-section" class="payment-info mt-4 d-none">
-                <i class="bi bi-credit-card me-2"></i> O pagamento no cartão será feito na arena no momento do atendimento.
+                <i class="bi bi-credit-card me-2"></i> O pagamento no cartão será feito presencialmente na arena.
             </div>
         </div>
         <div class="nav-buttons">
@@ -298,7 +309,6 @@
         </div>
         <div class="success-actions">
             <a href="/minhas-reservas" class="btn btn-success"><i class="bi bi-list-check me-2"></i>Ver histórico</a>
-            <button type="button" class="btn btn-outline-success" id="btnCompartilharReserva"><i class="bi bi-whatsapp me-2"></i>Compartilhar</button>
             <a href="/painel" class="btn btn-light"><i class="bi bi-grid me-2"></i>Voltar ao painel</a>
         </div>
     </div>
@@ -324,7 +334,6 @@
     const cartaoSection = document.getElementById('cartao-section');
     const btnConfirmarReserva = document.getElementById('btn-confirmar-reserva');
     const confirmationPanel = document.getElementById('reserva-confirmada');
-    const btnCompartilharReserva = document.getElementById('btnCompartilharReserva');
     horariosLabel.classList.add('d-none');
 
     function updatePriceFromQuadra() {
@@ -460,7 +469,7 @@
         pagamentoInfo.classList.toggle('d-none', Boolean(method));
         pixSection.classList.toggle('d-none', method !== 'pix');
         dinheiroSection.classList.toggle('d-none', method !== 'dinheiro');
-        cartaoSection.classList.toggle('d-none', method !== 'cartao');
+        cartaoSection.classList.toggle('d-none', !method.startsWith('cartao_'));
         btnConfirmarReserva.disabled = !method;
     }
 
@@ -489,12 +498,14 @@
         const paymentLabels = {
             dinheiro: 'Pendente em dinheiro',
             pix: 'PIX em análise',
-            cartao: 'Pendente no cartão'
+            cartao_credito: 'Pendente no cartão de crédito',
+            cartao_debito: 'Pendente no cartão de débito'
         };
         const paymentMessages = {
             dinheiro: 'Reserva confirmada. O pagamento em dinheiro fica pendente para confirmação na arena em até 5 minutos.',
             pix: 'Reserva registrada. A confirmação do PIX será analisada pela arena.',
-            cartao: 'Reserva confirmada. O pagamento no cartão será feito na arena.'
+            cartao_credito: 'Reserva confirmada. O pagamento no cartão de crédito será feito presencialmente na arena.',
+            cartao_debito: 'Reserva confirmada. O pagamento no cartão de débito será feito presencialmente na arena.'
         };
 
         document.getElementById('resumo-quadra').textContent = selectedCourt;
@@ -508,11 +519,6 @@
         confirmationPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         esportecToast('Reserva registrada com sucesso.', 'success');
     }
-
-    btnCompartilharReserva.addEventListener('click', () => {
-        const message = encodeURIComponent(`Minha reserva na EsporTec foi registrada: ${document.getElementById('resumo-quadra').textContent} - ${document.getElementById('resumo-data-hora').textContent}`);
-        window.open(`https://wa.me/?text=${message}`, '_blank');
-    });
 
     // Definir data mínima como hoje
     const today = new Date();
