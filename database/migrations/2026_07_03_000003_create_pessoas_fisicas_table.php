@@ -25,7 +25,7 @@ return new class extends Migration
                   ->restrictOnDelete();
 
             // CPF sem máscara
-            $table->string('CPF',11)
+            $table->string('cpf',11)
                   ->unique();
 
             // Indica se o CPF foi validado
