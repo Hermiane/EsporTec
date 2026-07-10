@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -39,12 +39,12 @@ return new class extends Migration
             |--------------------------------------------------------------------------
             */
 
-            $table->string('email',255);
+            $table->string('email', 255);
 
             /**
              * Código enviado ao usuário.
              */
-            $table->string('codigo',10);
+            $table->string('codigo', 10);
 
             /**
              * Número de tentativas.
@@ -66,15 +66,15 @@ return new class extends Migration
             /**
              * Tipo da operação.
              */
-            $table->enum('tipo',[
+            $table->enum('tipo', [
                 'resetar_senha',
-                'alterar_email'
+                'alterar_email',
             ]);
 
             /**
              * IP da solicitação.
              */
-            $table->string('ip',45)
+            $table->string('ip', 45)
                 ->nullable();
 
             /*
@@ -94,7 +94,7 @@ return new class extends Migration
             $table->index(
                 [
                     'usuarios_id',
-                    'codigo'
+                    'codigo',
                 ],
                 'idx_resetar_usuarios_codigo'
             );
@@ -106,11 +106,11 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE resetar_senhas
             ADD CONSTRAINT chk_tentativas
             CHECK (tentativa BETWEEN 0 AND 5)
-        ");
+        ');
     }
 
     /**

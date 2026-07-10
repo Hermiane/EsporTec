@@ -2,8 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 return new class extends Migration
 {
     /**
@@ -34,7 +35,7 @@ return new class extends Migration
                 'dinheiro',
                 'pix',
                 'cartao_credito',
-                'cartao_debito'
+                'cartao_debito',
             ]);
 
             /**
@@ -43,7 +44,7 @@ return new class extends Migration
             $table->enum('status', [
                 'pendente',
                 'pago',
-                'estornado'
+                'estornado',
             ])->default('pendente');
 
             /**
@@ -85,17 +86,16 @@ return new class extends Migration
              */
             $table->index([
                 'reservas_id',
-                'status'
+                'status',
             ]);
 
             $table->index('status');
 
             $table->index('metodo');
 
-        
         });
-        DB::statement("ALTER TABLE pagamentos ADD CONSTRAINT chk_pagamentos_valor CHECK (valor >= 0)
-        ");
+        DB::statement('ALTER TABLE pagamentos ADD CONSTRAINT chk_pagamentos_valor CHECK (valor >= 0)
+        ');
     }
 
     public function down(): void

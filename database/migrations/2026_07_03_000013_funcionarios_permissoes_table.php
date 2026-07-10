@@ -51,7 +51,7 @@ return new class extends Migration
              */
             $table->unique([
                 'funcionarios_id',
-                'permissoes_id'
+                'permissoes_id',
             ]);
         });
     }

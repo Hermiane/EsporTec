@@ -19,30 +19,30 @@ return new class extends Migration
 
             // Usuário associado
             $table->foreignId('usuarios_id')
-                  ->unique()
-                  ->constrained('usuarios')
-                  ->restrictOnDelete();
+                ->unique()
+                ->constrained('usuarios')
+                ->restrictOnDelete();
 
             // Cargo exercido
-            $table->string('cargo',50);
+            $table->string('cargo', 50);
 
             // Motivo da promoção
             $table->string('motivo')
-                  ->nullable();
+                ->nullable();
 
             // Último acesso ao painel
             $table->timestamp('ultimo_acesso')
-                  ->nullable();
+                ->nullable();
 
             // Quem criou este administrador
             $table->foreignId('criado_por')
-                  ->nullable()
-                  ->constrained('usuarios')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('usuarios')
+                ->nullOnDelete();
 
             // Controle lógico
             $table->boolean('ativo')
-                  ->default(true);
+                ->default(true);
 
             $table->timestamps();
         });

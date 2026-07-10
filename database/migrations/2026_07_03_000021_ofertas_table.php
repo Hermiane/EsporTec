@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -27,7 +27,7 @@ return new class extends Migration
             /**
              * Nome da oferta.
              */
-            $table->string('titulo',150);
+            $table->string('titulo', 150);
 
             /**
              * Descrição detalhada.
@@ -37,7 +37,7 @@ return new class extends Migration
             /**
              * Percentual de desconto.
              */
-            $table->decimal('desconto_percent',8,2);
+            $table->decimal('desconto_percent', 8, 2);
 
             /**
              * Data limite para utilização.
@@ -47,21 +47,21 @@ return new class extends Migration
             /**
              * Tipo da oferta.
              */
-            $table->enum('tipo',[
+            $table->enum('tipo', [
                 'aniversario',
                 'fidelidade',
-                'manual'
+                'manual',
             ]);
 
             /**
              * Público alvo.
              */
-            $table->enum('publico_alvo',[
+            $table->enum('publico_alvo', [
                 'todos',
                 'fiel',
                 'vip',
                 'inativo',
-                'individual'
+                'individual',
             ])->default('individual');
 
             /**
@@ -85,7 +85,7 @@ return new class extends Migration
              */
             $table->index([
                 'arenas_id',
-                'tipo'
+                'tipo',
             ]);
 
             /**
@@ -94,14 +94,14 @@ return new class extends Migration
              */
             $table->index([
                 'ativo',
-                'valida_ate'
+                'valida_ate',
             ]);
-            
+
         });
         /**
          * Percentual permitido.
          */
-        DB::statement("ALTER TABLE ofertas ADD CONSTRAINT chk_ofertas_desconto_percent CHECK (desconto_percent BETWEEN 0 AND 100)");
+        DB::statement('ALTER TABLE ofertas ADD CONSTRAINT chk_ofertas_desconto_percent CHECK (desconto_percent BETWEEN 0 AND 100)');
     }
 
     public function down(): void

@@ -50,7 +50,7 @@ return new class extends Migration
              */
             $table->unique([
                 'admins_arenas_id',
-                'permissoes_id'
+                'permissoes_id',
             ]);
         });
     }

@@ -21,10 +21,10 @@ return new class extends Migration
             $table->id();
 
             // Dados pessoais
-            $table->string('nome_completo',100);
+            $table->string('nome_completo', 100);
 
             // Nome utilizado para login
-            $table->string('nome_usuario',50)->unique();
+            $table->string('nome_usuario', 50)->unique();
 
             // Email principal
             $table->string('email', 191)->unique();
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('senha_hash');
 
             // Apenas números
-            $table->string('telefone',11);
+            $table->string('telefone', 11);
 
             // Data de nascimento
             $table->date('data_nascimento');
@@ -43,28 +43,28 @@ return new class extends Migration
 
             // Preferência para receber campanhas
             $table->boolean('email_marketing')
-                  ->default(false);
+                ->default(false);
 
             // Controle de ativação da conta
             $table->boolean('ativo')
-                  ->default(true);
+                ->default(true);
 
             // Token "Lembrar-me"
-            $table->string('relembrar_token',64)
-                  ->nullable()
-                  ->unique();
+            $table->string('relembrar_token', 64)
+                ->nullable()
+                ->unique();
 
             // Momento em que o e-mail foi confirmado
             $table->timestamp('email_verificacao')
-                  ->nullable();
+                ->nullable();
 
             // Quantidade de tentativas consecutivas
             $table->unsignedTinyInteger('login_tentativa')
-                  ->default(0);
+                ->default(0);
 
             // Bloqueio temporário da conta
             $table->timestamp('login_bloqueado_ate')
-                  ->nullable();
+                ->nullable();
 
             // created_at e updated_at
             $table->timestamps();

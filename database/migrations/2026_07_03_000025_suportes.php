@@ -46,7 +46,7 @@ return new class extends Migration
                 'pendente',
                 'resolvido',
                 'cancelado',
-                'fechado'
+                'fechado',
             ])->default('aberto');
 
             /*

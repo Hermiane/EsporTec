@@ -2,8 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 return new class extends Migration
 {
     /**
@@ -43,7 +44,7 @@ return new class extends Migration
              */
             $table->enum('momento', [
                 'pos_pagamentos',
-                'pos_jogo'
+                'pos_jogo',
             ]);
 
             /**
@@ -86,7 +87,7 @@ return new class extends Migration
              */
             $table->unique([
                 'reservas_id',
-                'momento'
+                'momento',
             ]);
 
             /**
@@ -95,14 +96,14 @@ return new class extends Migration
              */
             $table->index([
                 'usuarios_id',
-                'visivel'
+                'visivel',
             ]);
 
         });
         /**
          * Nota permitida entre 1 e 5.
          */
-        DB::statement("ALTER TABLE feedbacks ADD CONSTRAINT chk_feedbacks_nota CHECK (nota BETWEEN 1 AND 5)");
+        DB::statement('ALTER TABLE feedbacks ADD CONSTRAINT chk_feedbacks_nota CHECK (nota BETWEEN 1 AND 5)');
     }
 
     public function down(): void

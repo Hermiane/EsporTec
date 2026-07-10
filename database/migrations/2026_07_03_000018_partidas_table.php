@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -57,12 +57,11 @@ return new class extends Migration
              */
             $table->index('reservas_id');
 
-            
         });
         /**
          * Quantidade máxima precisa ser positiva.
          */
-        DB::statement("ALTER TABLE partidas ADD CONSTRAINT chk_partidas_max_jogador CHECK (max_jogador > 0) ");
+        DB::statement('ALTER TABLE partidas ADD CONSTRAINT chk_partidas_max_jogador CHECK (max_jogador > 0) ');
     }
 
     /**

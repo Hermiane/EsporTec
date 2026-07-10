@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -39,7 +39,7 @@ return new class extends Migration
                 'quinta-feira',
                 'sexta-feira',
                 'sabado',
-                'domingo'
+                'domingo',
             ]);
 
             $table->time('hora_inicio');
@@ -75,11 +75,11 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE horarios_funcionamento
             ADD CONSTRAINT chk_horarios_validos
             CHECK (hora_inicio < hora_fim)
-        ");
+        ');
     }
 
     /**

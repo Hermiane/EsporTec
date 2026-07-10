@@ -52,7 +52,7 @@ return new class extends Migration
                 'dono_arena',
                 'todos_clientes',
                 'todos_funcionarios',
-                'todos'
+                'todos',
             ]);
 
             /**
@@ -69,7 +69,7 @@ return new class extends Migration
                 'cancelamento',
                 'remarcacao',
                 'suporte',
-                'sistema'
+                'sistema',
             ])->default('manual');
 
             /**
@@ -110,7 +110,7 @@ return new class extends Migration
              */
             $table->index([
                 'usuarios_id',
-                'lida'
+                'lida',
             ]);
         });
     }
