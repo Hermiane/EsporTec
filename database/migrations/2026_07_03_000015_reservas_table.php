@@ -2,8 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 return new class extends Migration
 {
     /**
@@ -71,7 +72,7 @@ return new class extends Migration
                 'pendente',
                 'confirmada',
                 'concluida',
-                'cancelada'
+                'cancelada',
             ])->default('pendente');
 
             /**
@@ -101,29 +102,28 @@ return new class extends Migration
              */
             $table->index([
                 'quadras_id',
-                'reservas_usuarios_id'
+                'reservas_usuarios_id',
             ]);
 
             $table->index([
                 'data',
-                'status'
+                'status',
             ]);
 
-            
         });
 
         /**
          * Garante que o horário inicial
          * seja menor que o horário final.
          */
-        DB::statement("ALTER TABLE reservas ADD CONSTRAINT chk_reservas_horario CHECK (hora_inicio < hora_fim) 
-            ");
+        DB::statement('ALTER TABLE reservas ADD CONSTRAINT chk_reservas_horario CHECK (hora_inicio < hora_fim) 
+            ');
 
         /**
          * Valor nunca pode ser negativo.
          */
-        DB::statement("ALTER TABLE reservas ADD CONSTRAINT chk_reservas_valor_total CHECK (valor_total >= 0)
-            ");
+        DB::statement('ALTER TABLE reservas ADD CONSTRAINT chk_reservas_valor_total CHECK (valor_total >= 0)
+            ');
     }
 
     public function down(): void

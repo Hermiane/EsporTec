@@ -50,7 +50,7 @@ return new class extends Migration
                 'manha',
                 'tarde',
                 'noite',
-                'integral'
+                'integral',
             ])->nullable();
 
             /**
@@ -60,7 +60,7 @@ return new class extends Migration
                 'pendente',
                 'aceitado',
                 'expirado',
-                'cancelado'
+                'cancelado',
             ])->default('pendente');
 
             /**
@@ -92,7 +92,7 @@ return new class extends Migration
              */
             $table->index([
                 'status',
-                'email'
+                'email',
             ]);
         });
     }

@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -91,7 +91,7 @@ return new class extends Migration
                 'cnpj',
                 'email',
                 'telefone',
-                'aleatoria'
+                'aleatoria',
             ]);
 
             $table->string('pix_chave');
@@ -131,11 +131,11 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE arenas
             ADD CONSTRAINT chk_arenas_ativo
             CHECK (ativo IN (0,1))
-        ");
+        ');
     }
 
     /**

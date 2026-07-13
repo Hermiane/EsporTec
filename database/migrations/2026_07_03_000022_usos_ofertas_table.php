@@ -63,7 +63,7 @@ return new class extends Migration
              */
             $table->index([
                 'usuarios_id',
-                'ofertas_id'
+                'ofertas_id',
             ]);
         });
     }

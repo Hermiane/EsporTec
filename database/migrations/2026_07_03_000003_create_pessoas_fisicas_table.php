@@ -20,17 +20,17 @@ return new class extends Migration
 
             // Usuário proprietário do CPF
             $table->foreignId('usuarios_id')
-                  ->unique()
-                  ->constrained('usuarios')
-                  ->restrictOnDelete();
+                ->unique()
+                ->constrained('usuarios')
+                ->restrictOnDelete();
 
             // CPF sem máscara
-            $table->string('CPF',11)
-                  ->unique();
+            $table->string('cpf', 11)
+                ->unique();
 
             // Indica se o CPF foi validado
             $table->boolean('cpf_verificado')
-                  ->default(false);
+                ->default(false);
 
             $table->timestamps();
         });

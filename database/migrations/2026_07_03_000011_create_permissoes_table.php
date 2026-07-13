@@ -27,13 +27,13 @@ return new class extends Migration
              * Nome da permissão.
              */
             $table->string('titulo', 50)
-                  ->unique();
+                ->unique();
 
             /**
              * Explicação da permissão.
              */
             $table->text('descricao')
-                  ->nullable();
+                ->nullable();
 
             $table->timestamps();
         });

@@ -45,7 +45,7 @@ return new class extends Migration
                 'confirmada',
                 'reativada',
                 'remarcada',
-                'estornada'
+                'estornada',
             ]);
 
             /**
@@ -94,7 +94,7 @@ return new class extends Migration
              */
             $table->index([
                 'reservas_id',
-                'usuarios_id'
+                'usuarios_id',
             ]);
 
             /**

@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -50,7 +50,7 @@ return new class extends Migration
                 'evento',
                 'limpeza',
                 'interdicao',
-                'outros'
+                'outros',
             ]);
 
             /*
@@ -84,11 +84,11 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE bloqueios_quadras
             ADD CONSTRAINT chk_bloqueios_horarios
             CHECK (hora_inicio < hora_fim)
-        ");
+        ');
     }
 
     /**

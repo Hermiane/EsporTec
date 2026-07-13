@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -44,7 +44,7 @@ return new class extends Migration
                 'conta',
                 'marketing',
                 'equipamento',
-                'outros'
+                'outros',
             ]);
 
             $table->decimal('valor', 8, 2);
@@ -66,7 +66,7 @@ return new class extends Migration
                 'diaria',
                 'semanal',
                 'mensal',
-                'anual'
+                'anual',
             ])->nullable();
 
             /*
@@ -116,17 +116,17 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE despesas
             ADD CONSTRAINT chk_despesas_valor
             CHECK (valor >= 0)
-        ");
+        ');
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE despesas
             ADD CONSTRAINT chk_semana_do_mes
             CHECK (semana_do_mes BETWEEN 1 AND 5)
-        ");
+        ');
     }
 
     /**

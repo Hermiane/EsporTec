@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -82,7 +82,7 @@ return new class extends Migration
                 [
                     'usuarios_id',
                     'arenas_id',
-                    'dia_semana'
+                    'dia_semana',
                 ],
                 'uq_padrao_usuario_dia'
             );
@@ -94,17 +94,17 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE padroes_visitas
             ADD CONSTRAINT chk_dia_semana
             CHECK (dia_semana BETWEEN 0 AND 6)
-        ");
+        ');
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE padroes_visitas
             ADD CONSTRAINT chk_frequencia
             CHECK (frequencia >= 0)
-        ");
+        ');
     }
 
     /**

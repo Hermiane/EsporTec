@@ -2,8 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 return new class extends Migration
 {
     /**
@@ -54,7 +55,7 @@ return new class extends Migration
             $table->enum('status', [
                 'pendente',
                 'confirmado',
-                'recusado'
+                'recusado',
             ])->default('pendente');
 
             $table->timestamps();
@@ -65,14 +66,14 @@ return new class extends Migration
              */
             $table->index([
                 'partidas_id',
-                'usuarios_id'
+                'usuarios_id',
             ]);
 
         });
         /**
          * Validação do telefone.
          */
-        DB::statement("ALTER TABLE jogadores_partidas ADD CONSTRAINT chk_jogadores_partidas_contato CHECK (CHAR_LENGTH(contato) = 11 OR contato IS NULL)");
+        DB::statement('ALTER TABLE jogadores_partidas ADD CONSTRAINT chk_jogadores_partidas_contato CHECK (CHAR_LENGTH(contato) = 11 OR contato IS NULL)');
     }
 
     /**

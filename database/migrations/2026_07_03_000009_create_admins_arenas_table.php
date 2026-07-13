@@ -51,7 +51,7 @@ return new class extends Migration
              * Financeiro
              * Operacional
              */
-            $table->string('cargo',50);
+            $table->string('cargo', 50);
 
             /**
              * Define se este administrador é o proprietário
@@ -74,7 +74,7 @@ return new class extends Migration
              */
             $table->unique([
                 'arenas_id',
-                'usuarios_id'
+                'usuarios_id',
             ]);
         });
     }

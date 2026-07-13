@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -38,7 +38,7 @@ return new class extends Migration
                 'society',
                 'futsal',
                 'futebol',
-                'misto'
+                'misto',
             ])->default('society');
 
             $table->text('descricao');
@@ -86,17 +86,17 @@ return new class extends Migration
         |--------------------------------------------------------------------------
         */
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE quadras
             ADD CONSTRAINT chk_quadras_capacidade
             CHECK (capacidade_jogador > 0)
-        ");
+        ');
 
-        DB::statement("
+        DB::statement('
             ALTER TABLE quadras
             ADD CONSTRAINT chk_quadras_preco
             CHECK (preco_hora >= 0)
-        ");
+        ');
     }
 
     /**

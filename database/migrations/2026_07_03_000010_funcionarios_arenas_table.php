@@ -50,16 +50,16 @@ return new class extends Migration
              * Caixa
              * Gerente
              */
-            $table->string('cargo',50);
+            $table->string('cargo', 50);
 
             /**
              * Turno de trabalho.
              */
-            $table->enum('turno',[
+            $table->enum('turno', [
                 'manha',
                 'tarde',
                 'noite',
-                'integral'
+                'integral',
             ]);
 
             /**
@@ -82,7 +82,7 @@ return new class extends Migration
              */
             $table->unique([
                 'arenas_id',
-                'usuarios_id'
+                'usuarios_id',
             ]);
 
             /**
