@@ -26,7 +26,7 @@
         .icon-confirmacao { background: rgba(45, 129, 93, 0.15); color: var(--primary); }
 
         .notification-content { flex: 1; min-width: 0; }
-        .notification-title { font-weight: 600; margin-bottom: 0.3rem; font-size: 1rem; }
+        .notification-title { font-weight: 600; margin-bottom: 0.3rem; font-size: 1rem; display: flex; align-items: center; gap: 0.4rem; }
         .notification-text { color: var(--gray); font-size: 0.9rem; margin-bottom: 0.5rem; line-height: 1.4; }
         .notification-time { font-size: 0.75rem; color: #94A3B8; }
 
@@ -60,7 +60,7 @@
             <i class="bi bi-balloon-heart"></i>
         </div>
         <div class="notification-content">
-            <div class="notification-title">🎂 Feliz aniversário!</div>
+            <div class="notification-title"><i class="bi bi-balloon-heart text-danger"></i> Feliz aniversário!</div>
             <div class="notification-text">Hoje é seu dia! Que tal comemorar com uma partida? Ganhe 10% de desconto na sua próxima reserva.</div>
             <div class="notification-time">Hoje, 08:00</div>
         </div>
@@ -76,7 +76,7 @@
             <i class="bi bi-gift"></i>
         </div>
         <div class="notification-content">
-            <div class="notification-title">🎁 Oferta especial!</div>
+            <div class="notification-title"><i class="bi bi-gift text-warning"></i> Oferta especial!</div>
             <div class="notification-text">Reserve a Quadra Society Premium às terças e quintas e ganhe 15% de desconto. Válido até 30/06.</div>
             <div class="notification-time">Ontem, 14:30</div>
         </div>
@@ -91,7 +91,7 @@
             <i class="bi bi-exclamation-triangle"></i>
         </div>
         <div class="notification-content">
-            <div class="notification-title">⚠️ Aviso de manutenção</div>
+            <div class="notification-title"><i class="bi bi-exclamation-triangle text-danger"></i> Aviso de manutenção</div>
             <div class="notification-text">A Quadra Futsal Arena passará por manutenção preventiva no dia 20/06 das 08:00 às 12:00. Agende em outro horário.</div>
             <div class="notification-time">12/06, 10:15</div>
         </div>
@@ -106,7 +106,7 @@
             <i class="bi bi-check-circle"></i>
         </div>
         <div class="notification-content">
-            <div class="notification-title">✅ Reserva confirmada</div>
+            <div class="notification-title"><i class="bi bi-check-circle text-success"></i> Reserva confirmada</div>
             <div class="notification-text">Sua reserva na Quadra Society Premium para 14/06 às 19:00 foi confirmada. Chegue com 10 minutos de antecedência.</div>
             <div class="notification-time">10/06, 16:45</div>
         </div>

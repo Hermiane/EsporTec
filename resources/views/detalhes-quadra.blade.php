@@ -11,7 +11,22 @@
         :root { --primary: #2D815D; --dark: #1F5C42; --light: #E8F5EE; --bg: #F8FAFC; --gray: #64748B; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; margin: 0; }
         .container-detalhes { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .btn-back { width: 40px; height: 40px; border-radius: 10px; background: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
+        
+        .btn-back { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 10px; 
+            background: white; 
+            border: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            text-decoration: none; 
+            color: inherit;
+            margin-bottom: 1.5rem;
+        }
         .btn-back:hover { background: var(--light); }
 
         /* Galeria */
@@ -22,7 +37,17 @@
         .quadra-title { font-size: 2rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
         .rating { color: #FFC107; font-weight: 600; margin-bottom: 1rem; }
         .badges { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-        .badge-info { background: var(--light); color: var(--primary); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500; }
+        .badge-info { 
+            background: var(--light); 
+            color: var(--primary); 
+            padding: 0.4rem 0.8rem; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            font-weight: 500; 
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
         .description { color: var(--gray); line-height: 1.7; margin-bottom: 2rem; }
 
         /* Grade de Horários */
@@ -52,7 +77,7 @@
 <body>
 
 <div class="container-detalhes">
-    <a href="/" class="btn-back"><i class="bi bi-arrow-left"></i></a>
+    <a href="/" class="btn-back" title="Voltar para início"><i class="bi bi-arrow-left"></i></a>
 
     <!-- Galeria de Fotos -->
     <div id="quadraCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
@@ -86,12 +111,15 @@
         <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
         <span>4.8 (124 avaliações)</span>
     </div>
+    
+    <!-- Badges com ícones Bootstrap (sem emojis) -->
     <div class="badges">
-        <span class="badge-info">⚽ Society</span>
-        <span class="badge-info">👥 14 jogadores</span>
-        <span class="badge-info">️ Aberta</span>
-        <span class="badge-info">💡 Iluminação LED</span>
+        <span class="badge-info"><i class="bi bi-trophy"></i> Society</span>
+        <span class="badge-info"><i class="bi bi-people"></i> 14 jogadores</span>
+        <span class="badge-info"><i class="bi bi-sun"></i> Aberta</span>
+        <span class="badge-info"><i class="bi bi-lightbulb"></i> Iluminação LED</span>
     </div>
+    
     <p class="description">
         Quadra society com grama sintética de última geração, marcações oficiais e iluminação LED de alta performance.
         Ideal para campeonatos, treinos intensos e partidas entre amigos. Dispõe de vestiários, bebedouro e estacionamento gratuito.
@@ -99,7 +127,7 @@
 
     <!-- Agenda -->
     <div class="schedule-section">
-        <h4 class="fw-bold mb-3">📅 Disponibilidade para Hoje</h4>
+        <h4 class="fw-bold mb-3"><i class="bi bi-calendar-check me-2"></i>Disponibilidade para Hoje</h4>
         <div class="time-grid" id="grade-horarios">
             <!-- Gerado via JS -->
         </div>
@@ -111,18 +139,24 @@
         <div class="price-value">R$ 150,00</div>
         <small class="text-muted">Pagamento via PIX ou Cartão</small>
     </div>
-    <a href="/login?redirect=/nova-reserva" class="btn btn-success w-100 py-3 mt-3">
-    Reservar esta Quadra
-</a>
+    <a href="/login?redirect=/nova-reserva" class="btn btn-reserve w-100 py-3 mt-3">
+        Reservar esta Quadra
+    </a>
 
     <!-- Avaliações -->
-    <h4 class="fw-bold mt-5 mb-3">⭐ Avaliações dos Jogadores</h4>
+    <h4 class="fw-bold mt-5 mb-3"><i class="bi bi-star-fill me-2"></i>Avaliações dos Jogadores</h4>
     <div class="review-card">
         <div class="review-header">
             <span class="review-user">Carlos M.</span>
             <span class="review-date">10/06/2026</span>
         </div>
-        <div class="stars mb-2">★★★★★</div>
+        <div class="stars mb-2">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+        </div>
         <p class="review-text">Gramado impecável e iluminação excelente para jogos noturnos. Recomendo demais!</p>
     </div>
     <div class="review-card">
@@ -130,7 +164,13 @@
             <span class="review-user">Ana P.</span>
             <span class="review-date">08/06/2026</span>
         </div>
-        <div class="stars mb-2">★★★★☆</div>
+        <div class="stars mb-2">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star"></i>
+        </div>
         <p class="review-text">Ótima quadra, mas o bebedouro estava sem água no último jogo. Tirando isso, top!</p>
     </div>
     <div class="review-card">
@@ -138,7 +178,13 @@
             <span class="review-user">Grupo F.C. Unidos</span>
             <span class="review-date">02/06/2026</span>
         </div>
-        <div class="stars mb-2">★★★★★</div>
+        <div class="stars mb-2">
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i>
+        </div>
         <p class="review-text">Jogamos nosso campeonato aqui. Espaço amplo, vestiários limpos e staff muito atencioso.</p>
     </div>
 </div>

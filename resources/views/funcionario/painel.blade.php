@@ -18,12 +18,58 @@
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
 
         .layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 240px; background: var(--primary); color: white; padding: 1.5rem; display: flex; flex-direction: column; }
-        .sidebar-brand { font-size: 1.4rem; font-weight: 700; color: white; text-decoration: none; margin-bottom: 2.5rem; display: block; }
-        .nav-link { color: #94A3B8; font-weight: 500; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; transition: all 0.2s; text-decoration: none; }
+        .sidebar { 
+            width: 260px; 
+            background: var(--primary); 
+            color: white; 
+            padding: 1.5rem; 
+            display: flex; 
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-brand { 
+            font-size: 1.3rem; 
+            font-weight: 700; 
+            color: white; 
+            text-decoration: none; 
+            margin-bottom: 2.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.6rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+        }
+        .sidebar-brand i { font-size: 1.8rem; }
+        .sidebar-brand span { 
+            font-size: 0.75rem; 
+            opacity: 0.85; 
+            display: block;
+            font-weight: 400;
+            margin-top: -0.2rem;
+        }
+        .nav-link { 
+            color: #94A3B8; 
+            font-weight: 500; 
+            padding: 0.8rem 1rem; 
+            border-radius: 8px; 
+            margin-bottom: 0.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.8rem; 
+            transition: all 0.2s; 
+            text-decoration: none; 
+        }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
 
-        .main { flex: 1; padding: 2rem; overflow-y: auto; }
+        .main { 
+            flex: 1; 
+            padding: 2rem; 
+            overflow-y: auto;
+            margin-left: 260px;
+        }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
         .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0; }
         .badge-role { background: var(--secondary); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; }
@@ -42,7 +88,19 @@
         .dot-yellow { background: #F59E0B; }
         .dot-red { background: #EF4444; }
 
-        .btn-action { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; border: none; cursor: pointer; font-weight: 600; margin-right: 0.3rem; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .btn-action { 
+            padding: 0.4rem 0.7rem; 
+            border-radius: 6px; 
+            font-size: 0.75rem; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600; 
+            margin-right: 0.3rem; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.3rem;
+            white-space: nowrap;
+        }
         .btn-checkin { background: rgba(16, 185, 129, 0.1); color: var(--accent); }
         .btn-checkin:hover { background: var(--accent); color: white; }
         .btn-report { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
@@ -50,11 +108,40 @@
         .btn-pay { background: rgba(59,130,246,0.1); color: var(--secondary); }
         .btn-pay:hover { background: var(--secondary); color: white; }
 
-        .badge-payment { padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .badge-payment { 
+            padding: 0.4rem 0.7rem; 
+            border-radius: 6px; 
+            font-size: 0.75rem; 
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            line-height: 1.4;
+        }
         .badge-paid { background: rgba(16,185,129,0.15); color: var(--accent); }
         .badge-pending { background: rgba(245,158,11,0.15); color: #F59E0B; }
 
-        @media (max-width: 992px) { .sidebar { display: none; } }
+        /* Ajuste para telas menores */
+        @media (max-width: 1200px) {
+            .btn-action { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
+            .table-custom td { padding: 0.75rem 0.5rem; }
+            .badge-payment { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
+        }
+        @media (max-width: 992px) { 
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .btn-action { margin-bottom: 0.2rem; }
+        }
+        @media (max-width: 768px) {
+            .table-custom th, .table-custom td { font-size: 0.8rem; padding: 0.5rem; }
+            .btn-action { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
+            .badge-payment { 
+                display: block;
+                text-align: center;
+                padding: 0.5rem;
+                margin: 0.2rem 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -62,7 +149,13 @@
 <div class="layout">
     <!-- Sidebar -->
     <aside class="sidebar">
-        <a href="/painel-funcionario" class="sidebar-brand">EsporTec <span style="font-size:0.8rem; opacity:0.7;">Área do Funcionário</span></a>
+        <a href="/painel-funcionario" class="sidebar-brand">
+            <i class="bi bi-trophy"></i>
+            <div>
+                EsporTec
+                <span>Área do Funcionário</span>
+            </div>
+        </a>
         <nav>
             <a href="/painel-funcionario" class="nav-link active"><i class="bi bi-grid"></i> Agenda do Dia</a>
             <a href="/funcionario/perfil" class="nav-link"><i class="bi bi-person"></i> Meu Perfil</a>
@@ -79,40 +172,40 @@
     <main class="main">
         <div class="header">
             <div>
-                <h1>Agenda do Dia</h1>
+                <h1><i class="bi bi-calendar-check me-2"></i>Agenda do Dia</h1>
                 <p class="text-muted mb-0">Terça-feira, 14 de Junho de 2026</p>
             </div>
-            <span class="badge-role">Funcionário Ativo</span>
+            <span class="badge-role"><i class="bi bi-check-circle me-1"></i>Funcionário Ativo</span>
         </div>
 
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Reservas Hoje</div>
+                <div class="stat-label"><i class="bi bi-calendar3 me-1"></i>Reservas Hoje</div>
                 <div class="stat-value">12</div>
                 <small class="text-success"><i class="bi bi-arrow-up"></i> 2 confirmadas</small>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Receita do Dia</div>
+                <div class="stat-label"><i class="bi bi-cash-coin me-1"></i>Receita do Dia</div>
                 <div class="stat-value">R$ 1.450</div>
                 <small class="text-muted">Acumulado</small>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Quadras Ativas</div>
+                <div class="stat-label"><i class="bi bi-collection me-1"></i>Quadras Ativas</div>
                 <div class="stat-value">3/4</div>
                 <small class="text-warning"><i class="bi bi-wrench"></i> 1 em manutenção</small>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Próximo Check-in</div>
+                <div class="stat-label"><i class="bi bi-clock me-1"></i>Próximo Check-in</div>
                 <div class="stat-value">14:00</div>
                 <small class="text-muted">Society Premium</small>
             </div>
         </div>
 
-        <!-- Agenda do Dia (RF10: Coluna Pagamento) -->
+        <!-- Agenda do Dia -->
         <div class="agenda-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0">Partidas de Hoje</h4>
+                <h4 class="fw-bold mb-0"><i class="bi bi-list-ul me-2"></i>Partidas de Hoje</h4>
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalReservaManual">
                     <i class="bi bi-plus"></i> Reserva Manual
                 </button>
@@ -141,7 +234,7 @@
                                 </div>
                             </td>
                             <td><span class="status-dot dot-green"></span> Em Jogo</td>
-                            <td><span class="badge-payment badge-paid">Pago (PIX)</span></td>
+                            <td><span class="badge-payment badge-paid"><i class="bi bi-check2-circle me-1"></i>Pago (PIX)</span></td>
                             <td>
                                 <button class="btn-action btn-report" onclick="abrirManutencaoRapida()">
                                     <i class="bi bi-tools"></i> Manutenção
@@ -159,11 +252,13 @@
                             </td>
                             <td><span class="status-dot dot-yellow"></span> Pendente</td>
                             <td>
-                                <span class="badge-payment badge-pending" id="pag-status-123">Pendente (Dinheiro)</span>
+                                <span class="badge-payment badge-pending" id="pag-status-123">
+                                    <i class="bi bi-clock me-1"></i>Pendente<br><small>(Dinheiro)</small>
+                                </span>
                             </td>
                             <td>
                                 <button class="btn-action btn-pay" onclick="atualizarPagamento('123', this)">
-                                    <i class="bi bi-check-circle"></i> Confirmar Pgto
+                                    <i class="bi bi-check-circle"></i> Confirmar
                                 </button>
                             </td>
                         </tr>
@@ -177,10 +272,10 @@
                                 </div>
                             </td>
                             <td><span class="status-dot dot-green"></span> Confirmada</td>
-                            <td><span class="badge-payment badge-paid">Pago (Cartão)</span></td>
+                            <td><span class="badge-payment badge-paid"><i class="bi bi-check2-circle me-1"></i>Pago (Cartão)</span></td>
                             <td>
                                 <button class="btn-action btn-checkin" onclick="checkin(this)">
-                                    <i class="bi bi-check-circle"></i> Confirmar Chegada
+                                    <i class="bi bi-check-circle"></i> Check-in
                                 </button>
                             </td>
                         </tr>
@@ -189,9 +284,11 @@
                             <td class="text-muted">Society Premium</td>
                             <td class="text-muted">João Silva</td>
                             <td><span class="status-dot" style="background:#CBD5E1;"></span> Agendado</td>
-                            <td><span class="badge-payment badge-pending">Pendente (PIX)</span></td>
+                            <td><span class="badge-payment badge-pending"><i class="bi bi-clock me-1"></i>Pendente (PIX)</span></td>
                             <td>
-                                <button type="button" class="btn-action btn-checkin" disabled style="opacity:0.5; cursor:not-allowed;">Aguardando</button>
+                                <button type="button" class="btn-action btn-checkin" disabled style="opacity:0.5; cursor:not-allowed;">
+                                    <i class="bi bi-hourglass"></i> Aguardando
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -199,11 +296,11 @@
             </div>
         </div>
 
-        <!-- Feedbacks dos Clientes (RF11) -->
+        <!-- Feedbacks dos Clientes -->
         <div class="agenda-card" id="feedbacksClientes">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0"><i class="bi bi-chat-square-text me-2"></i>Feedbacks Recebidos</h4>
-                <span class="badge bg-secondary">Últimos 7 dias</span>
+                <span class="badge bg-secondary"><i class="bi bi-calendar-week me-1"></i>Últimos 7 dias</span>
             </div>
             <div class="table-responsive">
                 <table class="table-custom">
@@ -222,14 +319,30 @@
                             <td>Society Premium<br><small class="text-muted">14/06</small></td>
                             <td><span class="text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></span></td>
                             <td>"Gramado impecável e iluminação excelente. Voltaremos semana que vem!"</td>
-                            <td><button class="btn btn-sm btn-outline-primary" onclick="responderFeedback(this)">Responder</button></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalResponderFeedback"
+                                        data-cliente="João Silva"
+                                        data-comentario="Gramado impecável e iluminação excelente. Voltaremos semana que vem!">
+                                    <i class="bi bi-reply"></i> Responder
+                                </button>
+                            </td>
                         </tr>
                         <tr>
                             <td>Ana Lima</td>
                             <td>Society Descoberta<br><small class="text-muted">10/06</small></td>
                             <td><span class="text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i></span></td>
                             <td>"Ótima quadra, mas o bebedouro estava sem água no último jogo."</td>
-                            <td><button class="btn btn-sm btn-outline-primary" onclick="responderFeedback(this)">Responder</button></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalResponderFeedback"
+                                        data-cliente="Ana Lima"
+                                        data-comentario="Ótima quadra, mas o bebedouro estava sem água no último jogo.">
+                                    <i class="bi bi-reply"></i> Responder
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -336,6 +449,38 @@
     </div>
 </div>
 
+<!-- Modal Responder Feedback -->
+<div class="modal fade" id="modalResponderFeedback" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-reply me-2"></i>Responder Feedback</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Cliente</label>
+                    <p class="form-control-plaintext fw-semibold" id="feedbackCliente">-</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Comentário Original</label>
+                    <div class="p-3 bg-light rounded" id="feedbackComentario">-</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Sua Resposta</label>
+                    <textarea class="form-control" id="respostaFeedback" rows="4" placeholder="Digite sua resposta ao cliente..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="enviarRespostaFeedback()">
+                    <i class="bi bi-send me-2"></i>Enviar Resposta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
 <script>
@@ -353,7 +498,7 @@
             finishBtn.onclick = function() {
                 statusCell.innerHTML = '<span class="status-dot dot-green"></span> Concluído';
                 finishBtn.disabled = true;
-                finishBtn.textContent = 'Finalizado';
+                finishBtn.innerHTML = '<i class="bi bi-check2"></i> Finalizado';
                 esportecToast('Jogo finalizado. Quadra liberada.', 'success');
             };
             actionsCell.appendChild(finishBtn);
@@ -365,7 +510,7 @@
         if(confirm('Confirmar recebimento do pagamento?')) {
             const badge = document.getElementById('pag-status-' + id);
             badge.className = 'badge-payment badge-paid';
-            badge.textContent = 'Pago (Confirmado)';
+            badge.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Pago<br><small>(Confirmado)</small>';
             btn.style.display = 'none';
             esportecToast('Pagamento confirmado.', 'success');
         }
@@ -375,11 +520,38 @@
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modalManutencao')).show();
     }
 
-    function responderFeedback(button) {
-        button.textContent = 'Respondido';
-        button.className = 'btn btn-sm btn-outline-success';
-        button.disabled = true;
-        esportecToast('Resposta registrada para o cliente.', 'success');
+    // Carregar dados no modal de resposta de feedback
+    document.getElementById('modalResponderFeedback').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const cliente = button.getAttribute('data-cliente');
+        const comentario = button.getAttribute('data-comentario');
+        
+        document.getElementById('feedbackCliente').textContent = cliente;
+        document.getElementById('feedbackComentario').textContent = comentario;
+        document.getElementById('respostaFeedback').value = '';
+    });
+
+    function enviarRespostaFeedback() {
+        const resposta = document.getElementById('respostaFeedback').value.trim();
+        if (!resposta) {
+            esportecToast('Digite uma resposta antes de enviar.', 'warning');
+            return;
+        }
+        
+        bootstrap.Modal.getInstance(document.getElementById('modalResponderFeedback')).hide();
+        esportecToast('Resposta enviada ao cliente com sucesso.', 'success');
+        
+        // Atualiza visualmente o botão na tabela
+        setTimeout(() => {
+            const btns = document.querySelectorAll('[data-bs-target="#modalResponderFeedback"]');
+            btns.forEach(btn => {
+                if (btn.getAttribute('data-cliente') === document.getElementById('feedbackCliente').textContent) {
+                    btn.innerHTML = '<i class="bi bi-check2"></i> Respondido';
+                    btn.className = 'btn btn-sm btn-outline-success';
+                    btn.disabled = true;
+                }
+            });
+        }, 300);
     }
 
     function registrarManutencao() {

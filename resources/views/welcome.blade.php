@@ -971,6 +971,7 @@
                     <select class="form-select form-select-custom">
                         <option>Quadra Society Premium</option>
                         <option>Quadra Futsal Arena</option>
+                        <option>Quadra Society Descoberta</option>
                     </select>
                 </div>
                 <div class="col-md-6">

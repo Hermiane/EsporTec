@@ -6,7 +6,7 @@
 </head>
 <body class="bg-light">
     <div class="container py-5">
-        <h1 class="mb-4">🎯 EsporTec - Menu de Testes</h1>
+        <h1 class="mb-4"> EsporTec - Menu de Testes</h1>
         <p class="lead mb-4">Selecione um perfil para navegar:</p>
 
         <div class="row g-4">
@@ -14,7 +14,7 @@
             <div class="col-md-4">
                 <div class="card h-100">
                     <div class="card-body">
-                        <h3 class="card-title">🌐 Área Pública</h3>
+                        <h3 class="card-title"> Área Pública</h3>
                         <a href="/" class="btn btn-outline-primary w-100 mb-2">Landing Page</a>
                         <a href="/login" class="btn btn-outline-primary w-100 mb-2">Login</a>
                         <a href="/criar-conta" class="btn btn-outline-primary w-100 mb-2">Cadastro</a>
@@ -27,7 +27,7 @@
             <div class="col-md-4">
                 <div class="card h-100 border-success">
                     <div class="card-body">
-                        <h3 class="card-title text-success">👤 Cliente</h3>
+                        <h3 class="card-title text-success"> Cliente</h3>
                         <a href="/painel" class="btn btn-success w-100 mb-2">Painel do Cliente</a>
                         <a href="/nova-reserva" class="btn btn-outline-success w-100 mb-2">Nova Reserva</a>
                         <a href="/minhas-reservas" class="btn btn-outline-success w-100 mb-2">Minhas Reservas</a>
@@ -43,7 +43,7 @@
             <div class="col-md-4">
                 <div class="card h-100 border-primary">
                     <div class="card-body">
-                        <h3 class="card-title text-primary">👨‍ Funcionário</h3>
+                        <h3 class="card-title text-primary">‍ Funcionário</h3>
                         <a href="/painel-funcionario" class="btn btn-primary w-100 mb-2">Agenda Operacional</a>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
             <div class="col-md-12">
                 <div class="card border-danger">
                     <div class="card-body">
-                        <h3 class="card-title text-danger">👑 Administrador</h3>
+                        <h3 class="card-title text-danger"> Administrador</h3>
                         <div class="row g-2">
                             <div class="col-md-2"><a href="/admin/dashboard" class="btn btn-outline-danger w-100">Dashboard</a></div>
                             <div class="col-md-2"><a href="/admin/agendamentos" class="btn btn-outline-danger w-100">Agendamentos</a></div>

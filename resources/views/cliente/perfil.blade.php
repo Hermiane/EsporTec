@@ -72,7 +72,7 @@
             <div class="profile-info">
                 <h3>João Silva</h3>
                 <p>joao.silva@email.com</p>
-                <span class="badge-member">🎖️ Membro desde 2024</span>
+                <span class="badge-member"><i class="bi bi-calendar-check me-1"></i>Membro desde 2024</span>
             </div>
         </div>
 

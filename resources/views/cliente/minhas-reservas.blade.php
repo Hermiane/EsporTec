@@ -35,8 +35,26 @@
         .badge-cancelada { background: rgba(211,47,47,0.15); color: #D32F2F; }
         .badge-concluida { background: rgba(21,101,192,0.15); color: #1565C0; }
 
-        .reserva-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .btn-action { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; }
+        .reserva-actions { 
+            display: flex; 
+            gap: 0.5rem; 
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .btn-action { 
+            padding: 0.5rem 0.9rem; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.4rem; 
+            text-decoration: none;
+            white-space: nowrap;
+        }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--dark); }
         .btn-outline { background: white; border: 1px solid #E2E8F0; color: var(--gray); }
@@ -50,6 +68,13 @@
 
         .empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray); }
         .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+        
+        /* Ajuste para telas menores */
+        @media (max-width: 576px) {
+            .reserva-card { flex-direction: column; align-items: flex-start; }
+            .reserva-actions { width: 100%; justify-content: flex-start; }
+            .btn-action { flex: 1; justify-content: center; }
+        }
     </style>
 </head>
 <body>
@@ -149,7 +174,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">📋 Detalhes da Reserva</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-clipboard me-2"></i>Detalhes da Reserva</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -205,7 +230,7 @@
                 </div>
 
                 <div class="mt-4 p-3 border rounded">
-                    <strong class="d-block mb-2">📍 Localização:</strong>
+                    <strong class="d-block mb-2"><i class="bi bi-geo-alt me-2"></i>Localização:</strong>
                     <p class="mb-1">Rua dos Esportes, 123 - São Paulo, SP</p>
                     <small class="text-muted">Chegar com 10 minutos de antecedência</small>
                 </div>
@@ -228,7 +253,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">⭐ Avaliar Partida</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-star-fill me-2"></i>Avaliar Partida</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
