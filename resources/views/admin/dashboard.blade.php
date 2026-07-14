@@ -44,7 +44,7 @@
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
+        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.75;">Admin da arena</span></a>
         <nav>
             <a href="/admin/dashboard" class="nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
@@ -54,7 +54,6 @@
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
             <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
-            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
@@ -62,8 +61,8 @@
     <main class="main">
         <div class="header">
             <div>
-                <h1><i class="bi bi-speedometer2 me-2"></i>Visão Geral do Sistema</h1>
-                <p class="text-muted mb-0">Resumo operacional - Junho 2026</p>
+                <h1><i class="bi bi-speedometer2 me-2"></i>Visão Geral da Arena</h1>
+                <p class="text-muted mb-0">Painel do proprietário/gestor - Junho 2026</p>
             </div>
             <div>
                 <label class="form-label small text-muted mb-1">Arena ativa</label>

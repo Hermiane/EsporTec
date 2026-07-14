@@ -35,12 +35,13 @@
         .btn-edit { background: rgba(59,130,246,0.1); color: var(--primary); }
         .btn-inactive { background: rgba(239,68,68,0.1); color: var(--danger); }
         .btn-primary-admin { background: var(--primary); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .role-note { background:#EFF6FF; border:1px solid rgba(59,130,246,.18); border-radius:12px; padding:1rem; margin-bottom:1.5rem; color:#334155; }
     </style>
 </head>
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
+        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.75;">Admin da arena</span></a>
         <nav>
             <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
@@ -50,27 +51,33 @@
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
             <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
-            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
     <main class="main">
         <div class="header">
-            <h1><i class="bi bi-people me-2"></i>Gestão de Pessoas</h1>
+            <div>
+                <h1><i class="bi bi-people me-2"></i>Gestão de Pessoas</h1>
+                <p class="text-muted mb-0">Perfis separados entre plataforma, gestão da arena e operação.</p>
+            </div>
             <button class="btn-primary-admin" data-bs-toggle="modal" data-bs-target="#modalNovoUsuario">
                 <i class="bi bi-person-plus me-2"></i>Novo Usuário
             </button>
         </div>
 
         <div class="card-custom">
-            <h5 class="fw-bold mb-3">Administradores e Funcionários</h5>
+            <div class="role-note">
+                <div class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Quem é quem no sistema</div>
+                <div><strong>Super admin</strong> pertence à plataforma EsporTec. <strong>Admin da arena</strong> é o proprietário ou gestor da arena. <strong>Funcionário</strong> atende a operação diária.</div>
+            </div>
+            <h5 class="fw-bold mb-3">Plataforma, admins da arena e funcionários</h5>
 
             <!-- Usuário Super Admin (Protegido) -->
             <div class="user-card">
                 <div class="user-avatar" style="background:#DC2626; color:white;">SA</div>
                 <div class="user-info">
-                    <div class="user-name">Super Admin <span class="user-role role-super-admin">SUPER ADMIN</span></div>
-                    <div class="user-email">admin@esportec.com.br</div>
+                    <div class="user-name">Plataforma EsporTec <span class="user-role role-super-admin">SUPER ADMIN PLATAFORMA</span></div>
+                    <div class="user-email">suporte@esportec.com.br</div>
                 </div>
                 <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>
                 <!-- Botões desativados pois Super Admin não é editável -->
@@ -81,8 +88,9 @@
             <div class="user-card">
                 <div class="user-avatar" style="background:#3B82F6; color:white;">MA</div>
                 <div class="user-info">
-                    <div class="user-name">Maria Admin <span class="user-role role-admin">ADMIN</span></div>
+                    <div class="user-name">Maria Admin <span class="user-role role-admin">ADMIN DA ARENA</span></div>
                     <div class="user-email">maria@esportec.com.br</div>
+                    <small class="text-muted">Proprietária/Gestora da arena</small>
                 </div>
                 <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>
                 <button class="btn-action btn-edit" data-person-action="editar"><i class="bi bi-pencil"></i> Editar</button>
@@ -140,7 +148,7 @@
                 <div class="mb-3">
                     <label class="form-label fw-medium">Perfil</label>
                     <select class="form-select" id="pessoaPerfil">
-                        <option value="admin">Administrador</option>
+                        <option value="admin">Admin da arena</option>
                         <option value="funcionario">Funcionário</option>
                     </select>
                 </div>
@@ -199,7 +207,7 @@
             <div class="user-card">
                 <div class="user-avatar" style="background:#10B981; color:white;">${iniciais}</div>
                 <div class="user-info">
-                    <div class="user-name">${nome} <span class="user-role ${perfil === 'admin' ? 'role-admin' : 'role-funcionario'}">${perfil === 'admin' ? 'ADMIN' : 'FUNCIONÁRIO'}</span></div>
+                    <div class="user-name">${nome} <span class="user-role ${perfil === 'admin' ? 'role-admin' : 'role-funcionario'}">${perfil === 'admin' ? 'ADMIN DA ARENA' : 'FUNCIONÁRIO'}</span></div>
                     <div class="user-email">${email}</div>
                 </div>
                 <span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>

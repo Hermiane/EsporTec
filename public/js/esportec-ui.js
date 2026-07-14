@@ -74,15 +74,19 @@
     const publicRoutes = ['/', '/login', '/criar-conta', '/recuperar-senha', '/detalhes-quadra', '/cadastrar-arena', '/teste'];
     const path = window.location.pathname;
     const isPublic = publicRoutes.includes(path) || path.startsWith('/partida');
+    const isSuperAdmin = path.startsWith('/super-admin');
     const isAdmin = path.startsWith('/admin');
+    const isPlatformLog = path === '/admin/logs';
     const isStaff = path.startsWith('/funcionario') || path === '/painel-funcionario';
     const isClient = ['/painel', '/nova-reserva', '/minhas-reservas', '/notificacoes', '/perfil'].includes(path);
 
-    if (!isPublic && (isAdmin || isStaff || isClient)) {
+    if (!isPublic && (isSuperAdmin || isAdmin || isStaff || isClient)) {
         const role = sessionStorage.getItem('esportecRole');
         const allowed =
-            (isAdmin && role === 'admin') ||
-            (isStaff && (role === 'funcionario' || role === 'admin')) ||
+            (isPlatformLog && role === 'super_admin') ||
+            (isSuperAdmin && role === 'super_admin') ||
+            (isAdmin && !isPlatformLog && (role === 'admin' || role === 'super_admin')) ||
+            (isStaff && (role === 'funcionario' || role === 'admin' || role === 'super_admin')) ||
             (isClient && role === 'cliente');
 
         if (!role) {
@@ -91,7 +95,7 @@
         }
 
         if (!allowed) {
-            window.location.href = role === 'admin' ? '/admin/dashboard' : role === 'funcionario' ? '/painel-funcionario' : '/painel';
+            window.location.href = role === 'super_admin' ? '/super-admin/dashboard' : role === 'admin' ? '/admin/dashboard' : role === 'funcionario' ? '/painel-funcionario' : '/painel';
         }
     }
 })();

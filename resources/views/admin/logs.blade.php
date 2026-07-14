@@ -23,9 +23,9 @@
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <small class="opacity-75">ADMIN</small></a>
+        <a href="/super-admin/dashboard" class="sidebar-brand">EsporTec <small class="opacity-75">Super admin</small></a>
         <nav>
-            <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a href="/super-admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
             <a href="/admin/financeiro" class="nav-link"><i class="bi bi-cash-stack"></i> Financeiro</a>
             <a href="/admin/quadras" class="nav-link"><i class="bi bi-grid-3x3-gap"></i> Quadras</a>
@@ -39,10 +39,10 @@
     <main class="main">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
             <div>
-                <h1 class="fw-bold mb-1">Logs do sistema</h1>
-                <p class="text-muted mb-0">Acesso restrito ao super admin.</p>
+                <h1 class="fw-bold mb-1">Logs da plataforma</h1>
+                <p class="text-muted mb-0">Acesso restrito ao super admin da plataforma EsporTec.</p>
             </div>
-            <span class="badge bg-warning text-dark">Super admin</span>
+            <span class="badge bg-warning text-dark">Super admin da plataforma</span>
         </div>
         <section class="card-soft p-4">
             <div class="row g-3 mb-3">
@@ -57,7 +57,7 @@
                     <tbody>
                         <tr data-log-date="2026-06-21"><td>21/06/2026 15:42</td><td>Maria Admin</td><td><span class="badge bg-success">Pagamento</span></td><td>Confirmou pagamento da reserva #1235.</td><td>192.168.0.14</td></tr>
                         <tr data-log-date="2026-06-21"><td>21/06/2026 14:18</td><td>João Funcionário</td><td><span class="badge bg-primary">Reserva</span></td><td>Alterou horário da reserva #1234.</td><td>192.168.0.22</td></tr>
-                        <tr data-log-date="2026-06-21"><td>21/06/2026 09:10</td><td>Super Admin</td><td><span class="badge bg-warning text-dark">Equipe</span></td><td>Inativou funcionário Ana Lima.</td><td>192.168.0.10</td></tr>
+                        <tr data-log-date="2026-06-21"><td>21/06/2026 09:10</td><td>Plataforma EsporTec</td><td><span class="badge bg-warning text-dark">Equipe</span></td><td>Inativou funcionário Ana Lima como ação de suporte da plataforma.</td><td>192.168.0.10</td></tr>
                         <tr data-log-date="2026-06-20"><td>20/06/2026 20:05</td><td>Pedro Cliente</td><td><span class="badge bg-secondary">Login</span></td><td>Acessou a área do cliente.</td><td>189.88.12.40</td></tr>
                     </tbody>
                 </table>

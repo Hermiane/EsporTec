@@ -67,6 +67,13 @@
         .quick-btn span { font-weight: 600; font-size: 0.9rem; }
 
         .quadras-grid { margin-bottom: 2rem; }
+        .arena-selector { background: white; border-radius: 14px; padding: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
+        .arena-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; }
+        .arena-option { border: 1px solid #E2E8F0; border-radius: 12px; padding: 1rem; background: #FFFFFF; cursor: pointer; text-align: left; transition: all 0.2s ease; }
+        .arena-option:hover, .arena-option.active { border-color: var(--primary); background: var(--light); box-shadow: 0 6px 16px rgba(45,129,93,0.12); }
+        .arena-option strong { display: block; color: var(--text); margin-bottom: 0.2rem; }
+        .arena-option small { color: var(--gray); }
+        .arena-badge { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--light); color: var(--primary); border-radius: 999px; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.75rem; }
         .quadra-card { height: 100%; overflow: hidden; border: none; border-radius: 12px; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; }
         .quadra-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
         .quadra-img { width: 100%; height: 220px; object-fit: cover; }
@@ -143,10 +150,10 @@
         </div>
 
         <div id="searchPanel" class="top-panel d-none">
-            <label class="form-label fw-semibold" for="clientSearch">Buscar quadras</label>
+            <label class="form-label fw-semibold" for="clientSearch">Buscar arenas ou quadras</label>
             <div class="input-group">
                 <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                <input type="search" class="form-control" id="clientSearch" placeholder="Digite o nome da quadra">
+                <input type="search" class="form-control" id="clientSearch" placeholder="Digite o nome da arena ou quadra">
                 <button type="button" class="btn btn-success" id="goSearch">Ir</button>
             </div>
         </div>
@@ -215,16 +222,49 @@
             </a>
         </div>
 
+        <!-- Arenas disponíveis -->
+        <section class="arena-selector">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Escolha a arena</h5>
+                    <p class="text-muted mb-0">Você pode reservar em uma arena específica ou ver todas as quadras cadastradas.</p>
+                </div>
+                <span class="badge bg-success">3 arenas</span>
+            </div>
+            <div class="arena-options" id="arenaOptions">
+                <button type="button" class="arena-option active" data-arena-filter="todas">
+                    <strong>Todas as arenas</strong>
+                    <small>Mostrar todas as quadras disponíveis</small>
+                </button>
+                <button type="button" class="arena-option" data-arena-filter="esportec-arena">
+                    <strong>EsporTec Arena</strong>
+                    <small>Centro • 3 quadras cadastradas</small>
+                </button>
+                <button type="button" class="arena-option" data-arena-filter="society-cameta">
+                    <strong>Arena Society Cametá</strong>
+                    <small>Bairro Novo • 1 quadra cadastrada</small>
+                </button>
+                <button type="button" class="arena-option" data-arena-filter="zona-norte">
+                    <strong>Unidade Zona Norte</strong>
+                    <small>Zona Norte • 1 quadra cadastrada</small>
+                </button>
+            </div>
+        </section>
+
         <!-- Quadras Disponíveis -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <h5 class="fw-bold mb-0">Quadras Disponíveis</h5>
+            <div>
+                <h5 class="fw-bold mb-0">Quadras Disponíveis</h5>
+                <small class="text-muted" id="arenaAtualLabel">Mostrando quadras de todas as arenas</small>
+            </div>
         </div>
         <div class="row g-4 quadras-grid">
-            <div class="col-lg-4">
+            <div class="col-lg-4" data-arena="esportec-arena">
                 <div class="quadra-card">
                     <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80"
                          alt="Quadra Futsal Arena" class="quadra-img">
                     <div class="quadra-content">
+                        <span class="arena-badge"><i class="bi bi-building"></i>EsporTec Arena</span>
                         <h3 class="quadra-title">Quadra Futsal Arena</h3>
                         <div class="rating">
                             <i class="bi bi-star-fill"></i>
@@ -235,18 +275,19 @@
                         <p class="quadra-info"><strong>Capacidade:</strong> 10 jogadores</p>
                         <p class="quadra-info"><strong>Coberta:</strong> Sim</p>
                         <div class="price">R$ 120/hora</div>
-                        <a href="/nova-reserva?quadra=futsal-arena&etapa=data" class="btn-select-quadra">
+                        <a href="/nova-reserva?arena=esportec-arena&quadra=futsal-arena&etapa=data" class="btn-select-quadra">
                             Selecionar <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-4">
+            <div class="col-lg-4" data-arena="esportec-arena">
                 <div class="quadra-card">
                     <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=800&q=80"
                          alt="Quadra Society Premium" class="quadra-img">
                     <div class="quadra-content">
+                        <span class="arena-badge"><i class="bi bi-building"></i>EsporTec Arena</span>
                         <h3 class="quadra-title">Quadra Society Premium</h3>
                         <div class="rating">
                             <i class="bi bi-star-fill"></i>
@@ -257,18 +298,19 @@
                         <p class="quadra-info"><strong>Capacidade:</strong> 14 jogadores</p>
                         <p class="quadra-info"><strong>Coberta:</strong> Não</p>
                         <div class="price">R$ 150/hora</div>
-                        <a href="/nova-reserva?quadra=society-premium&etapa=data" class="btn-select-quadra">
+                        <a href="/nova-reserva?arena=esportec-arena&quadra=society-premium&etapa=data" class="btn-select-quadra">
                             Selecionar <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-4">
+            <div class="col-lg-4" data-arena="esportec-arena">
                 <div class="quadra-card">
                     <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80"
                          alt="Quadra Society Descoberta" class="quadra-img">
                     <div class="quadra-content">
+                        <span class="arena-badge"><i class="bi bi-building"></i>EsporTec Arena</span>
                         <h3 class="quadra-title">Quadra Society Descoberta</h3>
                         <div class="rating">
                             <i class="bi bi-star-fill"></i>
@@ -279,7 +321,53 @@
                         <p class="quadra-info"><strong>Capacidade:</strong> 14 jogadores</p>
                         <p class="quadra-info"><strong>Coberta:</strong> Não</p>
                         <div class="price">R$ 100/hora</div>
-                        <a href="/nova-reserva?quadra=society-descoberta&etapa=data" class="btn-select-quadra">
+                        <a href="/nova-reserva?arena=esportec-arena&quadra=society-descoberta&etapa=data" class="btn-select-quadra">
+                            Selecionar <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-arena="society-cameta">
+                <div class="quadra-card">
+                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80"
+                         alt="Campo Society Cametá" class="quadra-img">
+                    <div class="quadra-content">
+                        <span class="arena-badge"><i class="bi bi-building"></i>Arena Society Cametá</span>
+                        <h3 class="quadra-title">Campo Society Cametá</h3>
+                        <div class="rating">
+                            <i class="bi bi-star-fill"></i>
+                            <span>4.7 (51 avaliações)</span>
+                        </div>
+                        <p class="quadra-info">Campo society com grama sintética, arquibancada pequena e iluminação noturna.</p>
+                        <p class="quadra-info"><strong>Tipo:</strong> Society</p>
+                        <p class="quadra-info"><strong>Capacidade:</strong> 14 jogadores</p>
+                        <p class="quadra-info"><strong>Coberta:</strong> Não</p>
+                        <div class="price">R$ 130/hora</div>
+                        <a href="/nova-reserva?arena=society-cameta&quadra=campo-society-cameta&etapa=data" class="btn-select-quadra">
+                            Selecionar <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-arena="zona-norte">
+                <div class="quadra-card">
+                    <img src="https://images.unsplash.com/photo-1598881034666-6d344b6f58a6?auto=format&fit=crop&w=800&q=80"
+                         alt="Quadra Zona Norte" class="quadra-img">
+                    <div class="quadra-content">
+                        <span class="arena-badge"><i class="bi bi-building"></i>Unidade Zona Norte</span>
+                        <h3 class="quadra-title">Quadra Zona Norte</h3>
+                        <div class="rating">
+                            <i class="bi bi-star-fill"></i>
+                            <span>4.4 (38 avaliações)</span>
+                        </div>
+                        <p class="quadra-info">Quadra coberta para futsal e eventos esportivos de pequeno porte.</p>
+                        <p class="quadra-info"><strong>Tipo:</strong> Futsal</p>
+                        <p class="quadra-info"><strong>Capacidade:</strong> 10 jogadores</p>
+                        <p class="quadra-info"><strong>Coberta:</strong> Sim</p>
+                        <div class="price">R$ 110/hora</div>
+                        <a href="/nova-reserva?arena=zona-norte&quadra=quadra-zona-norte&etapa=data" class="btn-select-quadra">
                             Selecionar <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
@@ -421,6 +509,8 @@
     const clientSearch = document.getElementById('clientSearch');
     const goSearch = document.getElementById('goSearch');
     const emptySearch = document.getElementById('emptySearch');
+    const arenaAtualLabel = document.getElementById('arenaAtualLabel');
+    let currentArenaFilter = 'todas';
     const topPanels = [searchPanel, profilePanel];
 
     function openSidebar() {
@@ -464,6 +554,19 @@
 
     profileToggle.addEventListener('click', () => toggleTopPanel(profilePanel));
 
+    document.querySelectorAll('[data-arena-filter]').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('[data-arena-filter]').forEach(item => item.classList.remove('active'));
+            button.classList.add('active');
+            currentArenaFilter = button.dataset.arenaFilter;
+            arenaAtualLabel.textContent = currentArenaFilter === 'todas'
+                ? 'Mostrando quadras de todas as arenas'
+                : `Mostrando quadras da ${button.querySelector('strong').textContent.trim()}`;
+            filterCourtCards();
+            document.querySelector('.quadras-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
     document.addEventListener('click', event => {
         const clickedTopAction = event.target.closest('#profileToggle, #searchToggle, #profilePanel, #searchPanel');
         if (!clickedTopAction) {
@@ -478,14 +581,16 @@
 
         document.querySelectorAll('.quadras-grid .col-lg-4').forEach(cardColumn => {
             const title = cardColumn.querySelector('.quadra-title').textContent.toLowerCase();
-            const shouldHide = term && !title.includes(term);
+            const matchesArena = currentArenaFilter === 'todas' || cardColumn.dataset.arena === currentArenaFilter;
+            const matchesSearch = !term || title.includes(term) || cardColumn.textContent.toLowerCase().includes(term);
+            const shouldHide = !(matchesArena && matchesSearch);
             cardColumn.classList.toggle('d-none', shouldHide);
             if (!shouldHide) {
                 visibleCount++;
             }
         });
 
-        emptySearch.classList.toggle('d-none', !term || visibleCount > 0);
+        emptySearch.classList.toggle('d-none', visibleCount > 0);
         return visibleCount;
     }
 

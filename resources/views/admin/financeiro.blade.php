@@ -39,7 +39,7 @@
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
+        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.75;">Admin da arena</span></a>
         <nav>
             <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
@@ -49,7 +49,6 @@
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
             <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
-            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
@@ -58,12 +57,12 @@
         <div class="header">
             <div>
                 <h1><i class="bi bi-cash-stack me-2"></i>Gestão Financeira</h1>
-                <p class="text-muted mb-0">Módulo Financeiro - Entradas vs Saídas</p>
+                <p class="text-muted mb-0">Controle financeiro da arena selecionada</p>
             </div>
             <div class="d-flex gap-2 align-items-center">
                 <input type="month" class="form-control" value="2026-06" style="width: 150px;">
                 <button class="btn btn-primary-admin" data-bs-toggle="modal" data-bs-target="#modalDespesa"><i class="bi bi-plus-lg me-2"></i>Nova Despesa</button>
-                <span class="badge bg-secondary">Super Admin</span>
+                <span class="badge bg-success">Admin da arena</span>
             </div>
         </div>
 

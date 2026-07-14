@@ -24,7 +24,7 @@
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <small class="opacity-75">ADMIN</small></a>
+        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <small class="opacity-75">Admin da arena</small></a>
         <nav>
             <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
@@ -34,7 +34,6 @@
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-people"></i> Clientes</a>
             <a href="/admin/notificacoes" class="nav-link active"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
-            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
     </aside>
     <main class="main">

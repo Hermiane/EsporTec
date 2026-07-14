@@ -126,6 +126,56 @@
             margin: 0 auto;
         }
 
+        .arena-search-pill {
+            align-items: center;
+            background: #FFFFFF;
+            border: 1px solid #DDEBE4;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(31,92,66,0.08);
+            display: flex;
+            gap: 0.65rem;
+            margin: 0;
+            max-width: 430px;
+            padding: 0.42rem;
+            width: min(100%, 430px);
+        }
+
+        .arena-search-control {
+            align-items: center;
+            background: #F8FAF9;
+            border-radius: 8px;
+            display: flex;
+            flex: 1;
+            gap: 0.5rem;
+            padding: 0 0.8rem;
+        }
+
+        .arena-search-control i {
+            color: var(--primary-green);
+        }
+
+        .arena-search-control input {
+            background: transparent;
+            border: 0;
+            flex: 1;
+            font-size: 0.88rem;
+            outline: 0;
+            padding: 0.5rem 0;
+        }
+
+        .arena-search-btn {
+            background: #E8F5EE;
+            border-radius: 8px;
+            color: var(--primary-green);
+            padding: 0.5rem 0.9rem;
+            white-space: nowrap;
+        }
+
+        .arena-search-btn:hover {
+            background: #D7EDE2;
+            color: var(--dark-green);
+        }
+
         .search-pill input {
             border: none;
             padding: 1rem 1.5rem;
@@ -240,59 +290,6 @@
 
         .btn-details:hover {
             background: var(--dark-green);
-        }
-
-        /* Agenda Section */
-        .agenda-section {
-            background: var(--light-green);
-            border-radius: 16px;
-            padding: 3rem;
-            margin: 4rem 0;
-        }
-
-        .form-select-custom {
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            padding: 0.8rem;
-            font-size: 1rem;
-        }
-
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .time-slot {
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .time-available {
-            background: var(--primary-green);
-            color: white;
-        }
-
-        .time-available:hover {
-            background: var(--dark-green);
-            transform: scale(1.05);
-        }
-
-        .time-selected {
-            background: var(--dark-green);
-            color: white;
-            box-shadow: 0 0 0 3px rgba(45,129,93,0.18);
-        }
-
-        .time-busy {
-            background: #e0e0e0;
-            color: #999;
-            cursor: not-allowed;
         }
 
         /* Features */
@@ -428,8 +425,13 @@
                 margin: 0.3rem 0;
             }
 
-            .time-slots {
-                grid-template-columns: repeat(2, 1fr);
+            .arena-search-pill {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .arena-search-btn {
+                width: 100%;
             }
 
             .section-title {
@@ -598,164 +600,97 @@
     line-height: 1.6;
     background: white;
 }
-.quadras-slider {
-    max-width: 460px;
-    margin: 0 auto;
+.arena-public-card {
+    background: #fff;
+    border: 1px solid #E8F5EE;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    height: 100%;
+    padding: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.quadras-viewport {
+.arena-public-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(45,129,93,0.13);
+}
+
+.arena-public-icon {
+    align-items: center;
+    background: #E8F5EE;
     border-radius: 12px;
-    overflow: hidden;
-}
-
-.quadras-track {
-    display: flex;
-    align-items: stretch;
-    transition: transform 0.65s ease;
-}
-
-.quadras-item {
-    flex: 0 0 100%;
-    min-width: 100%;
-}
-
-.quadra-slide {
-    height: 100%;
-    padding: 0 0.25rem;
-}
-
-.quadras-slider .quadra-card {
-    height: 100%;
-    margin-bottom: 0;
-}
-
-#quadras {
-    padding: 52px 0 38px;
-}
-
-#quadras .section-title {
-    font-size: 2rem;
-    margin-bottom: 1.4rem;
-}
-
-.quadras-slider .quadra-img {
-    height: 185px;
-}
-
-.quadras-slider .quadra-content {
-    padding: 1rem 1.15rem 1.15rem;
-}
-
-.quadras-slider .quadra-title {
-    font-size: 1.2rem;
-    margin-bottom: 0.3rem;
-}
-
-.quadras-slider .rating {
-    font-size: 0.92rem;
-    margin-bottom: 0.45rem;
-}
-
-.quadras-slider .quadra-info {
-    font-size: 0.9rem;
-    line-height: 1.35;
-    margin: 0.25rem 0;
-}
-
-.quadras-slider .price {
-    font-size: 1.42rem;
-    margin: 0.7rem 0;
-}
-
-.quadras-slider .btn-details {
-    padding: 0.72rem;
-}
-
-.quadras-indicators {
-    position: static;
-    display: flex;
+    color: var(--primary);
+    display: inline-flex;
+    font-size: 1.6rem;
+    height: 48px;
     justify-content: center;
+    margin-bottom: 1rem;
+    width: 48px;
+}
+
+.arena-public-meta {
+    color: #5F6F65;
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.55rem;
-    margin: 0.75rem 0 0;
+    margin: 0.85rem 0 1rem;
 }
 
-.quadras-indicators button {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background-color: var(--primary-green);
-    opacity: 0.35;
-    border: 0;
-    padding: 0;
-}
-
-.quadras-indicators .active {
-    opacity: 1;
-}
-
-.quadras-actions {
-    display: flex;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-top: 0.75rem;
-}
-
-.quadras-nav-btn {
-    min-width: 140px;
-    padding: 0.55rem 0.9rem;
-    border-radius: 10px;
+.arena-public-meta span,
+.arena-badge {
+    background: #E8F5EE;
+    border-radius: 999px;
+    color: var(--primary-dark);
+    font-size: 0.82rem;
     font-weight: 600;
+    padding: 0.35rem 0.65rem;
+}
+
+.arena-owner-info {
+    color: #475569;
+    font-size: 0.92rem;
+    margin-top: 0.9rem;
+}
+
+.arena-owner-info p {
+    align-items: flex-start;
+    display: flex;
+    gap: 0.45rem;
+    margin-bottom: 0.4rem;
+}
+
+.arena-owner-info i {
+    color: var(--primary);
+    margin-top: 0.1rem;
+}
+
+.arena-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: center;
+    margin: 1rem auto 1.35rem;
+}
+
+.arena-filter-btn {
+    background: #fff;
+    border: 1px solid #BFDCCF;
+    border-radius: 999px;
+    color: var(--primary-dark);
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+}
+
+.arena-filter-btn.active,
+.arena-filter-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
 }
 
 @media (max-width: 768px) {
     .faq-card {
         padding: 1.5rem;
-    }
-
-    .quadras-slider {
-        max-width: 100%;
-        padding-left: 0.25rem;
-        padding-right: 0.25rem;
-    }
-
-    #quadras {
-        padding: 38px 0 30px;
-    }
-
-    #quadras .section-title {
-        font-size: 1.7rem;
-        margin-bottom: 1rem;
-    }
-
-    .quadras-slider .quadra-img {
-        height: 155px;
-    }
-
-    .quadras-slider .quadra-content {
-        padding: 0.85rem 0.95rem 1rem;
-    }
-
-    .quadras-slider .quadra-title {
-        font-size: 1.05rem;
-    }
-
-    .quadras-slider .rating,
-    .quadras-slider .quadra-info {
-        font-size: 0.84rem;
-    }
-
-    .quadras-slider .price {
-        font-size: 1.2rem;
-        margin: 0.55rem 0;
-    }
-
-    .quadras-slider .btn-details {
-        padding: 0.62rem;
-    }
-
-    .quadras-actions {
-        align-items: stretch;
-        flex-direction: column;
     }
 }
 
@@ -784,8 +719,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#quadras">
-                        Quadras
+                    <a class="nav-link" href="#arenas">
+                        Arenas
                     </a>
                 </li>
 
@@ -827,172 +762,87 @@
         <div class="container">
             <h1 class="hero-title">EsporTec</h1>
             <p class="hero-subtitle">Gestão inteligente de espaços esportivos</p>
-
-            <div class="search-pill">
-                <input type="text" id="buscarQuadra" placeholder="Buscar quadras...">
-                <a href="/login?redirect=/nova-reserva" class="btn btn-reserve text-decoration-none">
-    Reservar Quadra
-</a>
-    <a href="/cadastrar-arena" class="btn btn-register text-decoration-none">
-    Cadastrar Arena
-</a>
-            </div>
         </div>
     </section>
 
-    <!-- Nossas Quadras -->
-    <section id="quadras" class="section-padding">
+    <!-- Arenas cadastradas -->
+    <section id="arenas" class="section-padding">
         <div class="container">
-            <h2 class="section-title">Nossas Quadras</h2>
-
-            <div id="quadrasSlider" class="quadras-slider">
-                <div class="quadras-viewport">
-                <div class="quadras-track" id="quadrasGrid">
-                    <div class="quadras-item active">
-                        <div class="quadra-slide">
-                    <div class="quadra-card">
-                        <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80"
-                             alt="Quadra Futsal Arena" class="quadra-img">
-                        <div class="quadra-content">
-                            <h3 class="quadra-title">Quadra Futsal Arena</h3>
-                            <div class="rating">
-                                <i class="bi bi-star-fill"></i>
-                                <span>4.6 (89 avaliações)</span>
-                            </div>
-                            <p class="quadra-info">Quadra de futsal coberta com piso de madeira, ótima para competições e treinos.</p>
-                            <p class="quadra-info"><strong>Tipo:</strong> Futsal</p>
-                            <p class="quadra-info"><strong>Capacidade:</strong> 10 jogadores</p>
-                            <p class="quadra-info"><strong>Coberta:</strong> Sim</p>
-                            <div class="price">R$ 120/hora</div>
-                            <div class="d-grid">
-                                <a href="/detalhes-quadra" class="btn btn-details">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                        </div>
-                    </div>
-
-                    <div class="quadras-item">
-                        <div class="quadra-slide">
-                    <div class="quadra-card">
-                        <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=800&q=80"
-                             alt="Quadra Society Premium" class="quadra-img">
-                        <div class="quadra-content">
-                            <h3 class="quadra-title">Quadra Society Premium</h3>
-                            <div class="rating">
-                                <i class="bi bi-star-fill"></i>
-                                <span>4.8 (124 avaliações)</span>
-                            </div>
-                            <p class="quadra-info">Quadra society com grama sintética de última geração e iluminação LED.</p>
-                            <p class="quadra-info"><strong>Tipo:</strong> Society</p>
-                            <p class="quadra-info"><strong>Capacidade:</strong> 14 jogadores</p>
-                            <p class="quadra-info"><strong>Coberta:</strong> Não</p>
-                            <div class="price">R$ 150/hora</div>
-                            <div class="d-grid">
-                                <a href="/detalhes-quadra" class="btn btn-details">Ver Detalhes</a>
-                            </div>
-                        </div>
-                    </div>
-                        </div>
-                    </div>
-
-                    <div class="quadras-item">
-                        <div class="quadra-slide">
-    <div class="quadra-card">
-        <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80"
-             alt="Quadra Society Descoberta" class="quadra-img">
-
-        <div class="quadra-content">
-            <h3 class="quadra-title">Quadra Society Descoberta</h3>
-
-            <div class="rating">
-                <i class="bi bi-star-fill"></i>
-                <span>4.5 (67 avaliações)</span>
-            </div>
-
-            <p class="quadra-info">
-                Quadra society ao ar livre com grama sintética e iluminação noturna.
-            </p>
-
-            <p class="quadra-info">
-                <strong>Tipo:</strong> Society
-            </p>
-
-            <p class="quadra-info">
-                <strong>Capacidade:</strong> 14 jogadores
-            </p>
-
-            <p class="quadra-info">
-                <strong>Coberta:</strong> Não
-            </p>
-
-            <div class="price">R$ 100/hora</div>
-
-            <div class="d-grid">
-                <a href="/detalhes-quadra" class="btn btn-details">
-                    Ver Detalhes
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-                        </div>
-                    </div>
-
-            </div>
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
+                <div class="text-center flex-grow-1">
+                    <h2 class="section-title mb-2">Arenas Cadastradas</h2>
+                    <p class="section-subtitle mx-auto mb-0" style="max-width: 720px;">
+                        Busque uma arena ou escolha uma opção cadastrada para ver quadras, valores e horários daquele local.
+                    </p>
                 </div>
-                </div>
-                <div class="quadras-indicators" id="quadrasIndicators">
-                    <button type="button" class="active" data-quadras-dot="0" aria-current="true" aria-label="Quadra 1"></button>
-                    <button type="button" data-quadras-dot="1" aria-label="Quadra 2"></button>
-                    <button type="button" data-quadras-dot="2" aria-label="Quadra 3"></button>
-                </div>
-                <div class="quadras-actions">
-                    <button class="btn btn-outline-primary quadras-nav-btn" type="button" data-quadras-prev>
-                        <i class="bi bi-chevron-left me-1"></i>Anterior
-                    </button>
-                    <button class="btn btn-primary-custom quadras-nav-btn" type="button" data-quadras-next>
-                        Próxima<i class="bi bi-chevron-right ms-1"></i>
+                <div class="arena-search-pill" aria-label="Filtrar arenas cadastradas">
+                    <div class="arena-search-control">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="buscarQuadra" placeholder="Buscar arena ou quadra">
+                    </div>
+                    <button type="button" class="btn btn-reserve arena-search-btn" id="btnBuscarQuadra">
+                        Buscar
                     </button>
                 </div>
             </div>
-        </div>
-    </section>
 
-
-    <!-- Agenda de Disponibilidade -->
-    <section class="container">
-        <div class="agenda-section">
-            <h2 class="section-title">Agenda de Disponibilidade</h2>
-
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Selecione a Quadra</label>
-                    <select class="form-select form-select-custom">
-                        <option>Quadra Society Premium</option>
-                        <option>Quadra Futsal Arena</option>
-                        <option>Quadra Society Descoberta</option>
-                    </select>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="arena-public-card">
+                        <div class="arena-public-icon"><i class="bi bi-building"></i></div>
+                        <h3 class="feature-title">EsporTec Arena</h3>
+                        <p class="mb-0 text-muted">Unidade principal com quadras society e futsal, estacionamento e atendimento presencial.</p>
+                        <div class="arena-owner-info">
+                            <p><i class="bi bi-person-circle"></i><span><strong>Dono:</strong> João Silva</span></p>
+                            <p><i class="bi bi-geo-alt"></i><span><strong>Endereço:</strong> Rua dos Esportes, 123 - São Paulo, SP</span></p>
+                        </div>
+                        <div class="arena-public-meta">
+                            <span>3 quadras</span>
+                            <span>07:00-23:00</span>
+                        </div>
+                        <a href="/arenas/esportec-arena/quadras" class="btn btn-details w-100">
+                            Ver quadras desta arena
+                        </a>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Selecione a Data</label>
-                    <input type="date" class="form-control form-select-custom" value="2026-06-10">
-                </div>
-            </div>
 
-            <div class="time-slots">
-                <div class="time-slot time-available">07:00</div>
-                <div class="time-slot time-available">08:00</div>
-                <div class="time-slot time-busy">09:00</div>
-                <div class="time-slot time-available">10:00</div>
-                <div class="time-slot time-available">11:00</div>
-                <div class="time-slot time-busy">12:00</div>
-                <div class="time-slot time-busy">15:00</div>
-                <div class="time-slot time-available">16:00</div>
-                <div class="time-slot time-available">17:00</div>
-                <div class="time-slot time-busy">18:00</div>
-                <div class="time-slot time-available">19:00</div>
-                <div class="time-slot time-available">20:00</div>
+                <div class="col-md-4">
+                    <div class="arena-public-card">
+                        <div class="arena-public-icon"><i class="bi bi-geo-alt"></i></div>
+                        <h3 class="feature-title">Arena Society Cametá</h3>
+                        <p class="mb-0 text-muted">Arena parceira preparada para jogos society, com agenda própria e pagamento presencial.</p>
+                        <div class="arena-owner-info">
+                            <p><i class="bi bi-person-circle"></i><span><strong>Dono:</strong> Maria Oliveira</span></p>
+                            <p><i class="bi bi-geo-alt"></i><span><strong>Endereço:</strong> Bairro Novo - Cametá, PA</span></p>
+                        </div>
+                        <div class="arena-public-meta">
+                            <span>1 quadra</span>
+                            <span>08:00-22:00</span>
+                        </div>
+                        <a href="/arenas/society-cameta/quadras" class="btn btn-details w-100">
+                            Ver quadras desta arena
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="arena-public-card">
+                        <div class="arena-public-icon"><i class="bi bi-pin-map"></i></div>
+                        <h3 class="feature-title">Unidade Zona Norte</h3>
+                        <p class="mb-0 text-muted">Espaço compacto para reservas rápidas, ideal para treinos, amistosos e jogos recorrentes.</p>
+                        <div class="arena-owner-info">
+                            <p><i class="bi bi-person-circle"></i><span><strong>Dono:</strong> Carlos Mendes</span></p>
+                            <p><i class="bi bi-geo-alt"></i><span><strong>Endereço:</strong> Zona Norte - São Paulo, SP</span></p>
+                        </div>
+                        <div class="arena-public-meta">
+                            <span>1 quadra</span>
+                            <span>07:00-21:00</span>
+                        </div>
+                        <a href="/arenas/zona-norte/quadras" class="btn btn-details w-100">
+                            Ver quadras desta arena
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1005,6 +855,7 @@
                 <table class="table mb-0 align-middle">
                     <thead>
                         <tr>
+                            <th>Arena</th>
                             <th>Quadra</th>
                             <th>Tipo</th>
                             <th>Valor/hora</th>
@@ -1013,9 +864,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Quadra Futsal Arena</td><td>Futsal</td><td>R$ 120,00</td><td>Sim</td><td>10 jogadores</td></tr>
-                        <tr><td>Quadra Society Premium</td><td>Society</td><td>R$ 150,00</td><td>Não</td><td>14 jogadores</td></tr>
-                        <tr><td>Quadra Society Descoberta</td><td>Society</td><td>R$ 100,00</td><td>Não</td><td>14 jogadores</td></tr>
+                        <tr><td>EsporTec Arena</td><td>Quadra Futsal Arena</td><td>Futsal</td><td>R$ 120,00</td><td>Sim</td><td>10 jogadores</td></tr>
+                        <tr><td>EsporTec Arena</td><td>Quadra Society Premium</td><td>Society</td><td>R$ 150,00</td><td>Não</td><td>14 jogadores</td></tr>
+                        <tr><td>EsporTec Arena</td><td>Quadra Society Descoberta</td><td>Society</td><td>R$ 100,00</td><td>Não</td><td>14 jogadores</td></tr>
+                        <tr><td>Arena Society Cametá</td><td>Campo Society Cametá</td><td>Society</td><td>R$ 110,00</td><td>Não</td><td>14 jogadores</td></tr>
+                        <tr><td>Unidade Zona Norte</td><td>Quadra Zona Norte</td><td>Society</td><td>R$ 95,00</td><td>Sim</td><td>12 jogadores</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1189,7 +1042,7 @@
             <div class="footer-brand">EsporTec</div>
             <div class="footer-links mb-3">
                 <a href="/">Início</a>
-                <a href="#quadras">Quadras</a>
+                <a href="#arenas">Arenas</a>
                 <a href="#sobre">Sobre</a>
                 <a href="#contato">Contato</a>
                 <a href="#modalPrivacidade" data-bs-toggle="modal" data-bs-target="#modalPrivacidade">Política de Privacidade</a>
@@ -1235,74 +1088,52 @@
             });
         });
 
-        // Animação nos time slots
-        document.querySelectorAll('.time-slot.time-available').forEach(slot => {
-            slot.addEventListener('click', function() {
-                document.querySelectorAll('.time-slot.time-selected').forEach(selected => selected.classList.remove('time-selected'));
-                this.classList.add('time-selected');
-                esportecToast(`Horário selecionado: ${this.textContent}`, 'success');
-            });
-        });
-        const quadrasGrid = document.getElementById('quadrasGrid');
-        const quadrasSlider = document.getElementById('quadrasSlider');
-        const quadrasDots = [...document.querySelectorAll('[data-quadras-dot]')];
-        const quadrasPrevButton = document.querySelector('[data-quadras-prev]');
-        const quadrasNextButton = document.querySelector('[data-quadras-next]');
-        let currentQuadraSlide = 0;
-        let quadrasAutoPlay = null;
+        const buscarQuadra = document.getElementById('buscarQuadra');
+        const arenaSearchRoutes = [
+            {
+                terms: ['esportec', 'principal', 'futsal', 'premium', 'descoberta'],
+                url: '/arenas/esportec-arena/quadras'
+            },
+            {
+                terms: ['cameta', 'cametá', 'society cameta', 'campo society'],
+                url: '/arenas/society-cameta/quadras'
+            },
+            {
+                terms: ['zona norte', 'norte'],
+                url: '/arenas/zona-norte/quadras'
+            }
+        ];
 
-        function getQuadrasSlides() {
-            return [...quadrasGrid.querySelectorAll('.quadras-item')];
-        }
-
-        function showQuadraSlide(index) {
-            const slides = getQuadrasSlides();
-            if (!slides.length) {
+        function executarBuscaArena() {
+            const term = buscarQuadra.value.trim().toLowerCase();
+            if (!term) {
+                document.getElementById('arenas').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 return;
             }
 
-            currentQuadraSlide = (index + slides.length) % slides.length;
-            quadrasGrid.style.transform = `translateX(-${currentQuadraSlide * 100}%)`;
-
-            slides.forEach((slide, slideIndex) => {
-                slide.classList.toggle('active', slideIndex === currentQuadraSlide);
+            const found = arenaSearchRoutes.find(item => {
+                return item.terms.some(keyword => keyword.includes(term) || term.includes(keyword));
             });
 
-            quadrasDots.forEach((dot, dotIndex) => {
-                const isActive = dotIndex === currentQuadraSlide;
-                dot.classList.toggle('active', isActive);
-                dot.setAttribute('aria-current', isActive ? 'true' : 'false');
-            });
+            if (found) {
+                window.location.href = found.url;
+                return;
+            }
+
+            esportecToast('Nenhuma arena encontrada. Veja as opções cadastradas abaixo.', 'warning');
+            document.getElementById('arenas').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function restartQuadrasAutoPlay() {
-            clearInterval(quadrasAutoPlay);
-            quadrasAutoPlay = setInterval(() => {
-                showQuadraSlide(currentQuadraSlide + 1);
-            }, 7500);
-        }
+        buscarQuadra.addEventListener('keydown', event => {
+            if (event.key !== 'Enter') {
+                return;
+            }
 
-        quadrasPrevButton.addEventListener('click', () => {
-            showQuadraSlide(currentQuadraSlide - 1);
-            restartQuadrasAutoPlay();
+            event.preventDefault();
+            executarBuscaArena();
         });
 
-        quadrasNextButton.addEventListener('click', () => {
-            showQuadraSlide(currentQuadraSlide + 1);
-            restartQuadrasAutoPlay();
-        });
-
-        quadrasDots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                showQuadraSlide(Number(dot.dataset.quadrasDot));
-                restartQuadrasAutoPlay();
-            });
-        });
-
-        quadrasSlider.addEventListener('mouseenter', () => clearInterval(quadrasAutoPlay));
-        quadrasSlider.addEventListener('mouseleave', restartQuadrasAutoPlay);
-        showQuadraSlide(0);
-        restartQuadrasAutoPlay();
+        document.getElementById('btnBuscarQuadra').addEventListener('click', executarBuscaArena);
     </script>
 </body>
 </html>

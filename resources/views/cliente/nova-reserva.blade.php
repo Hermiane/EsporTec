@@ -112,11 +112,22 @@
             <h4 class="fw-bold mb-3">Escolha a Quadra</h4>
 
             <div class="mb-3">
+                <label class="form-label fw-medium">Selecione a Arena</label>
+                <select class="form-select" id="arena">
+                    <option value="esportec-arena">EsporTec Arena</option>
+                    <option value="society-cameta">Arena Society Cametá</option>
+                    <option value="zona-norte">Unidade Zona Norte</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label fw-medium">Selecione a Quadra</label>
                 <select class="form-select" id="quadra">
-                    <option value="futsal-arena" data-price="120">Quadra Futsal Arena (R$ 120/h)</option>
-                    <option value="society-premium" data-price="150">Quadra Society Premium (R$ 150/h)</option>
-                    <option value="society-descoberta" data-price="100">Quadra Society Descoberta (R$ 100/h)</option>
+                    <option value="futsal-arena" data-arena="esportec-arena" data-price="120">Quadra Futsal Arena (R$ 120/h)</option>
+                    <option value="society-premium" data-arena="esportec-arena" data-price="150">Quadra Society Premium (R$ 150/h)</option>
+                    <option value="society-descoberta" data-arena="esportec-arena" data-price="100">Quadra Society Descoberta (R$ 100/h)</option>
+                    <option value="campo-society-cameta" data-arena="society-cameta" data-price="110">Campo Society Cametá (R$ 110/h)</option>
+                    <option value="quadra-zona-norte" data-arena="zona-norte" data-price="95">Quadra Zona Norte (R$ 95/h)</option>
                 </select>
             </div>
             <div class="alert" style="background: var(--light); color: var(--primary); border-radius: 10px;">
@@ -291,6 +302,10 @@
         <p class="text-muted mb-0" id="confirmacao-texto">Sua reserva foi registrada com sucesso.</p>
         <div class="summary-grid">
             <div class="summary-item">
+                <small>Arena</small>
+                <strong id="resumo-arena">-</strong>
+            </div>
+            <div class="summary-item">
                 <small>Quadra</small>
                 <strong id="resumo-quadra">-</strong>
             </div>
@@ -321,6 +336,7 @@
     let selectedSlots = [];
     let pricePerHour = 120;
 
+    const arenaSelect = document.getElementById('arena');
     const quadraSelect = document.getElementById('quadra');
     const dataReserva = document.getElementById('data-reserva');
     const btnVerHorarios = document.getElementById('btn-ver-horarios');
@@ -336,6 +352,32 @@
     const confirmationPanel = document.getElementById('reserva-confirmada');
     horariosLabel.classList.add('d-none');
 
+    function updateQuadrasByArena() {
+        const selectedArena = arenaSelect.value;
+        const options = [...quadraSelect.options];
+        let currentOptionIsAvailable = false;
+
+        options.forEach(option => {
+            const isFromArena = option.dataset.arena === selectedArena;
+            option.hidden = !isFromArena;
+            option.disabled = !isFromArena;
+
+            if (isFromArena && option.value === quadraSelect.value) {
+                currentOptionIsAvailable = true;
+            }
+        });
+
+        if (!currentOptionIsAvailable) {
+            const firstAvailable = options.find(option => !option.disabled);
+            if (firstAvailable) {
+                quadraSelect.value = firstAvailable.value;
+            }
+        }
+
+        updatePriceFromQuadra();
+        hideTimeGridUntilDateConfirmed();
+    }
+
     function updatePriceFromQuadra() {
         const selected = quadraSelect.options[quadraSelect.selectedIndex];
         pricePerHour = parseInt(selected.getAttribute('data-price'));
@@ -344,14 +386,27 @@
     }
 
     const params = new URLSearchParams(window.location.search);
+    const arenaParam = params.get('arena');
     const quadraParam = params.get('quadra');
     const startOnDateStep = params.get('etapa') === 'data';
+    if (arenaParam && [...arenaSelect.options].some(option => option.value === arenaParam)) {
+        arenaSelect.value = arenaParam;
+    }
+
     if (quadraParam && [...quadraSelect.options].some(option => option.value === quadraParam)) {
+        const selectedParamOption = [...quadraSelect.options].find(option => option.value === quadraParam);
+        if (selectedParamOption && selectedParamOption.dataset.arena) {
+            arenaSelect.value = selectedParamOption.dataset.arena;
+        }
         quadraSelect.value = quadraParam;
     }
 
-    quadraSelect.addEventListener('change', updatePriceFromQuadra);
-    updatePriceFromQuadra();
+    arenaSelect.addEventListener('change', updateQuadrasByArena);
+    quadraSelect.addEventListener('change', () => {
+        updatePriceFromQuadra();
+        hideTimeGridUntilDateConfirmed();
+    });
+    updateQuadrasByArena();
 
     // Gerar grade de horários
     function generateTimeGrid() {
@@ -495,6 +550,7 @@
         }
 
         const selectedCourt = quadraSelect.options[quadraSelect.selectedIndex].textContent.replace(/\s*\(R\$.*/, '');
+        const selectedArena = arenaSelect.options[arenaSelect.selectedIndex].textContent;
         const paymentLabels = {
             dinheiro: 'Pendente em dinheiro',
             pix: 'PIX em análise',
@@ -508,6 +564,7 @@
             cartao_debito: 'Reserva confirmada. O pagamento no cartão de débito será feito presencialmente na arena.'
         };
 
+        document.getElementById('resumo-arena').textContent = selectedArena;
         document.getElementById('resumo-quadra').textContent = selectedCourt;
         document.getElementById('resumo-data-hora').textContent = `${dataReserva.value || 'Data não informada'} - ${selectedSlots.join(', ') || 'Horário não informado'}`;
         document.getElementById('resumo-pagamento').textContent = paymentLabels[selectedPayment.value];

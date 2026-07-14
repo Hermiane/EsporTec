@@ -100,7 +100,7 @@
             <i class="bi bi-trophy"></i>
             <div>
                 EsporTec
-                <span>ADMIN</span>
+                <span>Admin da arena</span>
             </div>
         </a>
         <nav>
@@ -112,7 +112,6 @@
             <a href="/admin/clientes" class="nav-link active"><i class="bi bi-people"></i> Clientes</a>
             <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
-            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>

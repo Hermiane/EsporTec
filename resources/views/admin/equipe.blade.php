@@ -18,7 +18,6 @@
         .nav-link { color:rgba(255,255,255,.75); border-radius:8px; padding:.75rem 1rem; margin-bottom:.35rem; display:flex; gap:.75rem; align-items:center; text-decoration:none; }
         .nav-link:hover,.nav-link.active { background:rgba(255,255,255,.12); color:white; }
         .main { flex:1; padding:2rem; }
-        
         /* Ajuste das tabs com mais espaçamento */
         .tabs-wrapper { 
             margin-bottom: 1.5rem; 
@@ -62,6 +61,7 @@
             box-shadow:0 4px 16px rgba(15,23,42,.06); 
             margin-top: 0;
         }
+        .role-note { background:var(--light); border:1px solid rgba(45,129,93,.18); border-radius:12px; padding:1rem; color:#334155; }
         
         .badge-crown { background:#F9A825; color:#1F2937; display:inline-flex; align-items:center; gap:0.3rem; padding: 0.35rem 0.7rem; }
         .badge-admin { background:rgba(21,101,192,.15); color:#1565C0; display:inline-flex; align-items:center; gap:0.3rem; padding: 0.35rem 0.7rem; }
@@ -132,7 +132,7 @@
             <i class="bi bi-trophy"></i>
             <div>
                 EsporTec
-                <small>ADMIN</small>
+                <small>Admin da arena</small>
             </div>
         </a>
         <nav>
@@ -144,18 +144,22 @@
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-people"></i> Clientes</a>
             <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link"><i class="bi bi-gear"></i> Configurações</a>
-            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
     </aside>
     <main class="main">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
             <div>
-                <h1 class="fw-bold mb-1"><i class="bi bi-people me-2"></i>Equipe</h1>
-                <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>CPF obrigatório para administradores e funcionários.</p>
+                <h1 class="fw-bold mb-1"><i class="bi bi-people me-2"></i>Equipe da arena</h1>
+                <p class="text-muted mb-0"><i class="bi bi-info-circle me-1"></i>Cadastre proprietários/gestores e funcionários que operam esta arena. CPF obrigatório para administradores e funcionários.</p>
             </div>
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalEquipe">
                 <i class="bi bi-person-plus"></i>Novo usuário
             </button>
+        </div>
+
+        <div class="role-note mb-4">
+            <div class="fw-bold mb-1"><i class="bi bi-info-circle me-2"></i>Diferença dos perfis</div>
+            <div><strong>Admin da arena</strong> é o proprietário ou gestor da arena. <strong>Funcionário</strong> atua na recepção e operação. <strong>Super admin</strong> é a conta da plataforma EsporTec, usada por quem mantém o sistema.</div>
         </div>
 
         <!-- Wrapper das tabs com espaçamento -->
@@ -163,7 +167,7 @@
             <ul class="nav nav-tabs" id="teamTabs" role="tablist">
                 <li class="nav-item">
                     <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#admins" type="button">
-                        <i class="bi bi-shield-check me-1"></i>Administradores
+                        <i class="bi bi-shield-check me-1"></i>Admins da arena
                     </button>
                 </li>
                 <li class="nav-item">
@@ -190,10 +194,10 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Super Admin</td>
+                                <td>Plataforma EsporTec</td>
                                 <td>000.000.000-00</td>
-                                <td>admin@esportec.com.br</td>
-                                <td><span class="badge badge-crown"><i class="bi bi-shield-lock"></i> Super admin</span></td>
+                                <td>suporte@esportec.com.br</td>
+                                <td><span class="badge badge-crown"><i class="bi bi-shield-lock"></i> Super admin da plataforma</span></td>
                                 <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> Ativo</span></td>
                                 <td class="actions-cell">
                                     <button class="btn btn-sm btn-outline-secondary btn-action-sm" disabled>
@@ -205,7 +209,7 @@
                                 <td>Maria Admin</td>
                                 <td>123.456.789-10</td>
                                 <td>maria@esportec.com.br</td>
-                                <td><span class="badge badge-admin"><i class="bi bi-shield-check"></i> Administrador</span></td>
+                                <td><span class="badge badge-admin"><i class="bi bi-shield-check"></i> Proprietária/Gestora</span></td>
                                 <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> Ativo</span></td>
                                 <td class="actions-cell">
                                     <button class="btn btn-sm btn-outline-success btn-action-sm" data-team-action="editar">
@@ -297,7 +301,7 @@
                     <label class="form-label fw-medium"><i class="bi bi-person-gear me-1"></i>Perfil</label>
                     <select class="form-select" id="teamPerfil">
                         <option>Funcionário</option>
-                        <option>Administrador</option>
+                        <option>Admin da arena</option>
                     </select>
                 </div>
             </div>
@@ -345,10 +349,10 @@
         const cpf = document.getElementById('teamCpf').value.trim() || '000.000.000-00';
         const email = document.getElementById('teamEmail').value.trim() || 'novo@esportec.com.br';
         const perfil = document.getElementById('teamPerfil').value;
-        const targetBody = perfil === 'Administrador' ? document.querySelector('#admins tbody') : document.querySelector('#funcionarios tbody');
+        const targetBody = perfil === 'Admin da arena' ? document.querySelector('#admins tbody') : document.querySelector('#funcionarios tbody');
         
-        const roleCell = perfil === 'Administrador'
-            ? '<span class="badge badge-admin"><i class="bi bi-shield-check"></i> Administrador</span>'
+        const roleCell = perfil === 'Admin da arena'
+            ? '<span class="badge badge-admin"><i class="bi bi-shield-check"></i> Proprietário/Gestor</span>'
             : 'Agenda, pagamentos';
             
         targetBody.insertAdjacentHTML('beforeend', `

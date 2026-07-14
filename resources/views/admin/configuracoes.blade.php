@@ -36,7 +36,7 @@
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.6;">ADMIN</span></a>
+        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.75;">Admin da arena</span></a>
         <nav>
             <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
@@ -46,15 +46,17 @@
             <a href="/admin/clientes" class="nav-link"><i class="bi bi-person-check"></i> Clientes</a>
             <a href="/admin/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/admin/configuracoes" class="nav-link active"><i class="bi bi-gear"></i> Configurações</a>
-            <a href="/admin/logs" class="nav-link"><i class="bi bi-journal-text"></i> Logs</a>
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
 
     <main class="main">
         <div class="header">
-            <h1><i class="bi bi-gear-wide-connected me-2"></i>Configurações do Sistema</h1>
-            <span class="badge bg-secondary">Super Admin</span>
+            <div>
+                <h1><i class="bi bi-gear-wide-connected me-2"></i>Configurações da Arena</h1>
+                <p class="text-muted mb-0">Dados que o proprietário/gestor controla para a própria arena.</p>
+            </div>
+            <span class="badge bg-success">Admin da arena</span>
         </div>
 
         <div class="settings-container">
