@@ -13,7 +13,6 @@ class ReservaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'usuario_id' => ['required', 'exists:usuarios,id'],
             'quadra_id' => ['required', 'exists:quadras,id'],
             'data' => ['required', 'date', 'after_or_equal:today'],
             'hora_inicio' => ['required', 'date_format:H:i'],
@@ -28,10 +27,60 @@ class ReservaController extends Controller
             $validated['status'] = 'pendente';
         }
 
-        $reserva = Reserva::create($validated);
+        $userId = auth()->id();
+        if (!$userId) {
+            return response()->json(['message' => 'Não autenticado'], 401);
+        }
+
+        // Confere se a quadra pertence à arena do usuário logado
+        // (no projeto: vínculo via funcionario_arena)
+        $arena = auth()->user()->arena()->first();
+
+        $arenaId = $arena?->id;
+        if (!$arenaId) {
+            return response()->json(['message' => 'Usuário sem arena vinculada'], 403);
+        }
+
+
+        $quadra = \App\Models\Quadra::findOrFail($validated['quadra_id']);
+        if ((int) $quadra->arenas_id !== (int) $arenaId) {
+            return response()->json(['message' => 'Quadra não pertence à sua arena'], 403);
+        }
+
+        // Conflito: mesma quadra + mesma data + intervalos se sobrepõem
+        // Considerar conflito os status: pendente, confirmada, paga
+        $statusConflito = ['pendente', 'confirmada', 'paga'];
+
+        $conflito = Reserva::where('quadras_id', $validated['quadra_id'])
+            ->where('data', $validated['data'])
+            ->whereIn('status', $statusConflito)
+            ->where(function ($q) use ($validated) {
+                $q->where(function ($q2) use ($validated) {
+                    $q2->where('hora_inicio', '<', $validated['hora_fim'])
+                        ->where('hora_fim', '>', $validated['hora_inicio']);
+                });
+            })
+            ->exists();
+
+        if ($conflito) {
+            return response()->json(['message' => 'Horário indisponível (conflito de reserva).'], 409);
+        }
+
+        $reserva = Reserva::create([
+            'reservas_usuarios_id' => $userId,
+            'quadras_id' => $validated['quadra_id'],
+            'data' => $validated['data'],
+            'hora_inicio' => $validated['hora_inicio'],
+            'hora_fim' => $validated['hora_fim'],
+            'valor_total' => $validated['valor_total'],
+            'status' => $validated['status'],
+            'observacao' => $validated['observacao'] ?? null,
+            'alteradas_por' => $userId,
+        ]);
 
         return response()->json($reserva, 201);
     }
+
 
     // ATUALIZAR STATUS DA RESERVA
     public function updateStatus(Request $request, $id)
@@ -51,9 +100,27 @@ class ReservaController extends Controller
 
     public function quadrasDisponiveis()
     {
-        $quadras = \App\Models\Quadra::where('ativa', 1)->get();
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'Não autenticado'], 401);
+        }
+
+        // No seu projeto, o vínculo arena <-> usuário via tabela funcionarios_arenas.
+        // Aqui usamos a mesma relação do model User (funcionario_arena/arenas).
+        $arena = $user->arena()->first();
+        $arenaId = $arena?->id;
+        if (!$arenaId) {
+            return response()->json(['message' => 'Usuário sem arena vinculada'], 403);
+        }
+
+        $quadras = \App\Models\Quadra::where('arenas_id', $arenaId)
+
+            ->where('ativa', 1)
+            ->get();
+
         return response()->json($quadras);
     }
+
 
     public function horariosDisponiveis($id)
     {

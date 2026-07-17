@@ -13,21 +13,41 @@ use App\Http\Controllers\Auth\PasswordResetController;
 Route::post('/clientes', [ClienteController::class, 'store']);
 // REQUISITO 4: Histórico
 Route::get('/clientes/{id}/historico', [ClienteController::class, 'historico']);
-// REQUISITO 2: Agendamento - ATUALIZADO
-Route::post('/reservas', [ReservaController::class, 'store']);
-Route::patch('/reservas/{id}/status', [ReservaController::class, 'updateStatus']); // NOVA
-Route::patch('/reservas/{id}/cancelar', [ReservaController::class, 'cancelar']); // NOVA
-// REQUISITO 3: Pagamento - ATUALIZADO
-Route::post('/pagamentos', [PagamentoController::class, 'store']); // NOVA
-Route::patch('/pagamentos/{id}/confirmar', [PagamentoController::class, 'confirmar']); // NOVA
-Route::patch('/pagamentos/{id}/recusar', [PagamentoController::class, 'recusar']); // NOVA
+
+// ===== API AUTENTICADA (front) =====
+Route::middleware('auth:sanctum')->group(function () {
+    // GET /api/quadras
+    Route::get('/quadras', [ReservaController::class, 'quadrasDisponiveis']);
+
+    // POST /api/reservas
+    Route::post('/reservas', [ReservaController::class, 'store']);
+
+    // Pagamentos do cliente
+    Route::post('/pagamentos', [PagamentoController::class, 'store']);
+
+    // Atualizações/cancelamento (se necessário pelo front)
+    Route::patch('/reservas/{id}/status', [ReservaController::class, 'updateStatus']);
+    Route::patch('/reservas/{id}/cancelar', [ReservaController::class, 'cancelar']);
+});
+
+
 // ===== ROTAS DO CLIENTE LOGADO =====
 Route::prefix('cliente')->group(function () {
  Route::get('/quadras', [ReservaController::class, 'quadrasDisponiveis']);
  Route::get('/quadras/{id}/horarios', [ReservaController::class, 'horariosDisponiveis']);
  Route::get('/reservas', [ReservaController::class, 'minhasReservas']);
  Route::post('/pagamentos', [PagamentoController::class, 'store']);
- Route::get('/pagamentos/reservas/{reserva_id}', [PagamentoController::class, 'pagamentoPorReserva']);
+ Route::get('/pagamentos/reservas/{reserva_id}', [PagamentoController::class, 'porReserva']);
+});
+
+// ===== ROTAS DO FUNCIONÁRIO/ADMIN =====
+use App\Http\Controllers\Funcionario\PagamentoController as FuncPagamentoController;
+Route::prefix('funcionario')->group(function () {
+    Route::get('/pagamentos/pendentes', [FuncPagamentoController::class, 'pendentes']);
+    Route::patch('/pagamentos/{id}/confirmar', [FuncPagamentoController::class, 'confirmar']);
+    Route::patch('/pagamentos/{id}/recusar', [FuncPagamentoController::class, 'recusar']);
+
+    // Versões POST (legacy) removidas para evitar duplicidade de rotas.
 });
 // ===== MÓDULO ADMIN =====
 Route::prefix('admin')->group(function () {
