@@ -1,7 +1,8 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Cliente\ClienteController;
-use App\Http\Controllers\Cliente\ReservaController;
+use App\Http\Controllers\ReservaController;
+
 use App\Http\Controllers\Cliente\PagamentoController;
 use App\Http\Controllers\Admin\AgendamentoController;
 use App\Http\Controllers\Admin\FinanceiroController;
@@ -52,15 +53,9 @@ Route::prefix('funcionario')->group(function () {
 // ===== MÓDULO ADMIN =====
 Route::prefix('admin')->group(function () {
  
- // Agendamentos
- Route::get('/agendamentos', [AgendamentoController::class, 'index']);
- Route::get('/agendamentos/{id}', [AgendamentoController::class, 'show']);
- Route::post('/agendamentos', [AgendamentoController::class, 'store']);
- Route::patch('/agendamentos/{id}/confirmar', [AgendamentoController::class, 'confirmar']);
- Route::patch('/agendamentos/{id}/cancelar', [AgendamentoController::class, 'cancelar']);
- 
  // Financeiro
  Route::get('/financeiro/fluxo-caixa', [FinanceiroController::class, 'fluxoCaixa']);
+
  
  // Usuários
  Route::get('/usuarios', [UsuarioController::class, 'index']);

@@ -88,27 +88,40 @@ class AdminController extends Controller
     // RF08 - CRUD Quadras com campos reais do Model
     public function listarQuadras()
     {
-        $quadras = Quadra::with('empresa')->get();
+        $quadras = Quadra::with('arena')->get();
         return response()->json($quadras, 200);
     }
+
     
     public function storeQuadra(Request $request)
     {
         $request->validate([
+            'arenas_id' => ['required', 'exists:arenas,id'],
             'nome' => 'required|string|max:255',
             'descricao' => 'nullable|string',
             'tipo' => 'required|string',
-            'endereco' => 'required|string',
-            'cidade' => 'required|string',
-            'estado' => 'required|string|size:2',
-            'capacidade_jogadores' => 'required|integer|min:1',
+            'foto' => 'nullable|string',
+            'capacidade_jogador' => 'required|integer|min:1',
             'coberta' => 'required|boolean',
             'preco_hora' => 'required|numeric|min:0',
-            'ativa' => 'boolean'
+            'ativo' => 'boolean'
         ]);
-        
-        $quadra = Quadra::create($request->all());
+
+        $data = $request->only([
+            'arenas_id',
+            'nome',
+            'tipo',
+            'descricao',
+            'foto',
+            'capacidade_jogador',
+            'coberta',
+            'preco_hora',
+            'ativo',
+        ]);
+
+        $quadra = Quadra::create($data);
         return response()->json(['message' => 'Quadra criada', 'data' => $quadra], 201);
+
     }
     
     public function updateQuadra(Request $request, $id)
@@ -118,13 +131,22 @@ class AdminController extends Controller
         $request->validate([
             'nome' => 'sometimes|string|max:255',
             'preco_hora' => 'sometimes|numeric|min:0',
-            'ativa' => 'sometimes|boolean',
+            'ativo' => 'sometimes|boolean',
             'coberta' => 'sometimes|boolean',
-            'capacidade_jogadores' => 'sometimes|integer|min:1'
+            'capacidade_jogador' => 'sometimes|integer|min:1'
         ]);
-        
-        $quadra->update($request->all());
+
+        $data = $request->only([
+            'nome',
+            'preco_hora',
+            'ativo',
+            'coberta',
+            'capacidade_jogador',
+        ]);
+
+        $quadra->update($data);
         return response()->json(['message' => 'Quadra atualizada', 'data' => $quadra], 200);
+
     }
     
     // RF09 - Relatório financeiro completo
