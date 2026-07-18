@@ -7,7 +7,7 @@ use App\Models\Usuario;
 use App\Models\Quadra;
 use App\Models\Reserva;
 use App\Models\Pagamento;
-use App\Models\SuperAdministrador;
+use App\Models\SuperAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,7 +17,7 @@ class AdminController extends Controller
     public function dashboard()
     {
         $totalReservas = Reserva::whereIn('status', ['confirmada', 'concluida'])->count();
-        $faturamento = Pagamento::where('status', 'confirmado')->sum('valor');
+        $faturamento = Pagamento::where('status', 'pago')->sum('valor');
         $reservasHoje = Reserva::whereDate('data', today())->count();
         $quadrasAtivas = Quadra::where('ativa', true)->count();
         $usuariosAtivos = Usuario::where('ativo', true)->count();
@@ -34,14 +34,14 @@ class AdminController extends Controller
     // RF07 - Gerenciar usuários
     public function usuarios(Request $request)
     {
-        $query = Usuario::select('id', 'nome_completo', 'email', 'telefone', 'ativo', 'email_verificado', 'created_at');
+        $query = Usuario::select('id', 'nome_completo', 'email', 'telefone', 'ativo', 'email_verificacao', 'created_at');
         
         // Filtro por status
         if ($request->has('ativo')) {
             $query->where('ativo', $request->boolean('ativo'));
         }
         
-        $usuarios = $query->with('superAdm')->orderBy('nome_completo')->get();
+        $usuarios = $query->with('superAdmin')->orderBy('nome_completo')->get();
         
         return response()->json($usuarios, 200);
     }
@@ -51,27 +51,27 @@ class AdminController extends Controller
     {
         $request->validate([
             'cargo' => 'required|string',
-            'permissoes' => 'nullable|array'
+            'motivo' => 'nullable|string'
         ]);
         
         $usuario = Usuario::findOrFail($id);
         
         // Verifica se já é admin
-        if ($usuario->superAdm) {
+        if ($usuario->superAdmin) {
             return response()->json(['message' => 'Usuário já é administrador'], 400);
         }
         
-        SuperAdministrador::create([
-            'usuario_id' => $usuario->id,
+        SuperAdmin::create([
+            'usuarios_id' => $usuario->id,
             'cargo' => $request->cargo,
-            'permissoes' => $request->permissoes ?? ['gerenciar_quadras', 'ver_relatorios'],
+            'motivo' => $request->motivo,
             'ativo' => true,
             'criado_por' => auth()->id()
         ]);
         
         return response()->json([
             'message' => 'Usuário promovido a administrador',
-            'data' => $usuario->load('superAdm')
+            'data' => $usuario->load('superAdmin')
         ], 200);
     }
     
@@ -98,9 +98,9 @@ class AdminController extends Controller
         $request->validate([
             'arenas_id' => ['required', 'exists:arenas,id'],
             'nome' => 'required|string|max:255',
-            'descricao' => 'nullable|string',
-            'tipo' => 'required|string',
-            'foto' => 'nullable|string',
+            'descricao' => 'required|string',
+            'tipo' => 'required|in:society,futsal,futebol,misto',
+            'foto' => 'required|string|max:255',
             'capacidade_jogador' => 'required|integer|min:1',
             'coberta' => 'required|boolean',
             'preco_hora' => 'required|numeric|min:0',
@@ -155,7 +155,7 @@ class AdminController extends Controller
         $inicio = $request->data_inicio ?? now()->startOfMonth();
         $fim = $request->data_fim ?? now()->endOfMonth();
         
-        $pagamentos = Pagamento::where('status', 'confirmado')
+        $pagamentos = Pagamento::where('status', 'pago')
             ->whereBetween('pago_em', [$inicio, $fim])
             ->with(['reserva.quadra:id,nome,preco_hora', 'reserva.usuario:id,nome_completo'])
             ->get();

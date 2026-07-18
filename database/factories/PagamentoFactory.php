@@ -65,6 +65,15 @@ class PagamentoFactory extends Factory
         ]);
     }
 
+    public function recusado(): static
+    {
+        return $this->state(fn () => [
+
+            'status' => 'recusado',
+
+        ]);
+    }
+
     public function pix(): static
     {
         return $this->state(fn () => [

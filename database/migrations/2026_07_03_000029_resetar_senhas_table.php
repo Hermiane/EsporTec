@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('resetar_senhas')) {
+            return;
+        }
+
         Schema::create('resetar_senhas', function (Blueprint $table) {
 
             /*

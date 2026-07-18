@@ -1,19 +1,28 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Cliente\ClienteController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PublicoController;
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\ReservaController;
 
-use App\Http\Controllers\Cliente\PagamentoController;
-use App\Http\Controllers\Admin\AgendamentoController;
+use App\Http\Controllers\PagamentoController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\FinanceiroController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\ClienteController as AdminClienteController;
 use App\Http\Controllers\Auth\PasswordResetController;
 // MÓDULO CLIENTE
 // REQUISITO 1: Cadastro autônomo
-Route::post('/clientes', [ClienteController::class, 'store']);
 // REQUISITO 4: Histórico
-Route::get('/clientes/{id}/historico', [ClienteController::class, 'historico']);
+
+Route::post('/auth/registro', [AuthController::class, 'registrar']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/recuperar-senha', [AuthController::class, 'solicitarReset']);
+Route::post('/auth/redefinir-senha', [AuthController::class, 'redefinirSenha']);
+Route::middleware('auth:sanctum')->post('/auth/logout', [AuthController::class, 'logout']);
+Route::get('/publico/arenas', [PublicoController::class, 'arenas']);
+Route::get('/publico/arenas/{id}', [PublicoController::class, 'arena']);
+Route::get('/publico/quadras/{id}', [PublicoController::class, 'quadra']);
 
 // ===== API AUTENTICADA (front) =====
 Route::middleware('auth:sanctum')->group(function () {
@@ -33,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 // ===== ROTAS DO CLIENTE LOGADO =====
-Route::prefix('cliente')->group(function () {
+Route::middleware('auth:sanctum')->prefix('cliente')->group(function () {
  Route::get('/quadras', [ReservaController::class, 'quadrasDisponiveis']);
  Route::get('/quadras/{id}/horarios', [ReservaController::class, 'horariosDisponiveis']);
  Route::get('/reservas', [ReservaController::class, 'minhasReservas']);
@@ -42,8 +51,11 @@ Route::prefix('cliente')->group(function () {
 });
 
 // ===== ROTAS DO FUNCIONÁRIO/ADMIN =====
-use App\Http\Controllers\Funcionario\PagamentoController as FuncPagamentoController;
-Route::prefix('funcionario')->group(function () {
+use App\Http\Controllers\PagamentoController as FuncPagamentoController;
+Route::middleware(['auth:sanctum', 'papel:equipe'])->prefix('funcionario')->group(function () {
+    Route::get('/agenda/dia', [AgendaController::class, 'dia']);
+    Route::get('/agenda/semana', [AgendaController::class, 'semana']);
+    Route::patch('/reservas/{id}/horario', [AgendaController::class, 'alterarHorario']);
     Route::get('/pagamentos/pendentes', [FuncPagamentoController::class, 'pendentes']);
     Route::patch('/pagamentos/{id}/confirmar', [FuncPagamentoController::class, 'confirmar']);
     Route::patch('/pagamentos/{id}/recusar', [FuncPagamentoController::class, 'recusar']);
@@ -51,7 +63,7 @@ Route::prefix('funcionario')->group(function () {
     // Versões POST (legacy) removidas para evitar duplicidade de rotas.
 });
 // ===== MÓDULO ADMIN =====
-Route::prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'papel:admin'])->prefix('admin')->group(function () {
  
  // Financeiro
  Route::get('/financeiro/fluxo-caixa', [FinanceiroController::class, 'fluxoCaixa']);
@@ -62,14 +74,13 @@ Route::prefix('admin')->group(function () {
  Route::post('/usuarios', [UsuarioController::class, 'store']);
  Route::get('/usuarios/{id}', [UsuarioController::class, 'show']);
  Route::put('/usuarios/{id}', [UsuarioController::class, 'update']);
- Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy']);
- Route::put('/usuarios/{id}/promover', [UsuarioController::class, 'promoverAdmin']);
- Route::put('/usuarios/{id}/toggle', [UsuarioController::class, 'toggleAtivo']);
+ Route::delete('/usuarios/{id}', [UsuarioController::class, 'inativar']);
+ Route::put('/usuarios/{id}/promover', [AdminController::class, 'promoverAdmin']);
+ Route::put('/usuarios/{id}/toggle', [AdminController::class, 'toggleAtivo']);
  
  // Clientes - gestão pelo admin
  Route::get('/clientes', [AdminClienteController::class, 'index']);
  Route::get('/clientes/{id}', [AdminClienteController::class, 'show']);
- Route::put('/clientes/{id}', [AdminClienteController::class, 'update']);
  
  // Quadras - gestão pelo admin
  Route::get('/quadras', [App\Http\Controllers\Admin\AdminController::class, 'listarQuadras']);
@@ -81,13 +92,6 @@ Route::prefix('admin')->group(function () {
  Route::get('/reservas', [App\Http\Controllers\Admin\AdminController::class, 'todasReservas']);
 });
 // ===== MÓDULO FUNCIONÁRIO =====
-Route::prefix('funcionario')->group(function () {
- Route::get('/agenda', [AgendamentoController::class, 'agendaFuncionario']);
- Route::get('/agenda/semana', [AgendamentoController::class, 'agendaSemana']);
- Route::get('/agenda/dia', [AgendamentoController::class, 'agendaDia']);
- Route::patch('/agendamentos/{id}/confirmar', [AgendamentoController::class, 'confirmar']);
- Route::patch('/agendamentos/{id}/cancelar', [AgendamentoController::class, 'cancelar']);
-});
 // Password Reset
 //Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
 //Route::post('/reset-password', [PasswordResetController::class, 'reset']);
