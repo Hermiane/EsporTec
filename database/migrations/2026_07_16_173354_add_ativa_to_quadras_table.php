@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quadras', function (Blueprint $table) {
-            $table->boolean('ativa')
-                ->default(true)
-                ->after('nome');
-        });
+        // A coluna já faz parte da migration de criação de quadras.
+        // Mantemos esta migration como no-op para bancos que a registraram depois.
     }
 
     /**
@@ -23,8 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quadras', function (Blueprint $table) {
-            $table->dropColumn('ativa');
-        });
+        // Não remover: a coluna pertence à migration original da tabela.
     }
 };

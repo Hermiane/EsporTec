@@ -44,6 +44,7 @@ return new class extends Migration
             $table->enum('status', [
                 'pendente',
                 'pago',
+                'recusado',
                 'estornado',
             ])->default('pendente');
 

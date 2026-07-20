@@ -23,14 +23,14 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'nome_completo' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:191', 'unique:usuarios,email,'.$user->id],
         ]);
 
         $user->fill($validated);
 
         if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
+            $user->email_verificacao = null;
         }
 
         $user->save();
@@ -47,7 +47,7 @@ class ProfileController extends Controller
         ]);
 
         $request->user()->update([
-            'password' => Hash::make($validated['password']),
+            'senha_hash' => Hash::make($validated['password']),
         ]);
 
         return back()->with('status', 'Senha alterada!');

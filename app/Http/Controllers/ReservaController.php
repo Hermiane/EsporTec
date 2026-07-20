@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Reserva;
+use App\Models\AdminArena;
+use App\Models\BloqueioQuadra;
+use App\Models\FuncionarioArena;
 use App\Models\Quadra;
-
+use App\Models\Reserva;
+use App\Models\Usuario;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ReservaController extends Controller
 {
-    // AGENDAMENTO: agora com quadra, usuario, hora_inicio/fim
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -20,55 +24,41 @@ class ReservaController extends Controller
             'hora_inicio' => ['required', 'date_format:H:i'],
             'hora_fim' => ['required', 'date_format:H:i', 'after:hora_inicio'],
             'valor_total' => ['required', 'numeric', 'min:0'],
-            // status é forçado no create (não confiamos no body)
-            'status' => ['sometimes', Rule::in(['pendente', 'confirmada', 'concluida', 'cancelada'])],
             'observacao' => ['nullable', 'string'],
         ]);
+        $userId = $this->usuarioAutenticado()->id;
 
-        $userId = auth()->id();
-        if (!$userId) {
-            return response()->json(['message' => 'Não autenticado'], 401);
-        }
-
-        $arena = auth()->user()->arena()->first();
-        $arenaId = $arena?->id;
-        if (!$arenaId) {
-            return response()->json(['message' => 'Usuário sem arena vinculada'], 403);
-        }
-
-        $quadra = Quadra::findOrFail($validated['quadra_id']);
-        if ((int) $quadra->arenas_id !== (int) $arenaId) {
-            return response()->json(['message' => 'Quadra não pertence à sua arena'], 403);
-        }
-
-        if (!(bool) $quadra->ativa) {
+        $quadra = Quadra::with('horariosFuncionamento')->findOrFail($validated['quadra_id']);
+        if (!$quadra->ativa) {
             return response()->json(['message' => 'Quadra inativa'], 403);
         }
 
-        $statusConflito = ['pendente', 'confirmada', 'paga'];
+        if (!$this->estaNoHorarioFuncionamento($quadra, $validated['data'], $validated['hora_inicio'], $validated['hora_fim'])) {
+            return response()->json(['message' => 'Horário fora do funcionamento da quadra'], 422);
+        }
 
-        try {
-            $reserva = DB::transaction(function () use ($validated, $userId, $statusConflito) {
-                // Lock explícito nas reservas conflitantes para evitar race condition
-                $conflitos = Reserva::query()
-                    ->where('quadras_id', $validated['quadra_id'])
+        $reserva = DB::transaction(function () use ($validated, $userId) {
+                // Serializa reservas da mesma quadra, inclusive quando ainda não há conflito gravado.
+                Quadra::whereKey($validated['quadra_id'])->lockForUpdate()->firstOrFail();
+                $hasConflitoReserva = Reserva::where('quadras_id', $validated['quadra_id'])
                     ->where('data', $validated['data'])
-                    ->whereIn('status', $statusConflito)
-                    ->where(function ($q) use ($validated) {
-                        $q->where(function ($q2) use ($validated) {
-                            $q2->where('hora_inicio', '<', $validated['hora_fim'])
-                                ->where('hora_fim', '>', $validated['hora_inicio']);
-                        });
-                    })
+                    ->whereIn('status', ['pendente', 'confirmada'])
+                    ->where('hora_inicio', '<', $validated['hora_fim'])
+                    ->where('hora_fim', '>', $validated['hora_inicio'])
                     ->lockForUpdate()
-                    ->get();
+                    ->exists();
 
-                if ($conflitos->isNotEmpty()) {
-                    // Mantém o mesmo contrato que já existia
-                    throw new \RuntimeException('Horário indisponível (conflito de reserva).');
+                $hasBloqueio = BloqueioQuadra::where('quadras_id', $validated['quadra_id'])
+                    ->where('data', $validated['data'])
+                    ->where('hora_inicio', '<', $validated['hora_fim'])
+                    ->where('hora_fim', '>', $validated['hora_inicio'])
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($hasConflitoReserva || $hasBloqueio) {
+                    abort(409, 'Horário indisponível.');
                 }
 
-                // Força status pendente no create
                 return Reserva::create([
                     'reservas_usuarios_id' => $userId,
                     'quadras_id' => $validated['quadra_id'],
@@ -82,106 +72,100 @@ class ReservaController extends Controller
                 ]);
             });
 
-            return response()->json($reserva, 201);
-        } catch (\RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 409);
-        }
-    
+        return response()->json($reserva, 201);
     }
 
-    // ATUALIZAR STATUS DA RESERVA
     public function updateStatus(Request $request, $id)
     {
         $reserva = Reserva::with('quadra')->findOrFail($id);
-
-        $userId = auth()->id();
-        if (!$userId) {
-            return response()->json(['message' => 'Não autenticado'], 401);
-        }
-
-        $arenaId = auth()->user()->arena()->first()?->id;
-        if (!$arenaId) {
-            return response()->json(['message' => 'Usuário sem arena vinculada'], 403);
-        }
-
-        if ((int) $reserva->quadra->arenas_id !== (int) $arenaId) {
-            return response()->json(['message' => 'Não autorizado'], 403);
+        $userId = $this->usuarioAutenticado()->id;
+        if (!$this->podeGerirArena($userId, $reserva->quadra->arenas_id)) {
+            abort(403, 'Não autorizado.');
         }
 
         $validated = $request->validate([
-            'status' => ['required', Rule::in(['pendente', 'confirmada', 'concluida', 'cancelada'])],
-            'alteradas_por' => ['sometimes', 'nullable', 'exists:usuarios,id'],
+            'status' => ['required', Rule::in(['concluida', 'cancelada'])],
         ]);
 
-        $validated['alteradas_por'] = $validated['alteradas_por'] ?? $userId;
+        if ($validated['status'] === 'concluida' && $reserva->status !== 'confirmada') {
+            return response()->json(['message' => 'Apenas reservas confirmadas podem ser concluídas'], 422);
+        }
 
-        $reserva->update($validated);
+        if ($validated['status'] === 'cancelada' && !in_array($reserva->status, ['pendente', 'confirmada'], true)) {
+            return response()->json(['message' => 'Esta reserva não pode ser cancelada'], 422);
+        }
 
-        return response()->json($reserva);
+        $data = ['status' => $validated['status'], 'alteradas_por' => $userId];
+        if ($validated['status'] === 'cancelada') {
+            $data += ['cancelados_por' => $userId, 'cancelada_em' => now()];
+        }
+        $reserva->update($data);
+
+        return response()->json($reserva->fresh());
     }
-
 
     public function quadrasDisponiveis()
     {
-        $user = auth()->user();
-        if (!$user) {
-            return response()->json(['message' => 'Não autenticado'], 401);
-        }
 
-        $arena = $user->arena()->first();
-        $arenaId = $arena?->id;
-        if (!$arenaId) {
-            return response()->json(['message' => 'Usuário sem arena vinculada'], 403);
-        }
+        return response()->json(Quadra::with('arena')->where('ativa', true)->get());
 
-        $quadras = Quadra::where('arenas_id', $arenaId)
-            ->where('ativo', 1)
-            ->get();
-
-        return response()->json($quadras);
     }
 
-
-    public function horariosDisponiveis($id)
+    public function horariosDisponiveis(Request $request, $id)
     {
-        $horarios = [
-            '08:00', '09:00', '10:00', '11:00',
-            '14:00', '15:00', '16:00', '17:00',
-            '18:00', '19:00', '20:00', '21:00',
-        ];
+        $validated = $request->validate([
+            'data' => ['required', 'date', 'after_or_equal:today'],
+            'duracao' => ['nullable', 'integer', 'min:30', 'max:240'],
+        ]);
+        $duracao = $validated['duracao'] ?? 60;
+        $quadra = Quadra::with('horariosFuncionamento')->where('ativa', true)->findOrFail($id);
+        $diaSemana = $this->diaSemana(Carbon::parse($validated['data']));
+        $bloqueios = BloqueioQuadra::where('quadras_id', $quadra->id)->where('data', $validated['data'])->get();
+        $reservas = Reserva::where('quadras_id', $quadra->id)->where('data', $validated['data'])
+            ->whereIn('status', ['pendente', 'confirmada'])->get();
 
-        return response()->json($horarios);
+        $horarios = [];
+        foreach ($quadra->horariosFuncionamento->where('dia_semana', $diaSemana)->where('ativo', true) as $funcionamento) {
+            $inicio = Carbon::createFromFormat('H:i:s', $funcionamento->hora_inicio);
+            $fim = Carbon::createFromFormat('H:i:s', $funcionamento->hora_fim);
+            while ($inicio->copy()->addMinutes($duracao)->lte($fim)) {
+                $termino = $inicio->copy()->addMinutes($duracao);
+                $ocupado = $reservas->contains(fn ($reserva) => $reserva->hora_inicio < $termino->format('H:i:s') && $reserva->hora_fim > $inicio->format('H:i:s'))
+                    || $bloqueios->contains(fn ($bloqueio) => $bloqueio->hora_inicio < $termino->format('H:i:s') && $bloqueio->hora_fim > $inicio->format('H:i:s'));
+                if (!$ocupado) {
+                    $horarios[] = $inicio->format('H:i');
+                }
+                $inicio->addMinutes($duracao);
+            }
+        }
+
+        return response()->json(array_values(array_unique($horarios)));
     }
 
     public function minhasReservas()
     {
-        return response()->json([]);
+        return response()->json(
+            Reserva::where('reservas_usuarios_id', $this->usuarioAutenticado()->id)
+                ->with(['quadra.arena', 'pagamento'])
+                ->orderByDesc('data')
+                ->orderByDesc('hora_inicio')
+                ->get()
+        );
     }
 
-
-    // CANCELAR RESERVA
     public function cancelar(Request $request, $id)
     {
         $reserva = Reserva::with('quadra')->findOrFail($id);
-
-        $userId = auth()->id();
-        if (!$userId) {
-            return response()->json(['message' => 'Não autenticado'], 401);
+        $userId = $this->usuarioAutenticado()->id;
+        $isOwner = $reserva->reservas_usuarios_id === $userId;
+        if (!$isOwner && !$this->podeGerirArena($userId, $reserva->quadra->arenas_id)) {
+            abort(403, 'Não autorizado.');
+        }
+        if (!in_array($reserva->status, ['pendente', 'confirmada'], true)) {
+            return response()->json(['message' => 'Esta reserva não pode ser cancelada'], 422);
         }
 
-        $arenaId = auth()->user()->arena()->first()?->id;
-        if (!$arenaId) {
-            return response()->json(['message' => 'Usuário sem arena vinculada'], 403);
-        }
-
-        if ((int) $reserva->quadra->arenas_id !== (int) $arenaId) {
-            return response()->json(['message' => 'Não autorizado'], 403);
-        }
-
-        $validated = $request->validate([
-            'observacao' => ['nullable', 'string'],
-        ]);
-
+        $validated = $request->validate(['observacao' => ['nullable', 'string']]);
         $reserva->update([
             'status' => 'cancelada',
             'cancelados_por' => $userId,
@@ -189,7 +173,41 @@ class ReservaController extends Controller
             'observacao' => $validated['observacao'] ?? $reserva->observacao,
         ]);
 
-        return response()->json($reserva);
+        return response()->json($reserva->fresh());
+    }
+
+    private function estaNoHorarioFuncionamento(Quadra $quadra, string $data, string $inicio, string $fim): bool
+    {
+        $diaSemana = $this->diaSemana(Carbon::parse($data));
+        return $quadra->horariosFuncionamento
+            ->where('dia_semana', $diaSemana)
+            ->where('ativo', true)
+            ->contains(fn ($horario) => $inicio >= substr($horario->hora_inicio, 0, 5) && $fim <= substr($horario->hora_fim, 0, 5));
+    }
+
+    private function diaSemana(Carbon $data): string
+    {
+        return ['segunda-feira', 'terca-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sabado', 'domingo'][$data->dayOfWeekIso - 1];
+    }
+
+    private function podeGerirArena(?int $userId, int $arenaId): bool
+    {
+        if (!$userId) {
+            return false;
+        }
+
+        return AdminArena::where('usuarios_id', $userId)->where('arenas_id', $arenaId)->where('ativo', true)->exists()
+            || FuncionarioArena::where('usuarios_id', $userId)->where('arenas_id', $arenaId)->where('ativo', true)->exists()
+            || \App\Models\SuperAdmin::where('usuarios_id', $userId)->where('ativo', true)->exists();
+    }
+
+    private function usuarioAutenticado(): Usuario
+    {
+        $user = Auth::user();
+        if (!$user instanceof Usuario) {
+            abort(401, 'Não autenticado.');
+        }
+
+        return $user;
     }
 }
-
