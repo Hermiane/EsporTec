@@ -95,6 +95,21 @@
         .badge-pendente { background: rgba(249,168,37,0.15); color: #F9A825; }
         .badge-cancelada { background: rgba(211,47,47,0.15); color: #D32F2F; }
 
+        /* Loading state */
+        .loading-placeholder {
+            background: #F1F5F9;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--gray);
+        }
+        .loading-placeholder i {
+            animation: spin 1s linear infinite;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
         /* Mobile */
         @media (max-width: 992px) {
             .sidebar { width: min(280px, 86vw); }
@@ -119,14 +134,14 @@
             <div class="nav-item"><a href="/painel" class="nav-link active"><i class="bi bi-grid"></i> Painel</a></div>
             <div class="nav-item"><a href="/nova-reserva" class="nav-link"><i class="bi bi-calendar-plus"></i> Nova Reserva</a></div>
             <div class="nav-item"><a href="/minhas-reservas" class="nav-link"><i class="bi bi-list-check"></i> Minhas Reservas</a></div>
-            <div class="nav-item"><a href="/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações <span class="badge bg-danger rounded-pill ms-auto">3</span></a></div>
+            <div class="nav-item"><a href="/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações <span class="badge bg-danger rounded-pill ms-auto" id="notifCount">3</span></a></div>
             <div class="nav-item"><a href="/perfil" class="nav-link"><i class="bi bi-person"></i> Meu Perfil</a></div>
         </nav>
         <a href="/login" class="nav-link logout"><i class="bi bi-box-arrow-left"></i> Sair</a>
     </aside>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Conteudo Principal -->
+    <!-- Conteúdo Principal -->
     <main class="main">
         <div class="header">
             <div class="d-flex align-items-center header-start">
@@ -134,16 +149,18 @@
                     <i class="bi bi-list"></i>
                 </button>
                 <div>
-                    <h1>Olá, João!</h1>
-                    <p>Bem-vindo de volta. Você tem 1 reserva confirmada para hoje.</p>
+                    <!-- DADO DINÂMICO: Nome do usuário logado -->
+                    <h1>Olá, {{ auth()->user()->nome_completo ?? 'Cliente' }}!</h1>
+                    <p>Bem-vindo de volta. Você tem <span id="reservasHojeCount">1</span> reserva confirmada para hoje.</p>
                 </div>
             </div>
             <div class="d-flex gap-2 align-items-center">
                 <button type="button" class="btn btn-light" id="searchToggle" aria-label="Buscar"><i class="bi bi-search"></i></button>
                 <a href="/notificacoes" class="btn btn-light" aria-label="Notificações"><i class="bi bi-bell"></i></a>
                 <button type="button" class="account-button" id="profileToggle" aria-label="Abrir menu da conta" aria-expanded="false">
-                    <span class="account-avatar">JS</span>
-                    <span class="account-name">João</span>
+                    <!--  DADO DINÂMICO: Avatar com iniciais -->
+                    <span class="account-avatar">{{ substr(auth()->user()->nome_completo ?? 'C', 0, 2) }}</span>
+                    <span class="account-name">{{ explode(' ', auth()->user()->nome_completo ?? 'Cliente')[0] }}</span>
                     <i class="bi bi-chevron-down"></i>
                 </button>
             </div>
@@ -160,9 +177,9 @@
 
         <div id="profilePanel" class="top-panel profile-menu d-none">
             <div class="profile-menu-header">
-                <span class="profile-menu-avatar">JS</span>
+                <span class="profile-menu-avatar">{{ substr(auth()->user()->nome_completo ?? 'C', 0, 2) }}</span>
                 <div>
-                    <h6 class="fw-bold mb-1">João Silva</h6>
+                    <h6 class="fw-bold mb-1">{{ auth()->user()->nome_completo ?? 'Cliente' }}</h6>
                     <small class="text-muted">Cliente EsporTec</small>
                 </div>
             </div>
@@ -173,7 +190,7 @@
                 </a>
                 <a href="/notificacoes" class="profile-action">
                     <span><i class="bi bi-bell me-2"></i>Notificações</span>
-                    <span class="badge bg-danger rounded-pill">3</span>
+                    <span class="badge bg-danger rounded-pill" id="profileNotifCount">3</span>
                 </a>
                 <a href="/login" class="profile-action danger">
                     <span><i class="bi bi-box-arrow-left me-2"></i>Sair da conta</span>
@@ -182,26 +199,34 @@
             </div>
         </div>
 
-        <!-- Próxima Reserva -->
-        <div class="highlight-card">
-            <h3 class="mb-2">Sua próxima partida</h3>
-            <p class="mb-3 opacity-75">Quadra Society Premium • Hoje, 19:00</p>
-            <div class="d-flex gap-4 align-items-center flex-wrap">
-                <div>
-                    <small class="d-block opacity-75">Duração</small>
-                    <strong>1h30min</strong>
+        <!-- Próxima Reserva (Carregado via JS) -->
+        <div class="highlight-card" id="proximaReservaCard">
+            <!-- Placeholder enquanto carrega -->
+            <div class="loading-placeholder" id="proximaReservaLoading">
+                <i class="bi bi-hourglass-split"></i>
+                <p class="mb-0 mt-2">Carregando sua próxima partida...</p>
+            </div>
+            <!-- Conteúdo dinâmico (preenchido via JS) -->
+            <div id="proximaReservaContent" class="d-none">
+                <h3 class="mb-2" id="proximaReservaQuadra">Quadra Society Premium</h3>
+                <p class="mb-3 opacity-75" id="proximaReservaInfo">Hoje, 19:00</p>
+                <div class="d-flex gap-4 align-items-center flex-wrap">
+                    <div>
+                        <small class="d-block opacity-75">Duração</small>
+                        <strong id="proximaReservaDuracao">1h30min</strong>
+                    </div>
+                    <div>
+                        <small class="d-block opacity-75">Status</small>
+                        <span class="badge bg-light text-success px-4 py-2 rounded-pill fw-bold" id="proximaReservaStatus">Confirmada</span>
+                    </div>
+                    <button type="button" class="btn btn-light ms-auto fw-semibold px-4" data-bs-toggle="modal" data-bs-target="#modalProximaReserva">
+                        Ver Detalhes
+                    </button>
                 </div>
-                <div>
-                    <small class="d-block opacity-75">Status</small>
-                    <span class="badge bg-light text-success px-4 py-2 rounded-pill fw-bold">Confirmada</span>
-                </div>
-                <button type="button" class="btn btn-light ms-auto fw-semibold px-4" data-bs-toggle="modal" data-bs-target="#modalProximaReserva">
-                    Ver Detalhes
-                </button>
             </div>
         </div>
 
-        <!-- Atalhos Rapidos -->
+        <!-- Atalhos Rápidos -->
         <h5 class="fw-bold mb-3">Atalhos Rápidos</h5>
         <div class="quick-grid">
             <a href="/nova-reserva" class="quick-btn">
@@ -222,172 +247,80 @@
             </a>
         </div>
 
-        <!-- Arenas disponíveis -->
+        <!-- Arenas disponíveis (Carregado via Blade + JS) -->
         <section class="arena-selector">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                 <div>
                     <h5 class="fw-bold mb-1">Escolha a arena</h5>
                     <p class="text-muted mb-0">Você pode reservar em uma arena específica ou ver todas as quadras cadastradas.</p>
                 </div>
-                <span class="badge bg-success">3 arenas</span>
+                <span class="badge bg-success" id="arenasCount">3 arenas</span>
             </div>
             <div class="arena-options" id="arenaOptions">
-                <button type="button" class="arena-option active" data-arena-filter="todas">
-                    <strong>Todas as arenas</strong>
-                    <small>Mostrar todas as quadras disponíveis</small>
-                </button>
-                <button type="button" class="arena-option" data-arena-filter="esportec-arena">
-                    <strong>EsporTec Arena</strong>
-                    <small>Centro • 3 quadras cadastradas</small>
-                </button>
-                <button type="button" class="arena-option" data-arena-filter="society-cameta">
-                    <strong>Arena Society Cametá</strong>
-                    <small>Bairro Novo • 1 quadra cadastrada</small>
-                </button>
-                <button type="button" class="arena-option" data-arena-filter="zona-norte">
-                    <strong>Unidade Zona Norte</strong>
-                    <small>Zona Norte • 1 quadra cadastrada</small>
-                </button>
+                <!-- DADOS VIA BLADE: Loop das arenas que o Controller enviou -->
+                @if(isset($arenas) && $arenas->count() > 0)
+                    <button type="button" class="arena-option active" data-arena-filter="todas">
+                        <strong>Todas as arenas</strong>
+                        <small>Mostrar todas as quadras disponíveis</small>
+                    </button>
+                    @foreach($arenas as $arena)
+                        <button type="button" class="arena-option" data-arena-filter="{{ $arena->slug ?? strtolower(str_replace(' ', '-', $arena->nome)) }}">
+                            <strong>{{ $arena->nome }}</strong>
+                            <small>{{ $arena->cidade ?? 'Localização' }} • {{ $arena->quadras_count ?? '1' }} quadra{{ $arena->quadras_count != 1 ? 's' : '' }} cadastrada{{ $arena->quadras_count != 1 ? 's' : '' }}</small>
+                        </button>
+                    @endforeach
+                @else
+                    <!-- Fallback se não houver arenas -->
+                    <button type="button" class="arena-option active" data-arena-filter="todas">
+                        <strong>Todas as arenas</strong>
+                        <small>Mostrar todas as quadras disponíveis</small>
+                    </button>
+                    <button type="button" class="arena-option" data-arena-filter="esportec-arena">
+                        <strong>EsporTec Arena</strong>
+                        <small>Centro • 3 quadras cadastradas</small>
+                    </button>
+                @endif
             </div>
         </section>
 
-        <!-- Quadras Disponíveis -->
+        <!-- Quadras Disponíveis (Carregado via JS) -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <div>
                 <h5 class="fw-bold mb-0">Quadras Disponíveis</h5>
                 <small class="text-muted" id="arenaAtualLabel">Mostrando quadras de todas as arenas</small>
             </div>
         </div>
-        <div class="row g-4 quadras-grid">
-            <div class="col-lg-4" data-arena="esportec-arena">
-                <div class="quadra-card">
-                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80"
-                         alt="Quadra Futsal Arena" class="quadra-img">
-                    <div class="quadra-content">
-                        <span class="arena-badge"><i class="bi bi-building"></i>EsporTec Arena</span>
-                        <h3 class="quadra-title">Quadra Futsal Arena</h3>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <span>4.6 (89 avaliações)</span>
-                        </div>
-                        <p class="quadra-info">Quadra de futsal coberta com piso de madeira, ótima para competições e treinos.</p>
-                        <p class="quadra-info"><strong>Tipo:</strong> Futsal</p>
-                        <p class="quadra-info"><strong>Capacidade:</strong> 10 jogadores</p>
-                        <p class="quadra-info"><strong>Coberta:</strong> Sim</p>
-                        <div class="price">R$ 120/hora</div>
-                        <a href="/nova-reserva?arena=esportec-arena&quadra=futsal-arena&etapa=data" class="btn-select-quadra">
-                            Selecionar <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4" data-arena="esportec-arena">
-                <div class="quadra-card">
-                    <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=800&q=80"
-                         alt="Quadra Society Premium" class="quadra-img">
-                    <div class="quadra-content">
-                        <span class="arena-badge"><i class="bi bi-building"></i>EsporTec Arena</span>
-                        <h3 class="quadra-title">Quadra Society Premium</h3>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <span>4.8 (124 avaliações)</span>
-                        </div>
-                        <p class="quadra-info">Quadra society com grama sintética de última geração e iluminação LED.</p>
-                        <p class="quadra-info"><strong>Tipo:</strong> Society</p>
-                        <p class="quadra-info"><strong>Capacidade:</strong> 14 jogadores</p>
-                        <p class="quadra-info"><strong>Coberta:</strong> Não</p>
-                        <div class="price">R$ 150/hora</div>
-                        <a href="/nova-reserva?arena=esportec-arena&quadra=society-premium&etapa=data" class="btn-select-quadra">
-                            Selecionar <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4" data-arena="esportec-arena">
-                <div class="quadra-card">
-                    <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80"
-                         alt="Quadra Society Descoberta" class="quadra-img">
-                    <div class="quadra-content">
-                        <span class="arena-badge"><i class="bi bi-building"></i>EsporTec Arena</span>
-                        <h3 class="quadra-title">Quadra Society Descoberta</h3>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <span>4.5 (67 avaliações)</span>
-                        </div>
-                        <p class="quadra-info">Quadra society ao ar livre com grama sintética e iluminação noturna.</p>
-                        <p class="quadra-info"><strong>Tipo:</strong> Society</p>
-                        <p class="quadra-info"><strong>Capacidade:</strong> 14 jogadores</p>
-                        <p class="quadra-info"><strong>Coberta:</strong> Não</p>
-                        <div class="price">R$ 100/hora</div>
-                        <a href="/nova-reserva?arena=esportec-arena&quadra=society-descoberta&etapa=data" class="btn-select-quadra">
-                            Selecionar <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4" data-arena="society-cameta">
-                <div class="quadra-card">
-                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80"
-                         alt="Campo Society Cametá" class="quadra-img">
-                    <div class="quadra-content">
-                        <span class="arena-badge"><i class="bi bi-building"></i>Arena Society Cametá</span>
-                        <h3 class="quadra-title">Campo Society Cametá</h3>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <span>4.7 (51 avaliações)</span>
-                        </div>
-                        <p class="quadra-info">Campo society com grama sintética, arquibancada pequena e iluminação noturna.</p>
-                        <p class="quadra-info"><strong>Tipo:</strong> Society</p>
-                        <p class="quadra-info"><strong>Capacidade:</strong> 14 jogadores</p>
-                        <p class="quadra-info"><strong>Coberta:</strong> Não</p>
-                        <div class="price">R$ 130/hora</div>
-                        <a href="/nova-reserva?arena=society-cameta&quadra=campo-society-cameta&etapa=data" class="btn-select-quadra">
-                            Selecionar <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4" data-arena="zona-norte">
-                <div class="quadra-card">
-                    <img src="https://images.unsplash.com/photo-1598881034666-6d344b6f58a6?auto=format&fit=crop&w=800&q=80"
-                         alt="Quadra Zona Norte" class="quadra-img">
-                    <div class="quadra-content">
-                        <span class="arena-badge"><i class="bi bi-building"></i>Unidade Zona Norte</span>
-                        <h3 class="quadra-title">Quadra Zona Norte</h3>
-                        <div class="rating">
-                            <i class="bi bi-star-fill"></i>
-                            <span>4.4 (38 avaliações)</span>
-                        </div>
-                        <p class="quadra-info">Quadra coberta para futsal e eventos esportivos de pequeno porte.</p>
-                        <p class="quadra-info"><strong>Tipo:</strong> Futsal</p>
-                        <p class="quadra-info"><strong>Capacidade:</strong> 10 jogadores</p>
-                        <p class="quadra-info"><strong>Coberta:</strong> Sim</p>
-                        <div class="price">R$ 110/hora</div>
-                        <a href="/nova-reserva?arena=zona-norte&quadra=quadra-zona-norte&etapa=data" class="btn-select-quadra">
-                            Selecionar <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- Placeholder enquanto carrega quadras -->
+        <div id="quadrasLoading" class="loading-placeholder">
+            <i class="bi bi-hourglass-split"></i>
+            <p class="mb-0 mt-2">Carregando quadras disponíveis...</p>
         </div>
+        
+        <!-- Grid de quadras (preenchido via JS) -->
+        <div class="row g-4 quadras-grid" id="quadrasGrid">
+        </div>
+        
         <div id="emptySearch" class="empty-search d-none">
             <i class="bi bi-search"></i>
             <strong>Nenhuma quadra encontrada</strong>
             <p class="mb-0">Tente buscar por Futsal, Society ou pelo nome da quadra.</p>
         </div>
 
-        <!-- Reservas Recentes -->
+        <!-- Reservas Recentes (Carregado via JS) -->
         <div class="card-custom">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Reservas Recentes</h5>
                 <a href="/minhas-reservas" class="text-decoration-none small fw-semibold" style="color: var(--primary)">Ver todas</a>
             </div>
             <div class="table-responsive">
-                <table class="table table-borderless align-middle mb-0">
+                <!-- Placeholder enquanto carrega -->
+                <div id="reservasLoading" class="loading-placeholder py-3">
+                    <i class="bi bi-hourglass-split"></i>
+                    <small>Carregando histórico...</small>
+                </div>
+                <!-- Tabela dinâmica -->
+                <table class="table table-borderless align-middle mb-0" id="reservasTable">
                     <thead class="text-muted small">
                         <tr>
                             <th>Quadra</th>
@@ -397,28 +330,8 @@
                             <th>Pagamento</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="fw-semibold">Quadra Futsal Arena</td>
-                            <td>12/06/2026</td>
-                            <td>16:00</td>
-                            <td><span class="badge-status badge-confirmada">Confirmada</span></td>
-                            <td><span class="badge-status badge-pendente">Pendente</span></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">Quadra Society Descoberta</td>
-                            <td>10/06/2026</td>
-                            <td>10:00</td>
-                            <td><span class="badge-status badge-confirmada">Concluída</span></td>
-                            <td><span class="badge-status badge-pago">Pago</span></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">Society Premium</td>
-                            <td>05/06/2026</td>
-                            <td>20:00</td>
-                            <td><span class="badge-status badge-cancelada">Cancelada</span></td>
-                            <td><span class="badge-status badge-cancelada">Cancelado</span></td>
-                        </tr>
+                    <tbody id="reservasBody">
+                        <!--  CONTEÚDO DINÂMICO: Será preenchido via JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -426,13 +339,14 @@
     </main>
 </div>
 
+<!-- Modal Detalhes da Próxima Reserva -->
 <div class="modal fade" id="modalProximaReserva" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 rounded-4">
             <div class="modal-header border-0">
                 <div>
                     <h5 class="modal-title fw-bold">Detalhes da próxima partida</h5>
-                    <small class="text-muted">Reserva #ESP-1900</small>
+                    <small class="text-muted" id="modalReservaId">Reserva #ESP-1900</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
@@ -441,39 +355,39 @@
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded-3 h-100">
                             <small class="text-muted d-block">Quadra</small>
-                            <strong class="fs-5">Quadra Society Premium</strong>
-                            <p class="mb-0 text-muted mt-2">Grama sintética, iluminação LED e capacidade para 14 jogadores.</p>
+                            <strong class="fs-5" id="modalQuadraNome">Quadra Society Premium</strong>
+                            <p class="mb-0 text-muted mt-2" id="modalQuadraDesc">Grama sintética, iluminação LED e capacidade para 14 jogadores.</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded-3 h-100">
                             <small class="text-muted d-block">Data e horário</small>
-                            <strong class="fs-5">Hoje, 19:00 - 20:30</strong>
+                            <strong class="fs-5" id="modalDataHora">Hoje, 19:00 - 20:30</strong>
                             <p class="mb-0 text-muted mt-2">Chegue com 10 minutos de antecedência.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 bg-light rounded-3">
                             <small class="text-muted d-block">Duração</small>
-                            <strong>1h30min</strong>
+                            <strong id="modalDuracao">1h30min</strong>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 bg-light rounded-3">
                             <small class="text-muted d-block">Status da reserva</small>
-                            <span class="badge-status badge-confirmada">Confirmada</span>
+                            <span class="badge-status badge-confirmada" id="modalStatus">Confirmada</span>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 bg-light rounded-3">
                             <small class="text-muted d-block">Pagamento</small>
-                            <span class="badge-status badge-pendente">Pendente</span>
+                            <span class="badge-status badge-pendente" id="modalPagamento">Pendente</span>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="p-3 bg-light rounded-3">
                             <small class="text-muted d-block">Endereço</small>
-                            <strong>Rua dos Esportes, 123 - São Paulo, SP</strong>
+                            <strong id="modalEndereco">Rua dos Esportes, 123 - São Paulo, SP</strong>
                         </div>
                     </div>
                 </div>
@@ -488,7 +402,7 @@
     </div>
 </div>
 
-<!-- Navegacao Mobile -->
+<!-- Navegação Mobile -->
 <nav class="mobile-nav">
     <a href="/painel"><i class="bi bi-grid"></i>Início</a>
     <a href="/nova-reserva"><i class="bi bi-calendar-plus"></i>Reservar</a>
@@ -499,6 +413,235 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
 <script>
+    //  VARIÁVEIS GLOBAIS PARA INTEGRAÇÃO
+    const API_BASE = '/api/cliente'; // CORRIGIDO: agora aponta para o prefixo correto
+    let currentArenaFilter = 'todas';
+    let currentSearchTerm = '';
+
+    // Dados fictícios (fallback quando a API não existe)
+    const MOCK_QUADRAS = [
+        {
+            id: 1, nome: 'Quadra Futsal Arena', tipo: 'Futsal', capacidade_jogadores: 10, coberta: true,
+            preco_hora: 120.00, descricao: 'Quadra de futsal coberta com piso de madeira.',
+            imagem: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
+            avaliacao_media: 4.6, total_avaliacoes: 89,
+            arena: { nome: 'EsporTec Arena', slug: 'esportec-arena' }, slug: 'futsal-arena'
+        },
+        {
+            id: 2, nome: 'Quadra Society Premium', tipo: 'Society', capacidade_jogadores: 14, coberta: false,
+            preco_hora: 150.00, descricao: 'Quadra society com grama sintética de última geração.',
+            imagem: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=800&q=80',
+            avaliacao_media: 4.8, total_avaliacoes: 124,
+            arena: { nome: 'EsporTec Arena', slug: 'esportec-arena' }, slug: 'society-premium'
+        },
+        {
+            id: 3, nome: 'Quadra Society Descoberta', tipo: 'Society', capacidade_jogadores: 14, coberta: false,
+            preco_hora: 100.00, descricao: 'Quadra society ao ar livre com grama sintética.',
+            imagem: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80',
+            avaliacao_media: 4.5, total_avaliacoes: 67,
+            arena: { nome: 'EsporTec Arena', slug: 'esportec-arena' }, slug: 'society-descoberta'
+        }
+    ];
+
+    const MOCK_RESERVAS = [
+        { id: 101, data: '2026-06-12', hora_inicio: '16:00', status: 'confirmada', quadra: { nome: 'Quadra Futsal Arena' }, pagamento: { status: 'pendente' } },
+        { id: 102, data: '2026-06-10', hora_inicio: '10:00', status: 'concluida', quadra: { nome: 'Quadra Society Descoberta' }, pagamento: { status: 'pago' } },
+        { id: 103, data: '2026-06-05', hora_inicio: '20:00', status: 'cancelada', quadra: { nome: 'Society Premium' }, pagamento: { status: 'cancelado' } }
+    ];
+
+    const MOCK_PROXIMA_RESERVA = {
+        id: 'ESP-1900', data: '2026-06-21', hora_inicio: '19:00', hora_fim: '20:30', status: 'confirmada',
+        quadra: { nome: 'Quadra Society Premium', descricao: 'Grama sintética, iluminação LED.', endereco: 'Rua dos Esportes, 123' },
+        pagamento: { status: 'pendente' }
+    };
+
+    //  FUNÇÕES DE CARREGAMENTO DE DADOS (API + fallback mock)
+    
+    // Carregar próxima reserva do usuário
+    async function carregarProximaReserva() {
+        try {
+            // API ainda não existe - usar mock
+            throw new Error('API não implementada ainda');
+        } catch (error) {
+            // Fallback com dados fictícios
+            const reserva = MOCK_PROXIMA_RESERVA;
+            document.getElementById('proximaReservaQuadra').textContent = reserva.quadra?.nome || 'Quadra não identificada';
+            document.getElementById('proximaReservaInfo').textContent = `${formatarData(reserva.data)}, ${reserva.hora_inicio}`;
+            document.getElementById('proximaReservaDuracao').textContent = calcularDuracao(reserva.hora_inicio, reserva.hora_fim);
+            document.getElementById('proximaReservaStatus').textContent = formatarStatus(reserva.status);
+            document.getElementById('proximaReservaStatus').className = `badge bg-light ${getBadgeClass(reserva.status)} px-4 py-2 rounded-pill fw-bold`;
+            
+            document.getElementById('modalReservaId').textContent = `Reserva #${reserva.id}`;
+            document.getElementById('modalQuadraNome').textContent = reserva.quadra?.nome;
+            document.getElementById('modalQuadraDesc').textContent = reserva.quadra?.descricao || '';
+            document.getElementById('modalDataHora').textContent = `${formatarData(reserva.data)}, ${reserva.hora_inicio} - ${reserva.hora_fim}`;
+            document.getElementById('modalDuracao').textContent = calcularDuracao(reserva.hora_inicio, reserva.hora_fim);
+            document.getElementById('modalStatus').textContent = formatarStatus(reserva.status);
+            document.getElementById('modalStatus').className = `badge-status ${getBadgeClass(reserva.status)}`;
+            document.getElementById('modalPagamento').textContent = reserva.pagamento?.status === 'pago' ? 'Pago' : 'Pendente';
+            document.getElementById('modalPagamento').className = `badge-status ${reserva.pagamento?.status === 'pago' ? 'badge-pago' : 'badge-pendente'}`;
+            document.getElementById('modalEndereco').textContent = reserva.quadra?.endereco || '';
+            
+            document.getElementById('proximaReservaLoading').classList.add('d-none');
+            document.getElementById('proximaReservaContent').classList.remove('d-none');
+        }
+    }
+
+    // Carregar quadras disponíveis 
+    async function carregarQuadras(arenaSlug = null, search = '') {
+        try {
+            document.getElementById('quadrasLoading').classList.remove('d-none');
+            document.getElementById('quadrasGrid').innerHTML = '';
+            
+            //  ROTA CORRIGIDA: /api/cliente/quadras (sem /disponiveis)
+            let url = `${API_BASE}/quadras`;
+            const params = new URLSearchParams();
+            if (arenaSlug && arenaSlug !== 'todas') params.append('arena', arenaSlug);
+            if (search) params.append('busca', search);
+            if (params.toString()) url += `?${params.toString()}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Erro ao carregar quadras');
+            
+            const quadras = await response.json();
+            renderizarQuadras(quadras);
+        } catch (error) {
+            console.log('Usando dados fictícios para quadras:', error.message);
+            // Fallback com mock
+            let quadrasFiltradas = MOCK_QUADRAS;
+            if (arenaSlug && arenaSlug !== 'todas') {
+                quadrasFiltradas = MOCK_QUADRAS.filter(q => q.arena?.slug === arenaSlug);
+            }
+            if (search) {
+                quadrasFiltradas = quadrasFiltradas.filter(q => 
+                    q.nome.toLowerCase().includes(search.toLowerCase()) ||
+                    q.tipo.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            renderizarQuadras(quadrasFiltradas);
+        } finally {
+            document.getElementById('quadrasLoading').classList.add('d-none');
+        }
+    }
+
+    // Função auxiliar para renderizar quadras
+    function renderizarQuadras(quadras) {
+        if (quadras.length > 0) {
+            quadras.forEach(quadra => {
+                const card = document.createElement('div');
+                card.className = 'col-lg-4';
+                card.dataset.arena = quadra.arena?.slug || 'sem-arena';
+                card.innerHTML = `
+                    <div class="quadra-card">
+                        <img src="${quadra.imagem || 'https://via.placeholder.com/800x220?text=Sem+imagem'}" 
+                             alt="${quadra.nome}" class="quadra-img">
+                        <div class="quadra-content">
+                            <span class="arena-badge"><i class="bi bi-building"></i>${quadra.arena?.nome || 'Arena'}</span>
+                            <h3 class="quadra-title">${quadra.nome}</h3>
+                            <div class="rating">
+                                <i class="bi bi-star-fill"></i>
+                                <span>${quadra.avaliacao_media?.toFixed(1) || '0.0'} (${quadra.total_avaliacoes || 0} avaliações)</span>
+                            </div>
+                            <p class="quadra-info">${quadra.descricao || ''}</p>
+                            <p class="quadra-info"><strong>Tipo:</strong> ${quadra.tipo}</p>
+                            <p class="quadra-info"><strong>Capacidade:</strong> ${quadra.capacidade_jogadores} jogadores</p>
+                            <p class="quadra-info"><strong>Coberta:</strong> ${quadra.coberta ? 'Sim' : 'Não'}</p>
+                            <div class="price">R$ ${parseFloat(quadra.preco_hora).toFixed(2).replace('.', ',')}/hora</div>
+                            <a href="/nova-reserva?arena=${quadra.arena?.slug}&quadra=${quadra.slug}&etapa=data" class="btn-select-quadra">
+                                Selecionar <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('quadrasGrid').appendChild(card);
+            });
+            document.getElementById('emptySearch').classList.add('d-none');
+        } else {
+            document.getElementById('emptySearch').classList.remove('d-none');
+        }
+    }
+
+    // Carregar reservas recentes - 
+    async function carregarReservasRecentes() {
+        try {
+            document.getElementById('reservasLoading').classList.remove('d-none');
+            document.getElementById('reservasBody').innerHTML = '';
+            
+            // ROTA CORRIGIDA: /api/cliente/reservas (sem /recentes)
+            const response = await fetch(`${API_BASE}/reservas?limit=5`);
+            if (!response.ok) throw new Error('Erro ao carregar reservas');
+            
+            const reservas = await response.json();
+            renderizarReservas(reservas);
+        } catch (error) {
+            console.log('Usando dados fictícios para reservas:', error.message);
+            // Fallback com mock
+            renderizarReservas(MOCK_RESERVAS);
+        } finally {
+            document.getElementById('reservasLoading').classList.add('d-none');
+        }
+    }
+
+    // Função auxiliar para renderizar reservas
+    function renderizarReservas(reservas) {
+        if (reservas.length > 0) {
+            reservas.forEach(reserva => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="fw-semibold">${reserva.quadra?.nome || 'Quadra'}</td>
+                    <td>${formatarData(reserva.data)}</td>
+                    <td>${reserva.hora_inicio}</td>
+                    <td><span class="badge-status ${getBadgeClass(reserva.status)}">${formatarStatus(reserva.status)}</span></td>
+                    <td><span class="badge-status ${reserva.pagamento?.status === 'pago' ? 'badge-pago' : 'badge-pendente'}">${reserva.pagamento?.status === 'pago' ? 'Pago' : 'Pendente'}</span></td>
+                `;
+                document.getElementById('reservasBody').appendChild(row);
+            });
+        } else {
+            document.getElementById('reservasBody').innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Nenhuma reserva recente</td></tr>';
+        }
+    }
+
+    // Carregar contador de notificações (mock por enquanto)
+    function carregarNotificacoesCount() {
+        document.getElementById('notifCount').textContent = 3;
+        document.getElementById('profileNotifCount').textContent = 3;
+    }
+
+    //  FUNÇÕES AUXILIARES
+  
+    function formatarData(dataISO) {
+        if (!dataISO) return '';
+        const data = new Date(dataISO);
+        const hoje = new Date();
+        const amanha = new Date(hoje);
+        amanha.setDate(amanha.getDate() + 1);
+        if (data.toDateString() === hoje.toDateString()) return 'Hoje';
+        if (data.toDateString() === amanha.toDateString()) return 'Amanhã';
+        return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    }
+    
+    function calcularDuracao(inicio, fim) {
+        if (!inicio || !fim) return '';
+        const [h1, m1] = inicio.split(':').map(Number);
+        const [h2, m2] = fim.split(':').map(Number);
+        const diffMin = (h2 * 60 + m2) - (h1 * 60 + m1);
+        const h = Math.floor(diffMin / 60);
+        const m = diffMin % 60;
+        return h > 0 ? `${h}h${m > 0 ? `${m}min` : ''}` : `${m}min`;
+    }
+    
+    function formatarStatus(status) {
+        const map = { 'pendente': 'Pendente', 'confirmada': 'Confirmada', 'concluida': 'Concluída', 'cancelada': 'Cancelada' };
+        return map[status] || status;
+    }
+    
+    function getBadgeClass(status) {
+        const map = { 'pendente': 'badge-pendente', 'confirmada': 'badge-confirmada', 'concluida': 'badge-confirmada', 'cancelada': 'badge-cancelada' };
+        return map[status] || '';
+    }
+
+    //  EVENT LISTENERS
+    
     const sidebar = document.querySelector('.sidebar');
     const menuToggle = document.getElementById('menuToggle');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -510,48 +653,25 @@
     const goSearch = document.getElementById('goSearch');
     const emptySearch = document.getElementById('emptySearch');
     const arenaAtualLabel = document.getElementById('arenaAtualLabel');
-    let currentArenaFilter = 'todas';
     const topPanels = [searchPanel, profilePanel];
 
-    function openSidebar() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('show');
-    }
-
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-    }
-
+    function openSidebar() { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
+    function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('show'); }
     menuToggle.addEventListener('click', openSidebar);
     sidebarOverlay.addEventListener('click', closeSidebar);
-    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-        link.addEventListener('click', closeSidebar);
-    });
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => link.addEventListener('click', closeSidebar));
 
     function toggleTopPanel(panel) {
-        topPanels.forEach(item => {
-            if (item !== panel) {
-                item.classList.add('d-none');
-            }
-        });
+        topPanels.forEach(item => { if (item !== panel) item.classList.add('d-none'); });
         panel.classList.toggle('d-none');
         syncProfileButtonState();
     }
-
     function syncProfileButtonState() {
         const isOpen = !profilePanel.classList.contains('d-none');
         profileToggle.classList.toggle('active', isOpen);
         profileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     }
-
-    searchToggle.addEventListener('click', () => {
-        toggleTopPanel(searchPanel);
-        if (!searchPanel.classList.contains('d-none')) {
-            clientSearch.focus();
-        }
-    });
-
+    searchToggle.addEventListener('click', () => { toggleTopPanel(searchPanel); if (!searchPanel.classList.contains('d-none')) clientSearch.focus(); });
     profileToggle.addEventListener('click', () => toggleTopPanel(profilePanel));
 
     document.querySelectorAll('[data-arena-filter]').forEach(button => {
@@ -559,71 +679,31 @@
             document.querySelectorAll('[data-arena-filter]').forEach(item => item.classList.remove('active'));
             button.classList.add('active');
             currentArenaFilter = button.dataset.arenaFilter;
-            arenaAtualLabel.textContent = currentArenaFilter === 'todas'
-                ? 'Mostrando quadras de todas as arenas'
-                : `Mostrando quadras da ${button.querySelector('strong').textContent.trim()}`;
-            filterCourtCards();
+            arenaAtualLabel.textContent = currentArenaFilter === 'todas' ? 'Mostrando quadras de todas as arenas' : `Mostrando quadras da ${button.querySelector('strong').textContent.trim()}`;
+            carregarQuadras(currentArenaFilter, currentSearchTerm);
             document.querySelector('.quadras-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
 
     document.addEventListener('click', event => {
         const clickedTopAction = event.target.closest('#profileToggle, #searchToggle, #profilePanel, #searchPanel');
-        if (!clickedTopAction) {
-            topPanels.forEach(panel => panel.classList.add('d-none'));
-            syncProfileButtonState();
-        }
+        if (!clickedTopAction) { topPanels.forEach(panel => panel.classList.add('d-none')); syncProfileButtonState(); }
     });
 
-    function filterCourtCards() {
-        const term = clientSearch.value.trim().toLowerCase();
-        let visibleCount = 0;
-
-        document.querySelectorAll('.quadras-grid .col-lg-4').forEach(cardColumn => {
-            const title = cardColumn.querySelector('.quadra-title').textContent.toLowerCase();
-            const matchesArena = currentArenaFilter === 'todas' || cardColumn.dataset.arena === currentArenaFilter;
-            const matchesSearch = !term || title.includes(term) || cardColumn.textContent.toLowerCase().includes(term);
-            const shouldHide = !(matchesArena && matchesSearch);
-            cardColumn.classList.toggle('d-none', shouldHide);
-            if (!shouldHide) {
-                visibleCount++;
-            }
-        });
-
-        emptySearch.classList.toggle('d-none', visibleCount > 0);
-        return visibleCount;
-    }
-
-    function goToSearchResult() {
-        filterCourtCards();
-        const firstVisibleCard = [...document.querySelectorAll('.quadras-grid .col-lg-4')]
-            .find(cardColumn => !cardColumn.classList.contains('d-none'));
-
-        if (firstVisibleCard) {
-            firstVisibleCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstVisibleCard.querySelector('.quadra-card').classList.add('shadow-lg');
-            setTimeout(() => firstVisibleCard.querySelector('.quadra-card').classList.remove('shadow-lg'), 900);
-            return;
-        }
-
-        emptySearch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
+    function filterCourtCards() { currentSearchTerm = clientSearch.value.trim(); carregarQuadras(currentArenaFilter, currentSearchTerm); }
+    function goToSearchResult() { filterCourtCards(); setTimeout(() => { const firstCard = document.querySelector('.quadras-grid .col-lg-4:not(.d-none)'); if (firstCard) firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
     clientSearch.addEventListener('input', filterCourtCards);
-    clientSearch.addEventListener('keydown', event => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            goToSearchResult();
-        }
-    });
+    clientSearch.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); goToSearchResult(); } });
     goSearch.addEventListener('click', goToSearchResult);
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') { topPanels.forEach(panel => panel.classList.add('d-none')); syncProfileButtonState(); closeSidebar(); } });
 
-    document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') {
-            topPanels.forEach(panel => panel.classList.add('d-none'));
-            syncProfileButtonState();
-            closeSidebar();
-        }
+    //  INICIALIZAÇÃO AO CARREGAR A PÁGINA
+    document.addEventListener('DOMContentLoaded', () => {
+        carregarProximaReserva();
+        carregarQuadras(currentArenaFilter);
+        carregarReservasRecentes();
+        carregarNotificacoesCount();
+        document.getElementById('reservasHojeCount').textContent = 1;
     });
 </script>
 </body>

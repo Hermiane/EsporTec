@@ -183,9 +183,6 @@ Route::get('/admin/financeiro', function () {
     return view('admin.financeiro');
 });
 
-Route::get('/admin/pessoas', function () {
-    return view('admin.pessoas');
-});
 
 Route::get('/admin/clientes', function () {
     return view('admin.clientes');

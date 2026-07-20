@@ -3,103 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Agenda do Dia - EsporTec</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #1F5C42;
-            --secondary: #2D815D;
-            --accent: #2D815D;
-            --bg: #F1F5F9;
-            --text: #334155;
-        }
+        :root { --primary: #1F5C42; --secondary: #2D815D; --accent: #2D815D; --bg: #F1F5F9; --text: #334155; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
-
+        
+        /* Layout */
         .layout { display: flex; min-height: 100vh; }
-        .sidebar { 
-            width: 260px; 
-            background: var(--primary); 
-            color: white; 
-            padding: 1.5rem; 
-            display: flex; 
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        .sidebar-brand { 
-            font-size: 1.3rem; 
-            font-weight: 700; 
-            color: white; 
-            text-decoration: none; 
-            margin-bottom: 2.5rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 0.6rem;
-            padding: 0.5rem;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-        }
+        .sidebar { width: 260px; background: var(--primary); color: white; padding: 1.5rem; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-brand { font-size: 1.3rem; font-weight: 700; color: white; text-decoration: none; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; border-radius: 8px; background: rgba(255,255,255,0.1); }
         .sidebar-brand i { font-size: 1.8rem; }
-        .sidebar-brand span { 
-            font-size: 0.75rem; 
-            opacity: 0.85; 
-            display: block;
-            font-weight: 400;
-            margin-top: -0.2rem;
-        }
-        .nav-link { 
-            color: #94A3B8; 
-            font-weight: 500; 
-            padding: 0.8rem 1rem; 
-            border-radius: 8px; 
-            margin-bottom: 0.5rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 0.8rem; 
-            transition: all 0.2s; 
-            text-decoration: none; 
-        }
+        .sidebar-brand span { font-size: 0.75rem; opacity: 0.85; display: block; font-weight: 400; margin-top: -0.2rem; }
+        .nav-link { color: #94A3B8; font-weight: 500; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; transition: all 0.2s; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
-
-        .main { 
-            flex: 1; 
-            padding: 2rem; 
-            overflow-y: auto;
-            margin-left: 260px;
-        }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .main { flex: 1; padding: 2rem; overflow-y: auto; margin-left: 260px; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
         .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0; }
         .badge-role { background: var(--secondary); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; }
 
+        /* Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .stat-card { background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin: 0.5rem 0; }
         .stat-label { font-size: 0.85rem; color: #64748B; font-weight: 500; }
 
+        /* Cards & Tables */
         .agenda-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
         .table-custom { width: 100%; border-collapse: collapse; }
         .table-custom th { text-align: left; padding: 1rem; color: #64748B; font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #E2E8F0; }
         .table-custom td { padding: 1rem; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+        
+        /* Status & Badges */
         .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dot-green { background: var(--accent); }
         .dot-yellow { background: #F59E0B; }
         .dot-red { background: #EF4444; }
+        .dot-gray { background: #94A3B8; }
+        
+        .badge-payment { padding: 0.4rem 0.7rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem; line-height: 1.4; }
+        .badge-paid { background: rgba(16,185,129,0.15); color: var(--accent); }
+        .badge-pending { background: rgba(245,158,11,0.15); color: #F59E0B; }
 
+        /*  BOTÕES  */
+        .actions-cell { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
         .btn-action { 
-            padding: 0.4rem 0.7rem; 
+            padding: 0.5rem 0.8rem; 
             border-radius: 6px; 
             font-size: 0.75rem; 
             border: none; 
             cursor: pointer; 
             font-weight: 600; 
-            margin-right: 0.3rem; 
             display: inline-flex; 
             align-items: center; 
-            gap: 0.3rem;
+            gap: 0.3rem; 
             white-space: nowrap;
+            transition: all 0.2s;
         }
         .btn-checkin { background: rgba(16, 185, 129, 0.1); color: var(--accent); }
         .btn-checkin:hover { background: var(--accent); color: white; }
@@ -107,47 +71,20 @@
         .btn-report:hover { background: #EF4444; color: white; }
         .btn-pay { background: rgba(59,130,246,0.1); color: var(--secondary); }
         .btn-pay:hover { background: var(--secondary); color: white; }
+        .btn-wait { background: #F1F5F9; color: #64748B; cursor: not-allowed; }
 
-        .badge-payment { 
-            padding: 0.4rem 0.7rem; 
-            border-radius: 6px; 
-            font-size: 0.75rem; 
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            line-height: 1.4;
-        }
-        .badge-paid { background: rgba(16,185,129,0.15); color: var(--accent); }
-        .badge-pending { background: rgba(245,158,11,0.15); color: #F59E0B; }
-
-        /* Ajuste para telas menores */
-        @media (max-width: 1200px) {
-            .btn-action { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
-            .table-custom td { padding: 0.75rem 0.5rem; }
-            .badge-payment { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
-        }
+        /* Responsividade */
         @media (max-width: 992px) { 
-            .sidebar { display: none; }
-            .main { margin-left: 0; }
-            .btn-action { margin-bottom: 0.2rem; }
-        }
-        @media (max-width: 768px) {
-            .table-custom th, .table-custom td { font-size: 0.8rem; padding: 0.5rem; }
-            .btn-action { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
-            .badge-payment { 
-                display: block;
-                text-align: center;
-                padding: 0.5rem;
-                margin: 0.2rem 0;
-            }
+            .sidebar { display: none; } 
+            .main { margin-left: 0; } 
+            .actions-cell { flex-direction: column; width: 100%; }
+            .btn-action { width: 100%; justify-content: center; margin-bottom: 0.2rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="layout">
-    <!-- Sidebar -->
     <aside class="sidebar">
         <a href="/painel-funcionario" class="sidebar-brand">
             <i class="bi bi-trophy"></i>
@@ -168,12 +105,11 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main">
         <div class="header">
             <div>
                 <h1><i class="bi bi-calendar-check me-2"></i>Agenda do Dia</h1>
-                <p class="text-muted mb-0">Terça-feira, 14 de Junho de 2026</p>
+                <p class="text-muted mb-0" id="dataAtual">Carregando data...</p>
             </div>
             <span class="badge-role"><i class="bi bi-check-circle me-1"></i>Funcionário Ativo</span>
         </div>
@@ -182,23 +118,23 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label"><i class="bi bi-calendar3 me-1"></i>Reservas Hoje</div>
-                <div class="stat-value">12</div>
-                <small class="text-success"><i class="bi bi-arrow-up"></i> 2 confirmadas</small>
+                <div class="stat-value" id="countReservas">-</div>
+                <small class="text-success" id="countConfirmadas"><i class="bi bi-arrow-up"></i> Carregando...</small>
             </div>
             <div class="stat-card">
                 <div class="stat-label"><i class="bi bi-cash-coin me-1"></i>Receita do Dia</div>
-                <div class="stat-value">R$ 1.450</div>
+                <div class="stat-value" id="countReceita">-</div>
                 <small class="text-muted">Acumulado</small>
             </div>
             <div class="stat-card">
                 <div class="stat-label"><i class="bi bi-collection me-1"></i>Quadras Ativas</div>
-                <div class="stat-value">3/4</div>
-                <small class="text-warning"><i class="bi bi-wrench"></i> 1 em manutenção</small>
+                <div class="stat-value" id="countQuadras">-</div>
+                <small class="text-warning" id="countManutencao"><i class="bi bi-wrench"></i> Carregando...</small>
             </div>
             <div class="stat-card">
-                <div class="stat-label"><i class="bi bi-clock me-1"></i>Próximo Check-in</div>
-                <div class="stat-value">14:00</div>
-                <small class="text-muted">Society Premium</small>
+                <div class="stat-label"><i class="bi bi-clock me-1"></i>Próxima Reserva</div>
+                <div class="stat-value" id="proximaReserva">-</div>
+                <small class="text-muted" id="proximaQuadra">Carregando...</small>
             </div>
         </div>
 
@@ -223,74 +159,9 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="fw-semibold">09:00 - 10:00</td>
-                            <td>Futsal Arena</td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="https://ui-avatars.com/api/?name=Pedro+S&background=random&size=24" class="rounded-circle">
-                                    <span>Pedro Santos</span>
-                                </div>
-                            </td>
-                            <td><span class="status-dot dot-green"></span> Em Jogo</td>
-                            <td><span class="badge-payment badge-paid"><i class="bi bi-check2-circle me-1"></i>Pago (PIX)</span></td>
-                            <td>
-                                <button class="btn-action btn-report" onclick="abrirManutencaoRapida()">
-                                    <i class="bi bi-tools"></i> Manutenção
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">10:00 - 11:30</td>
-                            <td>Society Descoberta</td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="https://ui-avatars.com/api/?name=Ana+L&background=random&size=24" class="rounded-circle">
-                                    <span>Ana Lima</span>
-                                </div>
-                            </td>
-                            <td><span class="status-dot dot-yellow"></span> Pendente</td>
-                            <td>
-                                <span class="badge-payment badge-pending" id="pag-status-123">
-                                    <i class="bi bi-clock me-1"></i>Pendente<br><small>(Dinheiro)</small>
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn-action btn-pay" onclick="atualizarPagamento('123', this)">
-                                    <i class="bi bi-check-circle"></i> Confirmar
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">14:00 - 15:30</td>
-                            <td>Society Premium</td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="https://ui-avatars.com/api/?name=Grupo+FC&background=random&size=24" class="rounded-circle">
-                                    <span>Grupo F.C. Unidos</span>
-                                </div>
-                            </td>
-                            <td><span class="status-dot dot-green"></span> Confirmada</td>
-                            <td><span class="badge-payment badge-paid"><i class="bi bi-check2-circle me-1"></i>Pago (Cartão)</span></td>
-                            <td>
-                                <button class="btn-action btn-checkin" onclick="checkin(this)">
-                                    <i class="bi bi-check-circle"></i> Check-in
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold text-muted">19:00 - 20:30</td>
-                            <td class="text-muted">Society Premium</td>
-                            <td class="text-muted">João Silva</td>
-                            <td><span class="status-dot" style="background:#CBD5E1;"></span> Agendado</td>
-                            <td><span class="badge-payment badge-pending"><i class="bi bi-clock me-1"></i>Pendente (PIX)</span></td>
-                            <td>
-                                <button type="button" class="btn-action btn-checkin" disabled style="opacity:0.5; cursor:not-allowed;">
-                                    <i class="bi bi-hourglass"></i> Aguardando
-                                </button>
-                            </td>
-                        </tr>
+                    <tbody id="agendaBody">
+                        <!-- Preenchido via JS -->
+                        <tr><td colspan="6" class="text-center text-muted py-4"><i class="bi bi-hourglass-split me-2"></i>Carregando agenda...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -314,32 +185,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Mock estático -->
                         <tr>
                             <td>João Silva</td>
                             <td>Society Premium<br><small class="text-muted">14/06</small></td>
                             <td><span class="text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></span></td>
                             <td>"Gramado impecável e iluminação excelente. Voltaremos semana que vem!"</td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#modalResponderFeedback"
-                                        data-cliente="João Silva"
-                                        data-comentario="Gramado impecável e iluminação excelente. Voltaremos semana que vem!">
-                                    <i class="bi bi-reply"></i> Responder
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Ana Lima</td>
-                            <td>Society Descoberta<br><small class="text-muted">10/06</small></td>
-                            <td><span class="text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i></span></td>
-                            <td>"Ótima quadra, mas o bebedouro estava sem água no último jogo."</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#modalResponderFeedback"
-                                        data-cliente="Ana Lima"
-                                        data-comentario="Ótima quadra, mas o bebedouro estava sem água no último jogo.">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalResponderFeedback" data-cliente="João Silva" data-comentario="Gramado impecável...">
                                     <i class="bi bi-reply"></i> Responder
                                 </button>
                             </td>
@@ -356,27 +209,22 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold"><i class="bi bi-tools me-2"></i>Reportar Problema / Manutenção</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-tools me-2"></i>Reportar Problema</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label fw-medium">Quadra</label>
-                    <select class="form-select">
-                        <option>Futsal Arena</option>
-                        <option>Society Premium</option>
-                        <option>Society Descoberta</option>
+                    <select class="form-select" id="manutencaoQuadra">
+                        <option value="">Selecione...</option>
+                        <option value="1">Futsal Arena</option>
+                        <option value="2">Society Premium</option>
+                        <option value="3">Society Descoberta</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium">Tipo de Problema</label>
-                    <select class="form-select">
-                        <option>Iluminação</option>
-                        <option>Gramado/Piso</option>
-                        <option>Rede/Trave</option>
-                        <option>Limpeza</option>
-                        <option>Outros</option>
-                    </select>
+                    <select class="form-select"><option>Iluminação</option><option>Gramado/Piso</option><option>Outros</option></select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium">Descrição</label>
@@ -385,9 +233,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="registrarManutencao()">
-                    <i class="bi bi-check-circle"></i> Registrar
-                </button>
+                <button type="button" class="btn btn-primary" onclick="registrarManutencao()"><i class="bi bi-check-circle"></i> Registrar</button>
             </div>
         </div>
     </div>
@@ -402,48 +248,21 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Cliente</label>
-                    <input type="text" class="form-control" placeholder="Nome do cliente">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Telefone</label>
-                    <input type="tel" class="form-control" placeholder="(00) 00000-0000">
+                <div class="mb-3"><label class="form-label fw-medium">Cliente</label><input type="text" class="form-control" id="reservaCliente" placeholder="Nome do cliente"></div>
+                <div class="mb-3"><label class="form-label fw-medium">Telefone</label><input type="tel" class="form-control" id="reservaTelefone" placeholder="(00) 00000-0000"></div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6"><label class="form-label fw-medium">Quadra</label><select class="form-select" id="reservaQuadra"><option value="">Selecione...</option><option value="1">Futsal Arena</option><option value="2">Society Premium</option><option value="3">Society Descoberta</option></select></div>
+                    <div class="col-6"><label class="form-label fw-medium">Data</label><input type="date" class="form-control" id="reservaData"></div>
                 </div>
                 <div class="row g-3 mb-3">
-                    <div class="col-6">
-                        <label class="form-label fw-medium">Quadra</label>
-                        <select class="form-select">
-                            <option>Futsal Arena</option>
-                            <option>Society Premium</option>
-                            <option>Society Descoberta</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-medium">Data</label>
-                        <input type="date" class="form-control">
-                    </div>
+                    <div class="col-6"><label class="form-label fw-medium">Hora Início</label><input type="time" class="form-control" id="reservaHoraInicio"></div>
+                    <div class="col-6"><label class="form-label fw-medium">Hora Fim</label><input type="time" class="form-control" id="reservaHoraFim"></div>
                 </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-6">
-                        <label class="form-label fw-medium">Hora Início</label>
-                        <input type="time" class="form-control">
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-medium">Hora Fim</label>
-                        <input type="time" class="form-control">
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Valor (R$)</label>
-                    <input type="number" step="0.01" class="form-control" placeholder="0,00">
-                </div>
+                <div class="mb-3"><label class="form-label fw-medium">Valor (R$)</label><input type="number" step="0.01" class="form-control" id="reservaValor" placeholder="0,00"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="criarReservaManual()">
-                    <i class="bi bi-check-circle"></i> Criar Reserva
-                </button>
+                <button type="button" class="btn btn-primary" onclick="criarReservaManual()"><i class="bi bi-check-circle"></i> Criar Reserva</button>
             </div>
         </div>
     </div>
@@ -458,24 +277,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Cliente</label>
-                    <p class="form-control-plaintext fw-semibold" id="feedbackCliente">-</p>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Comentário Original</label>
-                    <div class="p-3 bg-light rounded" id="feedbackComentario">-</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Sua Resposta</label>
-                    <textarea class="form-control" id="respostaFeedback" rows="4" placeholder="Digite sua resposta ao cliente..."></textarea>
-                </div>
+                <div class="mb-3"><label class="form-label fw-medium">Cliente</label><p class="form-control-plaintext fw-semibold" id="feedbackCliente">-</p></div>
+                <div class="mb-3"><label class="form-label fw-medium">Comentário Original</label><div class="p-3 bg-light rounded" id="feedbackComentario">-</div></div>
+                <div class="mb-3"><label class="form-label fw-medium">Sua Resposta</label><textarea class="form-control" id="respostaFeedback" rows="4" placeholder="Digite sua resposta..."></textarea></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="enviarRespostaFeedback()">
-                    <i class="bi bi-send me-2"></i>Enviar Resposta
-                </button>
+                <button type="button" class="btn btn-primary" onclick="enviarRespostaFeedback()"><i class="bi bi-send me-2"></i>Enviar Resposta</button>
             </div>
         </div>
     </div>
@@ -484,85 +292,254 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
 <script>
-    function checkin(btn) {
-        if(confirm('Confirmar chegada do cliente e iniciar o tempo de jogo?')) {
-            const row = btn.closest('tr');
-            const statusCell = row.cells[3];
-            statusCell.innerHTML = '<span class="status-dot dot-green"></span> Em Jogo';
-            btn.style.display = 'none';
+   
+    //  INTEGRAÇÃO COM API - MÓDULO FUNCIONÁRIO
+    
+    const API_BASE = '/api';
+    
+    // GERA DATA DE HOJE PARA O MOCK (Para funcionar com Stats)
+    const HOJE = new Date().toISOString().split('T')[0];
+    
+    // Mock data para fallback
+    const MOCK_AGENDA = [
+        { id: 1, data: HOJE, hora_inicio: '09:00', hora_fim: '10:00', status: 'confirmada', quadra: { id: 1, nome: 'Futsal Arena' }, usuario: { nome: 'Pedro Santos' }, pagamento: { status: 'pago', metodo: 'pix', valor: 120.00 } },
+        { id: 2, data: HOJE, hora_inicio: '10:00', hora_fim: '11:30', status: 'pendente', quadra: { id: 3, nome: 'Society Descoberta' }, usuario: { nome: 'Ana Lima' }, pagamento: { status: 'pendente', metodo: 'dinheiro', valor: 100.00 } },
+        { id: 3, data: HOJE, hora_inicio: '14:00', hora_fim: '15:30', status: 'confirmada', quadra: { id: 2, nome: 'Society Premium' }, usuario: { nome: 'Grupo F.C. Unidos' }, pagamento: { status: 'pago', metodo: 'cartao_credito', valor: 150.00 } },
+        { id: 4, data: HOJE, hora_inicio: '19:00', hora_fim: '20:30', status: 'agendada', quadra: { id: 2, nome: 'Society Premium' }, usuario: { nome: 'João Silva' }, pagamento: { status: 'pendente', metodo: 'pix', valor: 150.00 } }
+    ];
 
-            const actionsCell = row.cells[5];
-            const finishBtn = document.createElement('button');
-            finishBtn.className = 'btn-action btn-report';
-            finishBtn.innerHTML = '<i class="bi bi-flag"></i> Finalizar';
-            finishBtn.onclick = function() {
-                statusCell.innerHTML = '<span class="status-dot dot-green"></span> Concluído';
-                finishBtn.disabled = true;
-                finishBtn.innerHTML = '<i class="bi bi-check2"></i> Finalizado';
-                esportecToast('Jogo finalizado. Quadra liberada.', 'success');
-            };
-            actionsCell.appendChild(finishBtn);
-            esportecToast('Chegada confirmada e jogo iniciado.', 'success');
+    //  CARREGAR AGENDA DO DIA
+    async function carregarAgendaDia() {
+        try {
+            const response = await fetch(`${API_BASE}/funcionario/agenda/dia`);
+            if (!response.ok) throw new Error(`Erro ${response.status}`);
+            const agenda = await response.json();
+            renderizarAgenda(agenda);
+            atualizarStats(agenda);
+            console.log(' Agenda carregada da API');
+        } catch (error) {
+            console.log(' Usando dados de teste para agenda:', error.message);
+            renderizarAgenda(MOCK_AGENDA);
+            atualizarStats(MOCK_AGENDA);
         }
     }
 
-    function atualizarPagamento(id, btn) {
-        if(confirm('Confirmar recebimento do pagamento?')) {
-            const badge = document.getElementById('pag-status-' + id);
-            badge.className = 'badge-payment badge-paid';
-            badge.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Pago<br><small>(Confirmado)</small>';
-            btn.style.display = 'none';
-            esportecToast('Pagamento confirmado.', 'success');
-        }
-    }
+    function renderizarAgenda(reservas) {
+        const tbody = document.getElementById('agendaBody');
+        tbody.innerHTML = '';
 
-    function abrirManutencaoRapida() {
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalManutencao')).show();
-    }
-
-    // Carregar dados no modal de resposta de feedback
-    document.getElementById('modalResponderFeedback').addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const cliente = button.getAttribute('data-cliente');
-        const comentario = button.getAttribute('data-comentario');
-        
-        document.getElementById('feedbackCliente').textContent = cliente;
-        document.getElementById('feedbackComentario').textContent = comentario;
-        document.getElementById('respostaFeedback').value = '';
-    });
-
-    function enviarRespostaFeedback() {
-        const resposta = document.getElementById('respostaFeedback').value.trim();
-        if (!resposta) {
-            esportecToast('Digite uma resposta antes de enviar.', 'warning');
+        if (!reservas || reservas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Nenhuma reserva para hoje.</td></tr>';
             return;
         }
+
+        reservas.forEach(reserva => {
+            const statusConfig = getStatusConfig(reserva.status);
+            const pagamentoBadge = getPagamentoBadge(reserva.pagamento);
+            const acoes = getAcoesFuncionario(reserva);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="fw-semibold">${reserva.hora_inicio} - ${reserva.hora_fim}</td>
+                <td>${reserva.quadra?.nome || '-'}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(reserva.usuario?.nome || '?')}&background=random&size=32" class="rounded-circle">
+                        <span>${reserva.usuario?.nome || 'Cliente'}</span>
+                    </div>
+                </td>
+                <td><span class="status-dot ${statusConfig.dot}"></span> ${statusConfig.label}</td>
+                <td>${pagamentoBadge}</td>
+                <td>
+                    <div class="actions-cell">
+                        ${acoes}
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function getStatusConfig(status) {
+        const map = {
+            'confirmada': { dot: 'dot-green', label: 'Confirmada' },
+            'pendente': { dot: 'dot-yellow', label: 'Pendente' },
+            'agendada': { dot: 'dot-yellow', label: 'Agendada' },
+            'cancelada': { dot: 'dot-red', label: 'Cancelada' },
+            'concluida': { dot: 'dot-green', label: 'Concluída' }
+        };
+        return map[status] || { dot: 'dot-gray', label: 'Status' };
+    }
+
+    function getPagamentoBadge(pagamento) {
+        if (!pagamento) return '<span class="text-muted">-</span>';
+        const pago = pagamento.status === 'pago';
+        const classe = pago ? 'badge-paid' : 'badge-pending';
+        const icone = pago ? 'bi-check2-circle' : 'bi-clock';
+        const metodo = pagamento.metodo ? `(${formatarMetodo(pagamento.metodo)})` : '';
+        return `<span class="badge-payment ${classe}"><i class="bi ${icone} me-1"></i>${pago ? 'Pago' : 'Pendente'}<br><small>${metodo}</small></span>`;
+    }
+
+    function formatarMetodo(metodo) {
+        const map = { 'pix': 'PIX', 'dinheiro': 'Dinheiro', 'cartao_credito': 'Cartão', 'cartao_debito': 'Débito' };
+        return map[metodo] || metodo;
+    }
+
+    function getAcoesFuncionario(reserva) {
+        let html = '';
         
-        bootstrap.Modal.getInstance(document.getElementById('modalResponderFeedback')).hide();
-        esportecToast('Resposta enviada ao cliente com sucesso.', 'success');
+        if (reserva.status === 'agendada' || (reserva.status === 'pendente' && reserva.pagamento?.status === 'pendente')) {
+             html += `<button class="btn-action btn-pay" onclick="confirmarPagamento(${reserva.id}, this)">
+                <i class="bi bi-check-circle"></i> Confirmar
+            </button>`;
+        }
+
+        if (reserva.status === 'confirmada') {
+            html += `<button class="btn-action btn-checkin" onclick="fazerCheckin(${reserva.id}, this)">
+                <i class="bi bi-person-check"></i> Check-in
+            </button>`;
+        } else if (reserva.status === 'agendada') {
+            html += `<button type="button" class="btn-action btn-wait" disabled>
+                <i class="bi bi-hourglass"></i> Aguardando
+            </button>`;
+        }
         
-        // Atualiza visualmente o botão na tabela
-        setTimeout(() => {
-            const btns = document.querySelectorAll('[data-bs-target="#modalResponderFeedback"]');
-            btns.forEach(btn => {
-                if (btn.getAttribute('data-cliente') === document.getElementById('feedbackCliente').textContent) {
-                    btn.innerHTML = '<i class="bi bi-check2"></i> Respondido';
-                    btn.className = 'btn btn-sm btn-outline-success';
-                    btn.disabled = true;
-                }
-            });
-        }, 300);
+        html += `<button class="btn-action btn-report" onclick="abrirManutencaoRapida(${reserva.quadra?.id})">
+            <i class="bi bi-tools"></i> Manutenção
+        </button>`;
+        
+        return html;
+    }
+
+    //  STATS 
+    function atualizarStats(reservas) {
+        const reservasHoje = reservas; //
+
+        document.getElementById('countReservas').textContent = reservasHoje.length;
+        const confirmadas = reservasHoje.filter(r => r.status === 'confirmada').length;
+        document.getElementById('countConfirmadas').innerHTML = confirmadas > 0 ? 
+            `<i class="bi bi-arrow-up"></i> ${confirmadas} confirmadas` : 'Nenhuma confirmada';
+        
+        const receita = reservasHoje.filter(r => r.pagamento?.status === 'pago')
+            .reduce((sum, r) => sum + (r.pagamento?.valor || 0), 0);
+        document.getElementById('countReceita').textContent = `R$ ${receita.toFixed(2).replace('.', ',')}`;
+        
+        // Quadras ativas (conta quantas IDs únicos de quadra)
+        const quadrasUnicas = new Set(reservasHoje.map(r => r.quadra?.id).filter(Boolean)).size;
+        document.getElementById('countQuadras').textContent = quadrasUnicas > 0 ? quadrasUnicas : '-';
+        document.getElementById('countManutencao').innerHTML = quadrasUnicas > 0 ? 
+            `<i class="bi bi-check"></i> Todas operacionais` : 
+            `<i class="bi bi-dash"></i> Sem reservas`;
+        
+        // Próxima reserva
+        const proxima = reservasHoje.filter(r => r.status !== 'cancelada')
+            .sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio))[0];
+        if (proxima) {
+            document.getElementById('proximaReserva').textContent = proxima.hora_inicio;
+            document.getElementById('proximaQuadra').textContent = proxima.quadra?.nome || '';
+        } else {
+            document.getElementById('proximaReserva').textContent = '-';
+            document.getElementById('proximaQuadra').textContent = 'Sem reservas hoje';
+        }
+    }
+
+    //  AÇÕES (API Calls)
+    async function confirmarPagamento(pagamentoId, btn) {
+        if (!confirm('Confirmar recebimento?')) return;
+        try {
+            const response = await fetch(`${API_BASE}/funcionario/pagamentos/${pagamentoId}/confirmar`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' } });
+            if (!response.ok) throw new Error('Erro');
+            
+            const btnContainer = btn.parentElement;
+            const badge = btn.closest('tr').querySelector('.badge-payment');
+            if(badge) { badge.className = 'badge-payment badge-paid'; badge.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Pago<br><small>(Confirmado)</small>'; }
+            btn.remove(); // Remove botão de confirmar
+            esportecToast('Pagamento confirmado.', 'success');
+        } catch (e) {
+            // Fallback visual
+            const badge = btn.closest('tr').querySelector('.badge-payment');
+            if(badge) { badge.className = 'badge-payment badge-paid'; badge.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Pago<br><small>(Simulado)</small>'; }
+            btn.remove();
+            esportecToast('Pagamento confirmado (Simulado).', 'success');
+        }
+    }
+
+    async function fazerCheckin(reservaId, btn) {
+        if (!confirm('Confirmar check-in?')) return;
+        try {
+            const response = await fetch(`${API_BASE}/agendamentos/${reservaId}/confirmar`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' } });
+            if (!response.ok) throw new Error('Erro');
+            
+            // Atualiza UI
+            const row = btn.closest('tr');
+            row.cells[3].innerHTML = '<span class="status-dot dot-green"></span> Em Jogo';
+            btn.remove();
+            esportecToast('Check-in realizado.', 'success');
+        } catch (e) {
+            const row = btn.closest('tr');
+            row.cells[3].innerHTML = '<span class="status-dot dot-green"></span> Em Jogo (Simulado)';
+            btn.remove();
+            esportecToast('Check-in realizado (Simulado).', 'success');
+        }
+    }
+
+    async function criarReservaManual() {
+        const payload = {
+            usuario_id: 1, quadra_id: document.getElementById('reservaQuadra').value,
+            data: document.getElementById('reservaData').value,
+            hora_inicio: document.getElementById('reservaHoraInicio').value,
+            hora_fim: document.getElementById('reservaHoraFim').value,
+            valor_total: parseFloat(document.getElementById('reservaValor').value) || 0,
+            observacao: 'Reserva manual'
+        };
+        if (!payload.quadra_id || !payload.data) { esportecToast('Preencha os campos.', 'warning'); return; }
+
+        try {
+            const response = await fetch(`${API_BASE}/reservas`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error('Erro');
+            bootstrap.Modal.getInstance(document.getElementById('modalReservaManual')).hide();
+            esportecToast('Reserva criada.', 'success');
+            carregarAgendaDia();
+        } catch (e) {
+            bootstrap.Modal.getInstance(document.getElementById('modalReservaManual')).hide();
+            esportecToast('Reserva criada (Simulado).', 'success');
+            // Adiciona ao mock visualmente só pra demo
+            MOCK_AGENDA.push({ ...payload, id: Date.now(), status: 'agendada', usuario: { nome: payload.usuario_id }, quadra: { nome: 'Manual' }, pagamento: { status: 'pendente', valor: payload.valor_total } });
+            renderizarAgenda(MOCK_AGENDA);
+            atualizarStats(MOCK_AGENDA);
+        }
     }
 
     function registrarManutencao() {
         bootstrap.Modal.getInstance(document.getElementById('modalManutencao')).hide();
-        esportecToast('Solicitação de manutenção registrada.', 'success');
+        esportecToast('Manutenção registrada.', 'success');
     }
 
-    function criarReservaManual() {
-        bootstrap.Modal.getInstance(document.getElementById('modalReservaManual')).hide();
-        esportecToast('Reserva manual criada com sucesso.', 'success');
+    function abrirManutencaoRapida(quadraId) {
+        if (quadraId) document.getElementById('manutencaoQuadra').value = quadraId;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalManutencao')).show();
     }
+
+    // Modal Feedback
+    document.getElementById('modalResponderFeedback').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        document.getElementById('feedbackCliente').textContent = button.getAttribute('data-cliente');
+        document.getElementById('feedbackComentario').textContent = button.getAttribute('data-comentario');
+        document.getElementById('respostaFeedback').value = '';
+    });
+    function enviarRespostaFeedback() {
+        if (!document.getElementById('respostaFeedback').value.trim()) { esportecToast('Escreva uma resposta.', 'warning'); return; }
+        bootstrap.Modal.getInstance(document.getElementById('modalResponderFeedback')).hide();
+        esportecToast('Resposta enviada.', 'success');
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        const hoje = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('dataAtual').textContent = hoje.toLocaleDateString('pt-BR', options);
+        carregarAgendaDia();
+    });
 </script>
 </body>
 </html>

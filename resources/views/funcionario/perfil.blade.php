@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #0F172A; --secondary: #3B82F6; --bg: #F8FAFC; }
+        :root { --primary: #0f2a26; --secondary: #3b9cf6; --bg: #F8FAFC; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; }
         .layout { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: var(--primary); color: white; padding: 1.5rem; }

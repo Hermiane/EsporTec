@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Gestão de Agendamentos - EsporTec Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -63,25 +64,17 @@
         .filter-bar input, .filter-bar select { padding: 0.6rem; border: 1px solid #E2E8F0; border-radius: 8px; }
         .btn-primary-admin { background: var(--primary); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
         
-        /* Ajustes para evitar sobreposição de botões */
-        .actions-cell { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 0.2rem;
-            align-items: center;
-        }
+        .actions-cell { display: flex; flex-wrap: wrap; gap: 0.2rem; align-items: center; }
         
         @media (max-width: 1400px) {
             .btn-action { padding: 0.35rem 0.5rem; font-size: 0.7rem; margin: 0.1rem; }
             .table-custom td { padding: 0.8rem 0.6rem; font-size: 0.9rem; }
         }
-        
         @media (max-width: 1200px) {
             .actions-cell { flex-direction: column; align-items: flex-start; }
             .btn-action { width: 100%; justify-content: flex-start; margin: 0.1rem 0; }
             .badge-status { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
         }
-        
         @media (max-width: 992px) {
             .layout { display: block; }
             .sidebar { width: 100%; }
@@ -92,7 +85,6 @@
             .actions-cell { flex-direction: row; flex-wrap: wrap; }
             .btn-action { width: auto; }
         }
-        
         @media (max-width: 768px) {
             .table-custom th, .table-custom td { font-size: 0.8rem; padding: 0.5rem; }
             .btn-action { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
@@ -135,28 +127,28 @@
             <div class="stat-box total">
                 <i class="bi bi-calendar-event fs-1"></i>
                 <div>
-                    <div class="stat-value">45</div>
+                    <div class="stat-value" id="countTotal">-</div>
                     <div class="stat-label">Total do Mês</div>
                 </div>
             </div>
             <div class="stat-box pending">
                 <i class="bi bi-clock-history fs-1"></i>
                 <div>
-                    <div class="stat-value">5</div>
+                    <div class="stat-value" id="countPendentes">-</div>
                     <div class="stat-label">Pendentes</div>
                 </div>
             </div>
             <div class="stat-box confirmed">
                 <i class="bi bi-check-circle fs-1"></i>
                 <div>
-                    <div class="stat-value">38</div>
+                    <div class="stat-value" id="countConfirmadas">-</div>
                     <div class="stat-label">Confirmadas</div>
                 </div>
             </div>
             <div class="stat-box cancelled">
                 <i class="bi bi-x-circle fs-1"></i>
                 <div>
-                    <div class="stat-value">2</div>
+                    <div class="stat-value" id="countCanceladas">-</div>
                     <div class="stat-label">Canceladas</div>
                 </div>
             </div>
@@ -164,21 +156,18 @@
 
         <!-- Filtros -->
         <div class="filter-bar">
-            <input type="date" class="form-control" style="width: 200px;">
-            <select class="form-select" style="width: 200px;">
-                <option>Todas as Quadras</option>
-                <option>Futsal Arena</option>
-                <option>Society Premium</option>
-                <option>Beach Tennis #1</option>
+            <input type="date" class="form-control" id="filtroData" style="width: 200px;">
+            <select class="form-select" id="filtroQuadra" style="width: 200px;">
+                <option value="">Todas as Quadras</option>
             </select>
-            <select class="form-select" style="width: 200px;">
-                <option>Todos os Status</option>
-                <option>Pendente</option>
-                <option>Confirmada</option>
-                <option>Cancelada</option>
-                <option>Concluída</option>
+            <select class="form-select" id="filtroStatus" style="width: 200px;">
+                <option value="">Todos os Status</option>
+                <option value="pendente">Pendente</option>
+                <option value="confirmada">Confirmada</option>
+                <option value="cancelada">Cancelada</option>
+                <option value="concluida">Concluída</option>
             </select>
-            <input type="text" placeholder="Buscar cliente..." class="form-control" style="width: 250px;">
+            <input type="text" id="filtroCliente" placeholder="Buscar cliente..." class="form-control" style="width: 250px;">
         </div>
 
         <!-- Tabela -->
@@ -197,52 +186,8 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>#1234</td>
-                        <td>14/06/2026<br><small>14:00 - 15:30</small></td>
-                        <td>Society Premium</td>
-                        <td>João Silva</td>
-                        <td>(11) 99999-9999</td>
-                        <td>R$ 225,00</td>
-                        <td><span class="badge-status badge-confirmada"><i class="bi bi-check-circle"></i>Confirmada</span></td>
-                        <td><span class="badge-status badge-pendente"><i class="bi bi-clock"></i>Dinheiro pendente</span></td>
-                        <td class="actions-cell">
-                            <button class="btn-action btn-confirm" data-action="confirmar-pagamento"><i class="bi bi-cash-coin"></i> Pgto</button>
-                            <button class="btn-action btn-edit" data-action="ver-comprovante"><i class="bi bi-file-earmark-image"></i> Comprovante</button>
-                            <button class="btn-action btn-edit" data-action="editar-reserva"><i class="bi bi-pencil"></i> Editar</button>
-                            <button class="btn-action btn-cancel" data-action="cancelar-reserva"><i class="bi bi-x-circle"></i> Cancelar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1235</td>
-                        <td>15/06/2026<br><small>19:00 - 20:00</small></td>
-                        <td>Futsal Arena</td>
-                        <td>Pedro Santos</td>
-                        <td>(11) 98888-8888</td>
-                        <td>R$ 120,00</td>
-                        <td><span class="badge-status badge-pendente"><i class="bi bi-clock"></i>Pendente</span></td>
-                        <td><span class="badge-status badge-pendente"><i class="bi bi-clock"></i>PIX pendente</span></td>
-                        <td class="actions-cell">
-                            <button class="btn-action btn-confirm" data-action="confirmar-reserva"><i class="bi bi-check-circle"></i> Confirmar</button>
-                            <button class="btn-action btn-confirm" data-action="confirmar-pagamento"><i class="bi bi-cash-coin"></i> Pgto</button>
-                            <button class="btn-action btn-edit" data-action="editar-reserva"><i class="bi bi-pencil"></i> Editar</button>
-                            <button class="btn-action btn-cancel" data-action="cancelar-reserva"><i class="bi bi-x-circle"></i> Cancelar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1236</td>
-                        <td>16/06/2026<br><small>10:00 - 11:00</small></td>
-                        <td>Beach Tennis #1</td>
-                        <td>Ana Lima</td>
-                        <td>(11) 97777-7777</td>
-                        <td>R$ 100,00</td>
-                        <td><span class="badge-status badge-concluida"><i class="bi bi-check2-circle"></i>Concluída</span></td>
-                        <td><span class="badge-status badge-pago"><i class="bi bi-check2-circle"></i>Pago</span></td>
-                        <td class="actions-cell">
-                            <button class="btn-action btn-edit" disabled style="opacity:0.5"><i class="bi bi-lock"></i> Fechada</button>
-                        </td>
-                    </tr>
+                <tbody id="tabelaAgendamentos">
+                    <tr><td colspan="9" class="text-center text-muted py-4"><i class="bi bi-hourglass-spin me-2"></i>Carregando agendamentos...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -260,35 +205,33 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label fw-medium"><i class="bi bi-person me-1"></i>Cliente</label>
-                    <input type="text" class="form-control" placeholder="Nome do cliente">
+                    <input type="text" class="form-control" id="reservaCliente" placeholder="Nome do cliente">
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-6">
                         <label class="form-label fw-medium"><i class="bi bi-grid-3x3-gap me-1"></i>Quadra</label>
-                        <select class="form-select">
-                            <option>Society Premium</option>
-                            <option>Futsal Arena</option>
-                            <option>Beach Tennis #1</option>
+                        <select class="form-select" id="reservaQuadra">
+                            <option value="">Selecione...</option>
                         </select>
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-medium"><i class="bi bi-calendar me-1"></i>Data</label>
-                        <input type="date" class="form-control">
+                        <input type="date" class="form-control" id="reservaData">
                     </div>
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-6">
                         <label class="form-label fw-medium"><i class="bi bi-clock me-1"></i>Hora Início</label>
-                        <input type="time" class="form-control">
+                        <input type="time" class="form-control" id="reservaHoraInicio">
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-medium"><i class="bi bi-clock me-1"></i>Hora Fim</label>
-                        <input type="time" class="form-control">
+                        <input type="time" class="form-control" id="reservaHoraFim">
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium"><i class="bi bi-cash-coin me-1"></i>Valor (R$)</label>
-                    <input type="number" step="0.01" class="form-control" placeholder="0,00">
+                    <input type="number" step="0.01" class="form-control" id="reservaValor" placeholder="0,00">
                 </div>
             </div>
             <div class="modal-footer">
@@ -304,102 +247,331 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
 <script>
-    const modalReserva = document.getElementById('modalReserva');
-    const tableBody = document.querySelector('.table-custom tbody');
+    
+    //  INTEGRAÇÃO COM API - ADMIN AGENDAMENTOS
+    
+    const API_BASE = '/api';
+    
+    // Mock data para fallback
+    const MOCK_AGENDAMENTOS = [
+        { id: 1234, data: '2026-06-14', hora_inicio: '14:00', hora_fim: '15:30', status: 'confirmada', quadra: { nome: 'Society Premium' }, usuario: { nome: 'João Silva', telefone: '(11) 99999-9999' }, pagamento: { status: 'pendente', metodo: 'dinheiro', valor: 225.00 } },
+        { id: 1235, data: '2026-06-15', hora_inicio: '19:00', hora_fim: '20:00', status: 'pendente', quadra: { nome: 'Futsal Arena' }, usuario: { nome: 'Pedro Santos', telefone: '(11) 98888-8888' }, pagamento: { status: 'pendente', metodo: 'pix', valor: 120.00 } },
+        { id: 1236, data: '2026-06-16', hora_inicio: '10:00', hora_fim: '11:00', status: 'concluida', quadra: { nome: 'Beach Tennis #1' }, usuario: { nome: 'Ana Lima', telefone: '(11) 97777-7777' }, pagamento: { status: 'pago', metodo: 'cartao_credito', valor: 100.00 } }
+    ];
+    
+    const MOCK_QUADRAS = [
+        { id: 1, nome: 'Futsal Arena' },
+        { id: 2, nome: 'Society Premium' },
+        { id: 3, nome: 'Beach Tennis #1' }
+    ];
 
-    function executarAcaoAgendamento(button) {
+    //  CARREGAR AGENDAMENTOS - API: GET /api/admin/agendamentos
+    async function carregarAgendamentos() {
+        try {
+            const response = await fetch(`${API_BASE}/admin/agendamentos`);
+            if (!response.ok) throw new Error(`Erro ${response.status}`);
+            const agendamentos = await response.json();
+            
+            if (!agendamentos || agendamentos.length === 0) {
+                console.log(' API retornou vazio, usando mock');
+                renderizarTabela(MOCK_AGENDAMENTOS);
+                atualizarStats(MOCK_AGENDAMENTOS);
+                return;
+            }
+            
+            renderizarTabela(agendamentos);
+            atualizarStats(agendamentos);
+            console.log(' Agendamentos carregados:', agendamentos.length);
+        } catch (error) {
+            console.log(' Erro na API, usando mock:', error.message);
+            renderizarTabela(MOCK_AGENDAMENTOS);
+            atualizarStats(MOCK_AGENDAMENTOS);
+        }
+    }
+
+    function renderizarTabela(agendamentos) {
+        const tbody = document.getElementById('tabelaAgendamentos');
+        tbody.innerHTML = '';
+
+        if (!agendamentos || agendamentos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Nenhum agendamento encontrado.</td></tr>';
+            return;
+        }
+
+        agendamentos.forEach(agenda => {
+            const statusBadge = getStatusBadge(agenda.status);
+            const pagamentoBadge = getPagamentoBadge(agenda.pagamento);
+            const acoes = getAcoesAgendamento(agenda);
+
+            tbody.innerHTML += `
+                <tr data-agenda-id="${agenda.id}">
+                    <td>#${agenda.id}</td>
+                    <td>${formatarData(agenda.data)}<br><small>${agenda.hora_inicio} - ${agenda.hora_fim}</small></td>
+                    <td>${agenda.quadra?.nome || '-'}</td>
+                    <td>${agenda.usuario?.nome || '-'}</td>
+                    <td>${agenda.usuario?.telefone || '-'}</td>
+                    <td>R$ ${parseFloat(agenda.pagamento?.valor || 0).toFixed(2).replace('.', ',')}</td>
+                    <td>${statusBadge}</td>
+                    <td>${pagamentoBadge}</td>
+                    <td class="actions-cell">${acoes}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function getStatusBadge(status) {
+        const map = {
+            'pendente': '<span class="badge-status badge-pendente"><i class="bi bi-clock"></i>Pendente</span>',
+            'confirmada': '<span class="badge-status badge-confirmada"><i class="bi bi-check-circle"></i>Confirmada</span>',
+            'cancelada': '<span class="badge-status badge-cancelada"><i class="bi bi-x-circle"></i>Cancelada</span>',
+            'concluida': '<span class="badge-status badge-concluida"><i class="bi bi-check2-circle"></i>Concluída</span>'
+        };
+        return map[status] || '<span class="badge-status">-</span>';
+    }
+
+    function getPagamentoBadge(pagamento) {
+        if (!pagamento) return '<span class="badge-status">-</span>';
+        const pago = pagamento.status === 'pago';
+        const classe = pago ? 'badge-pago' : 'badge-pendente';
+        const icone = pago ? 'bi-check2-circle' : 'bi-clock';
+        const metodo = pagamento.metodo ? `(${formatarMetodo(pagamento.metodo)})` : '';
+        return `<span class="badge-status ${classe}"><i class="bi ${icone}"></i>${pago ? 'Pago' : 'Pendente'} ${metodo}</span>`;
+    }
+
+    function formatarMetodo(metodo) {
+        const map = { 'pix': 'PIX', 'dinheiro': 'Dinheiro', 'cartao_credito': 'Cartão', 'cartao_debito': 'Débito' };
+        return map[metodo] || metodo;
+    }
+
+    function getAcoesAgendamento(agenda) {
+        let html = '';
+        
+        // Confirmar reserva (se pendente)
+        if (agenda.status === 'pendente') {
+            html += `<button class="btn-action btn-confirm" data-action="confirmar-reserva" data-id="${agenda.id}"><i class="bi bi-check-circle"></i> Confirmar</button>`;
+        }
+        
+        // Confirmar pagamento (se pendente)
+        if (agenda.pagamento?.status === 'pendente') {
+            html += `<button class="btn-action btn-confirm" data-action="confirmar-pagamento" data-id="${agenda.pagamento.id || agenda.id}"><i class="bi bi-cash-coin"></i> Pgto</button>`;
+        }
+        
+        // Ver comprovante (se pago)
+        if (agenda.pagamento?.comprovante) {
+            html += `<button class="btn-action btn-edit" data-action="ver-comprovante" data-url="${agenda.pagamento.comprovante}"><i class="bi bi-file-earmark-image"></i> Comprovante</button>`;
+        }
+        
+        // Editar (se não concluída/cancelada)
+        if (!['concluida', 'cancelada'].includes(agenda.status)) {
+            html += `<button class="btn-action btn-edit" data-action="editar-reserva" data-id="${agenda.id}"><i class="bi bi-pencil"></i> Editar</button>`;
+        }
+        
+        // Cancelar (se não concluída/cancelada)
+        if (!['concluida', 'cancelada'].includes(agenda.status)) {
+            html += `<button class="btn-action btn-cancel" data-action="cancelar-reserva" data-id="${agenda.id}"><i class="bi bi-x-circle"></i> Cancelar</button>`;
+        }
+        
+        // Bloqueado se concluída
+        if (agenda.status === 'concluida') {
+            html += `<button class="btn-action btn-edit" disabled style="opacity:0.5"><i class="bi bi-lock"></i> Fechada</button>`;
+        }
+        
+        return html || '-';
+    }
+
+    function atualizarStats(agendamentos) {
+        document.getElementById('countTotal').textContent = agendamentos.length;
+        document.getElementById('countPendentes').textContent = agendamentos.filter(a => a.status === 'pendente').length;
+        document.getElementById('countConfirmadas').textContent = agendamentos.filter(a => a.status === 'confirmada').length;
+        document.getElementById('countCanceladas').textContent = agendamentos.filter(a => a.status === 'cancelada').length;
+    }
+
+    function formatarData(dataISO) {
+        if (!dataISO) return '-';
+        const [ano, mes, dia] = dataISO.split('-');
+        return `${dia}/${mes}/${ano}`;
+    }
+
+    // AÇÕES DOS BOTÕES
+    document.getElementById('tabelaAgendamentos').addEventListener('click', async event => {
+        const button = event.target.closest('[data-action]');
+        if (!button) return;
+
         const action = button.dataset.action;
+        const id = button.dataset.id;
 
         if (action === 'editar-reserva') {
-            bootstrap.Modal.getOrCreateInstance(modalReserva).show();
+            // Preenche modal com dados da reserva
+            const agenda = MOCK_AGENDAMENTOS.find(a => a.id == id);
+            if (agenda) {
+                document.getElementById('reservaCliente').value = agenda.usuario?.nome || '';
+                document.getElementById('reservaQuadra').value = agenda.quadra?.id || '';
+                document.getElementById('reservaData').value = agenda.data;
+                document.getElementById('reservaHoraInicio').value = agenda.hora_inicio;
+                document.getElementById('reservaHoraFim').value = agenda.hora_fim;
+                document.getElementById('reservaValor').value = agenda.pagamento?.valor || '';
+            }
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReserva')).show();
             return;
         }
 
         if (action === 'confirmar-reserva') {
-            const row = button.closest('tr');
-            row.querySelector('.badge-status').className = 'badge-status badge-confirmada';
-            row.querySelector('.badge-status').innerHTML = '<i class="bi bi-check-circle"></i>Confirmada';
-            button.remove();
-            esportecToast('Reserva confirmada.', 'success');
+            if (!confirm('Confirmar esta reserva?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/agendamentos/${id}/confirmar`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }
+                });
+                if (!response.ok) throw new Error('Erro');
+                esportecToast('Reserva confirmada.', 'success');
+                carregarAgendamentos();
+            } catch (error) {
+                // Fallback visual
+                const row = button.closest('tr');
+                row.querySelector('td:nth-child(7)').innerHTML = '<span class="badge-status badge-confirmada"><i class="bi bi-check-circle"></i>Confirmada</span>';
+                button.remove();
+                esportecToast('Reserva confirmada (simulado).', 'success');
+            }
             return;
         }
 
         if (action === 'confirmar-pagamento') {
-            const row = button.closest('tr');
-            const paymentBadge = row.children[7].querySelector('.badge-status');
-            paymentBadge.className = 'badge-status badge-pago';
-            paymentBadge.innerHTML = '<i class="bi bi-check2-circle"></i>Pago';
-            button.remove();
-            esportecToast('Pagamento confirmado.', 'success');
+            if (!confirm('Confirmar recebimento do pagamento?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/funcionario/pagamentos/${id}/confirmar`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }
+                });
+                if (!response.ok) throw new Error('Erro');
+                esportecToast('Pagamento confirmado.', 'success');
+                carregarAgendamentos();
+            } catch (error) {
+                // Fallback visual
+                const row = button.closest('tr');
+                row.querySelector('td:nth-child(8)').innerHTML = '<span class="badge-status badge-pago"><i class="bi bi-check2-circle"></i>Pago</span>';
+                button.remove();
+                esportecToast('Pagamento confirmado (simulado).', 'success');
+            }
             return;
         }
 
         if (action === 'ver-comprovante') {
-            esportecToast('Comprovante aberto para conferência.', 'info');
+            const url = button.dataset.url;
+            if (url) window.open(url, '_blank');
+            else esportecToast('Comprovante não disponível.', 'warning');
             return;
         }
 
         if (action === 'cancelar-reserva') {
-            if (!confirm('Cancelar esta reserva?')) {
-                return;
+            if (!confirm('Cancelar esta reserva?\n\nEsta ação não pode ser desfeita.')) return;
+            try {
+                const response = await fetch(`${API_BASE}/agendamentos/${id}/cancelar`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }
+                });
+                if (!response.ok) throw new Error('Erro');
+                esportecToast('Reserva cancelada.', 'success');
+                carregarAgendamentos();
+            } catch (error) {
+                // Fallback visual
+                const row = button.closest('tr');
+                row.querySelector('td:nth-child(7)').innerHTML = '<span class="badge-status badge-cancelada"><i class="bi bi-x-circle"></i>Cancelada</span>';
+                row.querySelectorAll('.btn-action').forEach(btn => { btn.disabled = true; btn.style.opacity = '0.5'; });
+                esportecToast('Reserva cancelada (simulado).', 'success');
             }
-            const row = button.closest('tr');
-            row.querySelector('.badge-status').className = 'badge-status badge-cancelada';
-            row.querySelector('.badge-status').innerHTML = '<i class="bi bi-x-circle"></i>Cancelada';
-            row.querySelectorAll('button').forEach(action => action.disabled = true);
-            esportecToast('Reserva cancelada.', 'success');
-        }
-    }
-
-    tableBody.addEventListener('click', event => {
-        const button = event.target.closest('[data-action]');
-        if (button) {
-            executarAcaoAgendamento(button);
+            return;
         }
     });
 
-    document.querySelectorAll('.filter-bar input, .filter-bar select').forEach(filter => {
-        filter.addEventListener('input', filtrarAgendamentos);
-        filter.addEventListener('change', filtrarAgendamentos);
-    });
+    //  FILTROS
+    function aplicarFiltros() {
+        const data = document.getElementById('filtroData').value;
+        const quadra = document.getElementById('filtroQuadra').value;
+        const status = document.getElementById('filtroStatus').value;
+        const cliente = document.getElementById('filtroCliente').value.trim().toLowerCase();
 
-    function filtrarAgendamentos() {
-        const filtros = [...document.querySelectorAll('.filter-bar input, .filter-bar select')]
-            .map(input => {
-                if (input.type === 'date' && input.value) {
-                    return input.value.split('-').reverse().join('/');
-                }
-                return input.value.trim().toLowerCase();
-            })
-            .filter(value => value && !value.startsWith('todas') && !value.startsWith('todos'));
-
-        tableBody.querySelectorAll('tr').forEach(row => {
+        document.querySelectorAll('#tabelaAgendamentos tr[data-agenda-id]').forEach(row => {
             const texto = row.textContent.toLowerCase();
-            row.classList.toggle('d-none', filtros.some(filtro => !texto.includes(filtro)));
+            const mostrar = 
+                (!data || texto.includes(data.split('-').reverse().join('/'))) &&
+                (!quadra || texto.includes(quadra)) &&
+                (!status || texto.includes(status)) &&
+                (!cliente || texto.includes(cliente));
+            row.classList.toggle('d-none', !mostrar);
         });
     }
 
-    document.getElementById('btnSalvarReserva').addEventListener('click', () => {
-        const id = `#${Math.floor(2000 + Math.random() * 7000)}`;
-        tableBody.insertAdjacentHTML('afterbegin', `
-            <tr>
-                <td>${id}</td>
-                <td>Hoje<br><small>19:00 - 20:00</small></td>
-                <td>Society Premium</td>
-                <td>Reserva manual</td>
-                <td>(11) 99999-9999</td>
-                <td>R$ 150,00</td>
-                <td><span class="badge-status badge-confirmada"><i class="bi bi-check-circle"></i>Confirmada</span></td>
-                <td><span class="badge-status badge-pendente"><i class="bi bi-clock"></i>Pendente</span></td>
-                <td class="actions-cell">
-                    <button class="btn-action btn-confirm" data-action="confirmar-pagamento"><i class="bi bi-cash-coin"></i> Pgto</button>
-                    <button class="btn-action btn-edit" data-action="editar-reserva"><i class="bi bi-pencil"></i> Editar</button>
-                    <button class="btn-action btn-cancel" data-action="cancelar-reserva"><i class="bi bi-x-circle"></i> Cancelar</button>
-                </td>
-            </tr>
-        `);
-        esportecToast('Reserva manual criada na tabela.', 'success');
-        bootstrap.Modal.getInstance(modalReserva).hide();
+    document.querySelectorAll('#filtroData, #filtroQuadra, #filtroStatus, #filtroCliente').forEach(input => {
+        input.addEventListener('input', aplicarFiltros);
+        input.addEventListener('change', aplicarFiltros);
+    });
+
+    //  CRIAR RESERVA MANUAL - API: POST /api/reservas
+    document.getElementById('btnSalvarReserva').addEventListener('click', async () => {
+        const payload = {
+            usuario_id: 1, // Em produção: pegar do usuário logado
+            quadra_id: document.getElementById('reservaQuadra').value,
+            data: document.getElementById('reservaData').value,
+            hora_inicio: document.getElementById('reservaHoraInicio').value,
+            hora_fim: document.getElementById('reservaHoraFim').value,
+            valor_total: parseFloat(document.getElementById('reservaValor').value) || 0,
+            observacao: 'Reserva manual criada por admin'
+        };
+
+        if (!payload.quadra_id || !payload.data || !payload.hora_inicio) {
+            esportecToast('Preencha todos os campos obrigatórios.', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/reservas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error('Erro');
+            
+            bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide();
+            esportecToast('Reserva criada.', 'success');
+            carregarAgendamentos();
+        } catch (error) {
+            console.error('Erro ao criar reserva:', error);
+            // Fallback visual
+            bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide();
+            esportecToast('Reserva criada (simulado).', 'success');
+            carregarAgendamentos();
+        }
+    });
+
+    //  CARREGAR QUADRAS NO SELECT
+    async function carregarQuadrasSelect() {
+        try {
+            const response = await fetch(`${API_BASE}/admin/quadras`);
+            if (!response.ok) throw new Error('Erro');
+            const quadras = await response.json();
+            preencherSelectQuadras(quadras);
+        } catch (error) {
+            console.log(' Usando mock para quadras:', error.message);
+            preencherSelectQuadras(MOCK_QUADRAS);
+        }
+    }
+
+    function preencherSelectQuadras(quadras) {
+        const selects = [document.getElementById('reservaQuadra'), document.getElementById('filtroQuadra')];
+        selects.forEach(select => {
+            if (!select) return;
+            const first = select.querySelector('option[value=""]')?.outerHTML || '<option value="">Selecione...</option>';
+            select.innerHTML = first;
+            quadras.forEach(q => {
+                select.innerHTML += `<option value="${q.id}">${q.nome}</option>`;
+            });
+        });
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+        carregarQuadrasSelect();
+        carregarAgendamentos();
     });
 </script>
 </body>

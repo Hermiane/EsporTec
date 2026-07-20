@@ -35,26 +35,8 @@
         .badge-cancelada { background: rgba(211,47,47,0.15); color: #D32F2F; }
         .badge-concluida { background: rgba(21,101,192,0.15); color: #1565C0; }
 
-        .reserva-actions { 
-            display: flex; 
-            gap: 0.5rem; 
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
-        .btn-action { 
-            padding: 0.5rem 0.9rem; 
-            border-radius: 8px; 
-            font-size: 0.85rem; 
-            font-weight: 600; 
-            border: none; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            display: flex; 
-            align-items: center; 
-            gap: 0.4rem; 
-            text-decoration: none;
-            white-space: nowrap;
-        }
+        .reserva-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .btn-action { padding: 0.5rem 0.9rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; white-space: nowrap; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--dark); }
         .btn-outline { background: white; border: 1px solid #E2E8F0; color: var(--gray); }
@@ -69,7 +51,6 @@
         .empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray); }
         .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
         
-        /* Ajuste para telas menores */
         @media (max-width: 576px) {
             .reserva-card { flex-direction: column; align-items: flex-start; }
             .reserva-actions { width: 100%; justify-content: flex-start; }
@@ -93,79 +74,18 @@
     </div>
 
     <!-- Conteúdo: Próximas -->
-    <div id="proximas" class="tab-content active">
-        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="Dinheiro - pagamento pendente" data-observacoes="Reserva para campeonato interno. Precisamos de 2 bolas extras.">
-            <div class="reserva-info">
-                <div class="reserva-title">Quadra Society Premium</div>
-                <div class="reserva-meta">
-                    <span><i class="bi bi-calendar3"></i> 14/06/2026</span>
-                    <span><i class="bi bi-clock"></i> 19:00 - 20:30</span>
-                    <span><i class="bi bi-cash-stack"></i> R$ 225,00</span>
-                </div>
-                <span class="badge-status badge-confirmada">Reserva confirmada</span>
-                <span class="badge-status badge-pendente ms-2">Pagamento pendente</span>
-            </div>
-            <div class="reserva-actions">
-                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
-                <button class="btn-action btn-outline" onclick="abrirRemarcacao(this)"><i class="bi bi-calendar2-week"></i> Remarcar</button>
-                <button class="btn-action btn-danger" onclick="confirmarCancelamento(this)"><i class="bi bi-x-circle"></i> Cancelar</button>
-            </div>
-        </div>
-
-        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="Cartão de débito - pago" data-observacoes="Reserva individual sem observações adicionais.">
-            <div class="reserva-info">
-                <div class="reserva-title">Quadra Futsal Arena</div>
-                <div class="reserva-meta">
-                    <span><i class="bi bi-calendar3"></i> 16/06/2026</span>
-                    <span><i class="bi bi-clock"></i> 16:00 - 17:00</span>
-                    <span><i class="bi bi-cash-stack"></i> R$ 120,00</span>
-                </div>
-                <span class="badge-status badge-confirmada">Reserva confirmada</span>
-                <span class="badge-status badge-pago ms-2">Pagamento pago</span>
-            </div>
-            <div class="reserva-actions">
-                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
-                <button class="btn-action btn-outline" onclick="abrirRemarcacao(this)"><i class="bi bi-calendar2-week"></i> Remarcar</button>
-            </div>
-        </div>
-    </div>
+    <div id="proximas" class="tab-content active"></div>
 
     <!-- Conteúdo: Passadas -->
-    <div id="passadas" class="tab-content">
-        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="PIX - confirmado" data-observacoes="Partida concluída sem pendências.">
-            <div class="reserva-info">
-                <div class="reserva-title">Quadra Society Descoberta</div>
-                <div class="reserva-meta">
-                    <span><i class="bi bi-calendar3"></i> 10/06/2026</span>
-                    <span><i class="bi bi-clock"></i> 10:00 - 11:00</span>
-                    <span><i class="bi bi-cash-stack"></i> R$ 100,00</span>
-                </div>
-                <span class="badge-status badge-concluida">Concluída</span>
-            </div>
-            <div class="reserva-actions">
-                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
-                <button class="btn-action btn-outline" data-bs-toggle="modal" data-bs-target="#modalAvaliacao"><i class="bi bi-star"></i> Avaliar</button>
-            </div>
-        </div>
-    </div>
+    <div id="passadas" class="tab-content"></div>
 
     <!-- Conteúdo: Canceladas -->
-    <div id="canceladas" class="tab-content">
-        <div class="reserva-card" data-responsavel="João Silva" data-pagamento="Dinheiro - cancelado" data-observacoes="Reserva cancelada pelo cliente.">
-            <div class="reserva-info">
-                <div class="reserva-title">Quadra Society Premium</div>
-                <div class="reserva-meta">
-                    <span><i class="bi bi-calendar3"></i> 05/06/2026</span>
-                    <span><i class="bi bi-clock"></i> 20:00 - 21:30</span>
-                    <span><i class="bi bi-cash-stack"></i> R$ 225,00</span>
-                </div>
-                <span class="badge-status badge-cancelada">Cancelada</span>
-            </div>
-            <div class="reserva-actions">
-                <button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>
-                <a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>
-            </div>
-        </div>
+    <div id="canceladas" class="tab-content"></div>
+    
+    <!-- Estado vazio -->
+    <div id="emptyState" class="empty-state d-none">
+        <i class="bi bi-calendar-x"></i>
+        <p class="mb-0">Nenhuma reserva encontrada nesta categoria.</p>
     </div>
 </div>
 
@@ -228,7 +148,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="mt-4 p-3 border rounded">
                     <strong class="d-block mb-2"><i class="bi bi-geo-alt me-2"></i>Localização:</strong>
                     <p class="mb-1">Rua dos Esportes, 123 - São Paulo, SP</p>
@@ -257,8 +176,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <p class="text-muted mb-3">Como foi sua experiência na <strong>Society Premium</strong>?</p>
-
+                <p class="text-muted mb-3">Como foi sua experiência na <strong id="avaliar-quadra">Society Premium</strong>?</p>
                 <div class="mb-4">
                     <div class="d-flex justify-content-center gap-2 mb-3" id="stars">
                         <i class="bi bi-star fs-1 text-warning" style="cursor: pointer;" onclick="setRating(1)"></i>
@@ -269,12 +187,10 @@
                     </div>
                     <input type="hidden" id="rating" value="0">
                 </div>
-
                 <div class="mb-3">
                     <label class="form-label fw-medium">Comentário (opcional)</label>
                     <textarea class="form-control" rows="3" placeholder="Conte-nos como foi sua experiência..."></textarea>
                 </div>
-
                 <div class="form-check text-start mb-3">
                     <input type="checkbox" class="form-check-input" id="recomendar">
                     <label class="form-check-label" for="recomendar">Recomendaria para outros jogadores</label>
@@ -290,6 +206,7 @@
     </div>
 </div>
 
+<!-- Modal Remarcação -->
 <div class="modal fade" id="modalRemarcacao" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -330,9 +247,186 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
 <script>
+  
+    // INTEGRAÇÃO COM API + FALLBACK
+   
+    const API_BASE = '/api/cliente';
     let reservaEmRemarcacao = null;
     let reservaEmDetalhe = null;
 
+    // DADOS FICTÍCIOS (FALLBACK) - Datas no futuro para aparecer em "Próximas"
+    const MOCK_RESERVAS = [
+        {
+            id: 101,
+            data: '2026-07-20',
+            hora_inicio: '19:00',
+            hora_fim: '20:30',
+            status: 'confirmada',
+            quadra: { nome: 'Quadra Society Premium' },
+            pagamento: { status: 'pendente', valor: 225.00, metodo: 'Dinheiro' },
+            responsavel: 'João Silva',
+            observacoes: 'Reserva para campeonato interno. Precisamos de 2 bolas extras.'
+        },
+        {
+            id: 102,
+            data: '2026-07-18',
+            hora_inicio: '16:00',
+            hora_fim: '17:00',
+            status: 'confirmada',
+            quadra: { nome: 'Quadra Futsal Arena' },
+            pagamento: { status: 'pago', valor: 120.00, metodo: 'Cartão de débito' },
+            responsavel: 'João Silva',
+            observacoes: 'Reserva individual sem observações adicionais.'
+        },
+        {
+            id: 103,
+            data: '2026-07-10',
+            hora_inicio: '10:00',
+            hora_fim: '11:00',
+            status: 'concluida',
+            quadra: { nome: 'Quadra Society Descoberta' },
+            pagamento: { status: 'pago', valor: 100.00, metodo: 'PIX' },
+            responsavel: 'João Silva',
+            observacoes: 'Partida concluída sem pendências.'
+        },
+        {
+            id: 104,
+            data: '2026-07-05',
+            hora_inicio: '20:00',
+            hora_fim: '21:30',
+            status: 'cancelada',
+            quadra: { nome: 'Quadra Society Premium' },
+            pagamento: { status: 'cancelado', valor: 0, metodo: 'Dinheiro' },
+            responsavel: 'João Silva',
+            observacoes: 'Reserva cancelada pelo cliente.'
+        }
+    ];
+
+    //  FUNÇÃO PRINCIPAL: Carrega reservas da API ou usa fallback
+    async function carregarReservas() {
+        try {
+            // quando as apis estiverem pronta desconta essas linhas e remover o throw
+            // const response = await fetch(`${API_BASE}/reservas`);
+            // if (!response.ok) throw new Error('Erro na API');
+            // const reservas = await response.json();
+            // renderizarTodasReservas(reservas);
+            
+            throw new Error('API ainda não implementada');
+        } catch (error) {
+            console.log('Usando dados de teste para reservas.');
+            renderizarTodasReservas(MOCK_RESERVAS);
+        }
+    }
+
+    //  Renderiza todas as abas com os dados
+    function renderizarTodasReservas(reservas) {
+        renderizarAba('proximas', reservas.filter(r => {
+            const hoje = new Date().toISOString().split('T')[0];
+            return r.data >= hoje && r.status !== 'cancelada';
+        }));
+        renderizarAba('passadas', reservas.filter(r => {
+            const hoje = new Date().toISOString().split('T')[0];
+            return r.data < hoje && r.status === 'concluida';
+        }));
+        renderizarAba('canceladas', reservas.filter(r => r.status === 'cancelada'));
+        
+        // Mostra mensagem se todas as abas estiverem vazias
+        const todasVazias = ['proximas', 'passadas', 'canceladas'].every(id => 
+            document.getElementById(id).children.length === 0
+        );
+        document.getElementById('emptyState').classList.toggle('d-none', !todasVazias);
+    }
+
+    //  Renderiza uma aba específica
+    function renderizarAba(abaId, reservas) {
+        const container = document.getElementById(abaId);
+        container.innerHTML = '';
+
+        if (reservas.length === 0) return;
+
+        reservas.forEach(reserva => {
+            const card = document.createElement('div');
+            card.className = 'reserva-card';
+            card.dataset.reserva = JSON.stringify(reserva).replace(/"/g, '&quot;');
+            card.dataset.responsavel = reserva.responsavel || 'João Silva';
+            card.dataset.pagamento = `${reserva.pagamento?.metodo || 'Não informado'} - ${formatarStatusPagamento(reserva.pagamento?.status)}`;
+            card.dataset.observacoes = reserva.observacoes || 'Sem observações.';
+
+            const badges = getBadgesHTML(reserva);
+            const actions = getActionsHTML(reserva, abaId);
+
+            card.innerHTML = `
+                <div class="reserva-info">
+                    <div class="reserva-title">${reserva.quadra?.nome || 'Quadra'}</div>
+                    <div class="reserva-meta">
+                        <span><i class="bi bi-calendar3"></i> ${formatarData(reserva.data)}</span>
+                        <span><i class="bi bi-clock"></i> ${reserva.hora_inicio} - ${reserva.hora_fim}</span>
+                        <span><i class="bi bi-cash-stack"></i> R$ ${reserva.pagamento?.valor?.toFixed(2).replace('.', ',') || '0,00'}</span>
+                    </div>
+                    ${badges}
+                </div>
+                <div class="reserva-actions">
+                    ${actions}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    //  Gera os badges de status
+    function getBadgesHTML(reserva) {
+        let html = '';
+        if (reserva.status === 'confirmada') {
+            html += `<span class="badge-status badge-confirmada">Reserva confirmada</span>`;
+        } else if (reserva.status === 'concluida') {
+            html += `<span class="badge-status badge-concluida">Concluída</span>`;
+        } else if (reserva.status === 'cancelada') {
+            html += `<span class="badge-status badge-cancelada">Cancelada</span>`;
+        }
+        if (reserva.pagamento?.status === 'pago') {
+            html += `<span class="badge-status badge-pago ms-2">Pagamento pago</span>`;
+        } else if (reserva.pagamento?.status === 'pendente') {
+            html += `<span class="badge-status badge-pendente ms-2">Pagamento pendente</span>`;
+        }
+        return html;
+    }
+
+    //  Gera os botões de ação
+    function getActionsHTML(reserva, abaId) {
+        let html = `<button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>`;
+        
+        if (abaId === 'passadas' && reserva.status === 'concluida') {
+            html += `<button class="btn-action btn-outline" data-bs-toggle="modal" data-bs-target="#modalAvaliacao" onclick="prepararAvaliacao('${reserva.quadra?.nome}')"><i class="bi bi-star"></i> Avaliar</button>`;
+        }
+        if (abaId === 'proximas' && reserva.status !== 'cancelada') {
+            html += `<button class="btn-action btn-outline" onclick="abrirRemarcacao(this)"><i class="bi bi-calendar2-week"></i> Remarcar</button>`;
+            html += `<button class="btn-action btn-danger" onclick="confirmarCancelamento(this)"><i class="bi bi-x-circle"></i> Cancelar</button>`;
+        }
+        if (abaId === 'canceladas') {
+            html += `<a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>`;
+        }
+        return html;
+    }
+
+    //  Funções de utilidade
+    function formatarData(dataISO) {
+        if (!dataISO) return '-';
+        const [ano, mes, dia] = dataISO.split('-');
+        return `${dia}/${mes}/${ano}`;
+    }
+    function formatarStatus(status) {
+        const map = { 'pendente': 'Pendente', 'confirmada': 'Confirmada', 'concluida': 'Concluída', 'cancelada': 'Cancelada' };
+        return map[status] || status;
+    }
+    function formatarStatusPagamento(status) {
+        const map = { 'pago': 'pago', 'pendente': 'pagamento pendente', 'cancelado': 'cancelado' };
+        return map[status] || 'pendente';
+    }
+
+    
+    //  FUNÇÕES DE INTERAÇÃO (mantidas do original)
+
+    
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -342,18 +436,17 @@
 
     function abrirDetalhesReserva(trigger) {
         const card = trigger.closest('.reserva-card');
+        const reserva = JSON.parse(card.dataset.reserva.replace(/&quot;/g, '"'));
         reservaEmDetalhe = card;
-        const metaItems = card.querySelectorAll('.reserva-meta span');
-        const badges = [...card.querySelectorAll('.badge-status')].map(badge => badge.textContent.trim()).join(' / ');
 
-        document.getElementById('detalhe-quadra').textContent = card.querySelector('.reserva-title').textContent.trim();
-        document.getElementById('detalhe-data').textContent = metaItems[0]?.textContent.trim() || '-';
-        document.getElementById('detalhe-horario').textContent = metaItems[1]?.textContent.trim() || '-';
-        document.getElementById('detalhe-valor').textContent = metaItems[2]?.textContent.trim() || '-';
-        document.getElementById('detalhe-responsavel').textContent = card.dataset.responsavel || 'João Silva';
-        document.getElementById('detalhe-status').textContent = badges || 'Confirmada';
-        document.getElementById('detalhe-pagamento').textContent = card.dataset.pagamento || 'Pagamento pendente';
-        document.getElementById('detalhe-observacoes').textContent = card.dataset.observacoes || 'Sem observações.';
+        document.getElementById('detalhe-quadra').textContent = reserva.quadra?.nome || '-';
+        document.getElementById('detalhe-data').textContent = formatarData(reserva.data);
+        document.getElementById('detalhe-horario').textContent = `${reserva.hora_inicio} - ${reserva.hora_fim}`;
+        document.getElementById('detalhe-valor').textContent = `R$ ${reserva.pagamento?.valor?.toFixed(2).replace('.', ',') || '0,00'}`;
+        document.getElementById('detalhe-responsavel').textContent = reserva.responsavel || '-';
+        document.getElementById('detalhe-status').textContent = formatarStatus(reserva.status);
+        document.getElementById('detalhe-pagamento').textContent = `${reserva.pagamento?.metodo || '-'} - ${formatarStatusPagamento(reserva.pagamento?.status)}`;
+        document.getElementById('detalhe-observacoes').textContent = reserva.observacoes || 'Sem observações.';
 
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalhes')).show();
     }
@@ -362,13 +455,21 @@
         if(confirm('Tem certeza que deseja cancelar esta reserva?')) {
             const card = trigger.closest ? trigger.closest('.reserva-card') : trigger;
             if (card) {
-                card.querySelectorAll('.badge-status').forEach(badge => badge.remove());
+                const reserva = JSON.parse(card.dataset.reserva.replace(/&quot;/g, '"'));
+                reserva.status = 'cancelada';
+                card.dataset.reserva = JSON.stringify(reserva).replace(/"/g, '&quot;');
+                
+                // Atualiza visualmente
+                card.querySelectorAll('.badge-status').forEach(b => b.remove());
                 card.querySelector('.reserva-info').insertAdjacentHTML('beforeend', '<span class="badge-status badge-cancelada">Cancelada</span>');
                 card.querySelector('.reserva-actions').innerHTML = '<a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>';
+                
+                // Move para aba canceladas
                 document.getElementById('canceladas').prepend(card);
+                if (document.getElementById('proximas').children.length === 0) switchTab('canceladas', document.querySelector('[data-filter="canceladas"]'));
             }
             bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
-            esportecToast('Reserva cancelada e movida para a aba Canceladas.', 'success');
+            if (typeof esportecToast === 'function') esportecToast('Reserva cancelada.', 'success');
         }
     }
 
@@ -382,48 +483,60 @@
         const data = document.getElementById('novaDataReserva').value;
         const horario = document.getElementById('novoHorarioReserva').value;
         if (!data || !horario) {
-            esportecToast('Escolha a nova data e o novo horário.', 'warning');
+            if (typeof esportecToast === 'function') esportecToast('Escolha data e horário.', 'warning');
             return;
         }
-
         if (reservaEmRemarcacao) {
+            const reserva = JSON.parse(reservaEmRemarcacao.dataset.reserva.replace(/&quot;/g, '"'));
+            reserva.data = data;
+            const [hInicio] = horario.split(' - ');
+            reserva.hora_inicio = hInicio;
+            reservaEmRemarcacao.dataset.reserva = JSON.stringify(reserva).replace(/"/g, '&quot;');
+            
             const metaItems = reservaEmRemarcacao.querySelectorAll('.reserva-meta span');
-            metaItems[0].innerHTML = `<i class="bi bi-calendar3"></i> ${data.split('-').reverse().join('/')}`;
+            metaItems[0].innerHTML = `<i class="bi bi-calendar3"></i> ${formatarData(data)}`;
             metaItems[1].innerHTML = `<i class="bi bi-clock"></i> ${horario}`;
-            reservaEmRemarcacao.querySelectorAll('.badge-status').forEach(badge => badge.remove());
+            reservaEmRemarcacao.querySelectorAll('.badge-status').forEach(b => b.remove());
             reservaEmRemarcacao.querySelector('.reserva-info').insertAdjacentHTML('beforeend', '<span class="badge-status badge-confirmada">Remarcada</span>');
         }
-
         bootstrap.Modal.getInstance(document.getElementById('modalRemarcacao')).hide();
-        esportecToast('Reserva remarcada com sucesso.', 'success');
+        if (typeof esportecToast === 'function') esportecToast('Reserva remarcada.', 'success');
     }
 
-    // Funções do Modal de Avaliação
+    function prepararAvaliacao(quadraNome) {
+        document.getElementById('avaliar-quadra').textContent = quadraNome || 'Quadra';
+    }
+
     function setRating(n) {
         document.getElementById('rating').value = n;
         const stars = document.querySelectorAll('#stars i');
         stars.forEach((star, index) => {
-            if (index < n) {
-                star.classList.remove('bi-star');
-                star.classList.add('bi-star-fill');
-            } else {
-                star.classList.remove('bi-star-fill');
-                star.classList.add('bi-star');
-            }
+            star.classList.toggle('bi-star-fill', index < n);
+            star.classList.toggle('bi-star', index >= n);
         });
     }
 
     function submitAvaliacao() {
         const rating = document.getElementById('rating').value;
         if (rating == 0) {
-            esportecToast('Selecione uma nota de 1 a 5 estrelas.', 'warning');
+            if (typeof esportecToast === 'function') esportecToast('Selecione uma nota.', 'warning');
             return;
         }
-        esportecToast('Avaliação enviada com sucesso. Obrigado pelo feedback.', 'success');
-        document.querySelector('[data-bs-target="#modalAvaliacao"]').innerHTML = '<i class="bi bi-check2"></i> Avaliada';
-        document.querySelector('[data-bs-target="#modalAvaliacao"]').disabled = true;
+        if (typeof esportecToast === 'function') esportecToast('Avaliação enviada!', 'success');
+        const btn = document.querySelector(`[onclick*="prepararAvaliacao"]`);
+        if (btn) {
+            btn.innerHTML = '<i class="bi bi-check2"></i> Avaliada';
+            btn.disabled = true;
+        }
         bootstrap.Modal.getInstance(document.getElementById('modalAvaliacao')).hide();
     }
+
+   
+    // INICIALIZAÇÃO
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        carregarReservas();
+    });
 </script>
 </body>
 </html>

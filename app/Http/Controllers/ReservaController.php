@@ -135,7 +135,7 @@ class ReservaController extends Controller
         }
 
         $quadras = Quadra::where('arenas_id', $arenaId)
-            ->where('ativa', 1)
+            ->where('ativo', 1)
             ->get();
 
         return response()->json($quadras);
