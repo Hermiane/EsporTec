@@ -1,34 +1,78 @@
 # EsporTec
 
-Sistema web responsivo para gestao de espacos esportivos, com foco em reservas de quadras society/futsal, area do cliente, area do funcionario e painel administrativo.
+Aplicação Laravel para gestão de arenas esportivas, quadras, reservas e pagamentos. Possui área pública, cliente, funcionário, administração da arena e superadmin.
 
-## Alteracoes recentes
+## Requisitos
 
-Alteracoes de front-end registradas por **nilcilene74**:
+- PHP 8.3 ou superior
+- Composer
+- MySQL/MariaDB
+- Node.js e npm (opcional, somente se for alterar os assets do front-end)
+- XAMPP ou ambiente equivalente
 
-- Ajustes na tela inicial com carrossel de quadras, navegacao, busca e textos do projeto.
-- Correcao de acentuacao e textos nas telas publicas, login, cliente, funcionario e administrador.
-- Area do cliente com painel, selecao de quadra, nova reserva em etapas, historico, notificacoes, perfil e detalhes de reserva.
-- Fluxo de pagamento com escolha entre dinheiro, PIX e cartao, exibindo a area de PIX somente quando essa forma for selecionada.
-- Exibicao de horarios somente depois da data completa ser confirmada.
-- Area do funcionario com painel, agenda, perfil e acoes de gerenciamento de reservas.
-- Area do administrador com dashboard, agendamentos, financeiro, quadras, equipe, clientes, notificacoes, configuracoes e logs.
-- Botoes e acoes de interface ajustados para ficarem mais intuitivos e funcionais.
-- Inclusao de interacoes em JavaScript para avisos, filtros, modais, navegacao e atualizacoes visuais no front-end.
+## Instalação para avaliação
 
-Ultimo pacote de atualizacoes enviado no commit:
+1. Clone o repositório e entre na pasta do projeto.
+
+2. Instale as dependências:
+
+```bash
+composer install
+```
+
+3. Crie um banco MySQL vazio chamado `esportec`.
+
+4. Copie o arquivo de configuração de exemplo:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+5. Confira no `.env` as credenciais locais do MySQL. No XAMPP padrão, elas são:
+
+```env
+DB_DATABASE=esportec
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+6. Gere a chave, crie as tabelas e carregue a base de demonstração:
+
+```bash
+php artisan key:generate
+php artisan migrate:fresh --seed
+php artisan storage:link
+php artisan serve
+```
+
+Abra `http://127.0.0.1:8000` no navegador.
+
+> `migrate:fresh --seed` apaga as tabelas do banco configurado no `.env`. Use-o apenas em um banco local de demonstração vazio.
+
+## Dados de demonstração
+
+O comando de instalação cria uma arena, duas quadras, horários de funcionamento, reservas e pagamentos de exemplo em português. Todas as contas abaixo usam a senha:
 
 ```text
-2c4bc96 - Finaliza fluxos e interacoes do front-end
+EsporTec@123
 ```
+
+| Área | E-mail | Tipo de acesso no login |
+| --- | --- | --- |
+| Superadmin | `superadmin@esportec.test` | Super admin |
+| Administração da arena | `gestor@arenaexemplo.test` | Admin da arena |
+| Funcionário | `funcionario@arenaexemplo.test` | Funcionário |
+| Cliente | `cliente@esportec.test` | Cliente |
+
+## Segurança e dados locais
+
+- O arquivo `.env` não é versionado e não deve ser enviado ao Git.
+- A base demonstrativa é criada pelos seeders; dados cadastrados em um computador não são enviados automaticamente pelo Git.
+- Para demonstrar a aplicação com dados criados localmente, use o link do Cloudflare Tunnel ou exporte o banco como arquivo SQL separadamente.
 
 ## Tecnologias
 
-- Laravel
-- Blade
-- Bootstrap
-- JavaScript
-
-## Observacao
-
-Este projeto ainda esta focado no front-end. Algumas funcionalidades simulam o comportamento esperado da aplicacao ate a integracao completa com banco de dados e regras de back-end.
+- Laravel 13
+- PHP 8.3+
+- MySQL/MariaDB
+- Blade, Bootstrap e JavaScript
