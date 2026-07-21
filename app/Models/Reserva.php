@@ -144,6 +144,11 @@ class Reserva extends Model
         );
     }
 
+    public function pagamentos(): HasMany
+    {
+        return $this->hasMany(Pagamento::class, 'reservas_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relacionamentos 1:N

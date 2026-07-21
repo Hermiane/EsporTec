@@ -178,6 +178,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     
     //  INTEGRAÇÃO COM API - ADMIN FINANCEIRO
@@ -238,13 +239,7 @@
             
             throw new Error('Estrutura inesperada');
             
-        } catch (error) {
-            console.log(' Usando dados de teste:', error.message);
-            renderizarStats(MOCK_FINANCEIRO.stats);
-            renderizarGraficoBarras(MOCK_FINANCEIRO.grafico_semanal);
-            renderizarGraficoPizza(MOCK_FINANCEIRO.grafico_categorias);
-            renderizarDespesas(MOCK_FINANCEIRO.despesas_recentes);
-        }
+        } catch (error) { console.error('Erro ao carregar financeiro:', error.message); renderizarStats({ entradas: 0, saidas: 0, saldo: 0, margem: 0, entradas_variacao: 0, saidas_variacao: 0, melhor_semana: '-', maior_entrada: 0 }); renderizarGraficoBarras({ labels: [], entradas: [], saidas: [] }); renderizarGraficoPizza({ labels: [], values: [], colors: [] }); renderizarDespesas([]); }
     }
 
     function renderizarStats(stats) {

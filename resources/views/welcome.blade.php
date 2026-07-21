@@ -787,62 +787,36 @@
             </div>
 
             <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="arena-public-card">
-                        <div class="arena-public-icon"><i class="bi bi-building"></i></div>
-                        <h3 class="feature-title">EsporTec Arena</h3>
-                        <p class="mb-0 text-muted">Unidade principal com quadras society e futsal, estacionamento e atendimento presencial.</p>
-                        <div class="arena-owner-info">
-                            <p><i class="bi bi-person-circle"></i><span><strong>Dono:</strong> João Silva</span></p>
-                            <p><i class="bi bi-geo-alt"></i><span><strong>Endereço:</strong> Rua dos Esportes, 123 - São Paulo, SP</span></p>
+                @forelse ($arenas as $arena)
+                    @php
+                        $horarios = $arena->quadras->flatMap->horariosFuncionamento;
+                        $inicio = $horarios->min('hora_inicio');
+                        $fim = $horarios->max('hora_fim');
+                        $endereco = collect([$arena->logradouro, $arena->numero, $arena->bairro, $arena->cidade, $arena->estado])->filter()->implode(', ');
+                    @endphp
+                    <div class="col-md-4">
+                        <div class="arena-public-card">
+                            @if ($arena->foto_capa)
+                                <img src="{{ $arena->foto_capa }}" alt="{{ $arena->nome }}" class="w-100 rounded mb-3" style="height: 160px; object-fit: cover;">
+                            @else
+                                <div class="arena-public-icon"><i class="bi bi-building"></i></div>
+                            @endif
+                            <h3 class="feature-title">{{ $arena->nome }}</h3>
+                            <p class="mb-0 text-muted">{{ $arena->descricao ?: 'Informações da arena disponíveis em sua página.' }}</p>
+                            <div class="arena-owner-info">
+                                <p><i class="bi bi-person-circle"></i><span><strong>Responsável:</strong> {{ $arena->criadoPor?->nome_completo ?? 'Não informado' }}</span></p>
+                                <p><i class="bi bi-geo-alt"></i><span><strong>Endereço:</strong> {{ $endereco ?: 'Não informado' }}</span></p>
+                            </div>
+                            <div class="arena-public-meta">
+                                <span>{{ $arena->quadras_ativas_count }} {{ $arena->quadras_ativas_count === 1 ? 'quadra' : 'quadras' }}</span>
+                                <span>{{ $inicio && $fim ? substr($inicio, 0, 5).' - '.substr($fim, 0, 5) : 'Horários a consultar' }}</span>
+                            </div>
+                            <a href="/arenas/{{ $arena->id }}/quadras" class="btn btn-details w-100">Ver quadras desta arena</a>
                         </div>
-                        <div class="arena-public-meta">
-                            <span>3 quadras</span>
-                            <span>07:00-23:00</span>
-                        </div>
-                        <a href="/arenas/esportec-arena/quadras" class="btn btn-details w-100">
-                            Ver quadras desta arena
-                        </a>
                     </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="arena-public-card">
-                        <div class="arena-public-icon"><i class="bi bi-geo-alt"></i></div>
-                        <h3 class="feature-title">Arena Society Cametá</h3>
-                        <p class="mb-0 text-muted">Arena parceira preparada para jogos society, com agenda própria e pagamento presencial.</p>
-                        <div class="arena-owner-info">
-                            <p><i class="bi bi-person-circle"></i><span><strong>Dono:</strong> Maria Oliveira</span></p>
-                            <p><i class="bi bi-geo-alt"></i><span><strong>Endereço:</strong> Bairro Novo - Cametá, PA</span></p>
-                        </div>
-                        <div class="arena-public-meta">
-                            <span>1 quadra</span>
-                            <span>08:00-22:00</span>
-                        </div>
-                        <a href="/arenas/society-cameta/quadras" class="btn btn-details w-100">
-                            Ver quadras desta arena
-                        </a>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="arena-public-card">
-                        <div class="arena-public-icon"><i class="bi bi-pin-map"></i></div>
-                        <h3 class="feature-title">Unidade Zona Norte</h3>
-                        <p class="mb-0 text-muted">Espaço compacto para reservas rápidas, ideal para treinos, amistosos e jogos recorrentes.</p>
-                        <div class="arena-owner-info">
-                            <p><i class="bi bi-person-circle"></i><span><strong>Dono:</strong> Carlos Mendes</span></p>
-                            <p><i class="bi bi-geo-alt"></i><span><strong>Endereço:</strong> Zona Norte - São Paulo, SP</span></p>
-                        </div>
-                        <div class="arena-public-meta">
-                            <span>1 quadra</span>
-                            <span>07:00-21:00</span>
-                        </div>
-                        <a href="/arenas/zona-norte/quadras" class="btn btn-details w-100">
-                            Ver quadras desta arena
-                        </a>
-                    </div>
-                </div>
+                @empty
+                    <div class="col-12"><p class="text-center text-muted mb-0">Ainda não há arenas aprovadas disponíveis.</p></div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -864,11 +838,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>EsporTec Arena</td><td>Quadra Futsal Arena</td><td>Futsal</td><td>R$ 120,00</td><td>Sim</td><td>10 jogadores</td></tr>
-                        <tr><td>EsporTec Arena</td><td>Quadra Society Premium</td><td>Society</td><td>R$ 150,00</td><td>Não</td><td>14 jogadores</td></tr>
-                        <tr><td>EsporTec Arena</td><td>Quadra Society Descoberta</td><td>Society</td><td>R$ 100,00</td><td>Não</td><td>14 jogadores</td></tr>
-                        <tr><td>Arena Society Cametá</td><td>Campo Society Cametá</td><td>Society</td><td>R$ 110,00</td><td>Não</td><td>14 jogadores</td></tr>
-                        <tr><td>Unidade Zona Norte</td><td>Quadra Zona Norte</td><td>Society</td><td>R$ 95,00</td><td>Sim</td><td>12 jogadores</td></tr>
+                        @forelse ($arenas as $arena)
+                            @foreach ($arena->quadras as $quadra)
+                                <tr>
+                                    <td>{{ $arena->nome }}</td>
+                                    <td>{{ $quadra->nome }}</td>
+                                    <td>{{ ucfirst($quadra->tipo) }}</td>
+                                    <td>R$ {{ number_format((float) $quadra->preco_hora, 2, ',', '.') }}</td>
+                                    <td>{{ $quadra->coberta ? 'Sim' : 'Não' }}</td>
+                                    <td>{{ $quadra->capacidade_jogador }} jogadores</td>
+                                </tr>
+                            @endforeach
+                        @empty
+                            <tr><td colspan="6" class="text-center text-muted">Nenhuma quadra disponível no momento.</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -1089,20 +1072,13 @@
         });
 
         const buscarQuadra = document.getElementById('buscarQuadra');
-        const arenaSearchRoutes = [
-            {
-                terms: ['esportec', 'principal', 'futsal', 'premium', 'descoberta'],
-                url: '/arenas/esportec-arena/quadras'
-            },
-            {
-                terms: ['cameta', 'cametá', 'society cameta', 'campo society'],
-                url: '/arenas/society-cameta/quadras'
-            },
-            {
-                terms: ['zona norte', 'norte'],
-                url: '/arenas/zona-norte/quadras'
-            }
-        ];
+        const arenaSearchRoutes = @json($arenas->map(fn ($arena) => [
+            'terms' => collect([$arena->nome])
+                ->merge($arena->quadras->pluck('nome'))
+                ->filter()
+                ->values(),
+            'url' => '/arenas/'.$arena->id.'/quadras',
+        ])->values());
 
         function executarBuscaArena() {
             const term = buscarQuadra.value.trim().toLowerCase();

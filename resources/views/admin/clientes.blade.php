@@ -183,6 +183,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
 
     //  INTEGRAÇÃO COM API - ADMIN CLIENTES
@@ -206,9 +207,8 @@
             const clientes = await response.json();
             
             if (!clientes || clientes.length === 0) {
-                console.log(' API retornou vazio, usando mock');
-                renderizarClientes(MOCK_CLIENTES);
-                atualizarStats(MOCK_CLIENTES);
+                renderizarClientes([]);
+                atualizarStats([]);
                 return;
             }
             
@@ -216,9 +216,9 @@
             atualizarStats(clientes);
             console.log(' Clientes carregados:', clientes.length);
         } catch (error) {
-            console.log(' Erro na API, usando mock:', error.message);
-            renderizarClientes(MOCK_CLIENTES);
-            atualizarStats(MOCK_CLIENTES);
+            console.error('Erro ao carregar clientes:', error.message);
+            renderizarClientes([]);
+            atualizarStats([]);
         }
     }
 

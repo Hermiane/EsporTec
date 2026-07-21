@@ -133,6 +133,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     
     //  INTEGRAÇÃO COM API - ADMIN EQUIPE
@@ -155,16 +156,15 @@
             const usuarios = await response.json();
             
             if (!usuarios || usuarios.length === 0) {
-                console.log(' API retornou vazio, usando mock');
-                renderizarUsuarios(MOCK_USUARIOS);
+                renderizarUsuarios([]);
                 return;
             }
             
             renderizarUsuarios(usuarios);
             console.log(' Usuários carregados:', usuarios.length);
         } catch (error) {
-            console.log(' Erro na API, usando mock:', error.message);
-            renderizarUsuarios(MOCK_USUARIOS);
+            console.error('Erro ao carregar equipe:', error.message);
+            renderizarUsuarios([]);
         }
     }
 

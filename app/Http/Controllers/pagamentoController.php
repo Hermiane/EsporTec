@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pagamento;
+use App\Models\Configuracao;
 use App\Models\Reserva;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class PagamentoController extends Controller
             'comprovante' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ]);
 
-        $reserva = Reserva::findOrFail($validated['reserva_id']);
+        $reserva = Reserva::with('quadra')->findOrFail($validated['reserva_id']);
         $this->authorize('create', [Pagamento::class, $reserva]);
         if ($reserva->status !== 'pendente') {
             return response()->json(['message' => 'Apenas reservas pendentes podem receber pagamento'], 422);
@@ -32,10 +33,16 @@ class PagamentoController extends Controller
             $validated['comprovante'] = $request->file('comprovante')->store('comprovantes', 'public');
         }
 
-        $pagamento = DB::transaction(function () use ($validated) {
-            if (Pagamento::where('reservas_id', $validated['reserva_id'])->lockForUpdate()->exists()) {
-                abort(422, 'Esta reserva já possui um pagamento');
-            }
+        $pagamento = DB::transaction(function () use ($validated, $reserva) {
+            $pago = Pagamento::where('reservas_id', $reserva->id)->where('status', 'pago')->sum('valor');
+            $restante = max(0, (float) $reserva->valor_total - (float) $pago);
+            abort_if($restante <= 0, 422, 'Esta reserva já está quitada.');
+            $config = Configuracao::where('arenas_id', $reserva->quadra->arenas_id)->whereIn('chave', ['adiantamento_ativo', 'adiantamento_percentual', 'adiantamento_valor_minimo'])->pluck('valor', 'chave');
+            $adiantamentoAtivo = filter_var($config->get('adiantamento_ativo', false), FILTER_VALIDATE_BOOLEAN);
+            $percentual = (float) $config->get('adiantamento_percentual', 50);
+            $minimo = (float) $config->get('adiantamento_valor_minimo', 40);
+            $valorEsperado = $pago == 0 && $adiantamentoAtivo ? min($restante, max((float) $reserva->valor_total * $percentual / 100, $minimo)) : $restante;
+            abort_unless(round((float) $validated['valor'], 2) === round($valorEsperado, 2), 422, 'Valor do pagamento não corresponde à política da arena.');
 
             return Pagamento::create([
                 'reservas_id' => $validated['reserva_id'],
@@ -44,6 +51,7 @@ class PagamentoController extends Controller
                 'pix_copia_cola' => $validated['pix_copia_cola'] ?? null,
                 'comprovante' => $validated['comprovante'] ?? null,
                 'status' => 'pendente',
+                'tipo' => $pago == 0 && $adiantamentoAtivo ? 'adiantamento' : ($pago == 0 ? 'integral' : 'saldo'),
             ]);
         });
 

@@ -246,6 +246,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     
     //  INTEGRAÇÃO COM API - ADMIN AGENDAMENTOS
@@ -273,9 +274,8 @@
             const agendamentos = await response.json();
             
             if (!agendamentos || agendamentos.length === 0) {
-                console.log(' API retornou vazio, usando mock');
-                renderizarTabela(MOCK_AGENDAMENTOS);
-                atualizarStats(MOCK_AGENDAMENTOS);
+                renderizarTabela([]);
+                atualizarStats([]);
                 return;
             }
             
@@ -283,9 +283,9 @@
             atualizarStats(agendamentos);
             console.log(' Agendamentos carregados:', agendamentos.length);
         } catch (error) {
-            console.log(' Erro na API, usando mock:', error.message);
-            renderizarTabela(MOCK_AGENDAMENTOS);
-            atualizarStats(MOCK_AGENDAMENTOS);
+            console.error('Erro ao carregar agendamentos:', error.message);
+            renderizarTabela([]);
+            atualizarStats([]);
         }
     }
 
@@ -306,9 +306,9 @@
             tbody.innerHTML += `
                 <tr data-agenda-id="${agenda.id}">
                     <td>#${agenda.id}</td>
-                    <td>${formatarData(agenda.data)}<br><small>${agenda.hora_inicio} - ${agenda.hora_fim}</small></td>
+                    <td>${formatarData(agenda.data)}<br><small>${formatarHora(agenda.hora_inicio)} - ${formatarHora(agenda.hora_fim)}</small></td>
                     <td>${agenda.quadra?.nome || '-'}</td>
-                    <td>${agenda.usuario?.nome || '-'}</td>
+                    <td>${agenda.usuario?.nome_completo || '-'}</td>
                     <td>${agenda.usuario?.telefone || '-'}</td>
                     <td>R$ ${parseFloat(agenda.pagamento?.valor || 0).toFixed(2).replace('.', ',')}</td>
                     <td>${statusBadge}</td>
@@ -346,14 +346,14 @@
     function getAcoesAgendamento(agenda) {
         let html = '';
         
-        // Confirmar reserva (se pendente)
+        // O dono confirma a reserva; o pagamento pode ser feito depois, no local.
         if (agenda.status === 'pendente') {
             html += `<button class="btn-action btn-confirm" data-action="confirmar-reserva" data-id="${agenda.id}"><i class="bi bi-check-circle"></i> Confirmar</button>`;
         }
-        
-        // Confirmar pagamento (se pendente)
-        if (agenda.pagamento?.status === 'pendente') {
-            html += `<button class="btn-action btn-confirm" data-action="confirmar-pagamento" data-id="${agenda.pagamento.id || agenda.id}"><i class="bi bi-cash-coin"></i> Pgto</button>`;
+
+        const pagamentoNoLocal = ['dinheiro', 'cartao_credito', 'cartao_debito'].includes(agenda.pagamento?.metodo);
+        if (agenda.pagamento?.status === 'pendente' && pagamentoNoLocal) {
+            html += `<button class="btn-action btn-confirm" data-action="confirmar-pagamento" data-id="${agenda.pagamento.id}"><i class="bi bi-cash-coin"></i> Confirmar pagamento</button>`;
         }
         
         // Ver comprovante (se pago)
@@ -388,8 +388,12 @@
 
     function formatarData(dataISO) {
         if (!dataISO) return '-';
-        const [ano, mes, dia] = dataISO.split('-');
+        const [ano, mes, dia] = String(dataISO).slice(0, 10).split('-');
         return `${dia}/${mes}/${ano}`;
+    }
+
+    function formatarHora(hora) {
+        return hora ? String(hora).slice(0, 5) : '-';
     }
 
     // AÇÕES DOS BOTÕES
@@ -415,42 +419,26 @@
             return;
         }
 
-        if (action === 'confirmar-reserva') {
-            if (!confirm('Confirmar esta reserva?')) return;
+        if (action === 'confirmar-pagamento') {
+            if (!confirm('Confirmar recebimento do pagamento?')) return;
             try {
-                const response = await fetch(`${API_BASE}/agendamentos/${id}/confirmar`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }
-                });
-                if (!response.ok) throw new Error('Erro');
-                esportecToast('Reserva confirmada.', 'success');
-                carregarAgendamentos();
+                await EsporTecApi.request(`${API_BASE}/admin/pagamentos/${id}/confirmar`, { method: 'PATCH' });
+                esportecToast('Pagamento confirmado.', 'success');
+                await carregarAgendamentos();
             } catch (error) {
-                // Fallback visual
-                const row = button.closest('tr');
-                row.querySelector('td:nth-child(7)').innerHTML = '<span class="badge-status badge-confirmada"><i class="bi bi-check-circle"></i>Confirmada</span>';
-                button.remove();
-                esportecToast('Reserva confirmada (simulado).', 'success');
+                esportecToast(error.message || 'Não foi possível confirmar o pagamento.', 'danger');
             }
             return;
         }
 
-        if (action === 'confirmar-pagamento') {
-            if (!confirm('Confirmar recebimento do pagamento?')) return;
+        if (action === 'confirmar-reserva') {
+            if (!confirm('Confirmar esta reserva? O pagamento continuará pendente até ser feito.')) return;
             try {
-                const response = await fetch(`${API_BASE}/funcionario/pagamentos/${id}/confirmar`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }
-                });
-                if (!response.ok) throw new Error('Erro');
-                esportecToast('Pagamento confirmado.', 'success');
-                carregarAgendamentos();
+                await EsporTecApi.request(`${API_BASE}/admin/reservas/${id}/confirmar`, { method: 'PATCH' });
+                esportecToast('Reserva confirmada. O cliente já pode visualizar a confirmação.', 'success');
+                await carregarAgendamentos();
             } catch (error) {
-                // Fallback visual
-                const row = button.closest('tr');
-                row.querySelector('td:nth-child(8)').innerHTML = '<span class="badge-status badge-pago"><i class="bi bi-check2-circle"></i>Pago</span>';
-                button.remove();
-                esportecToast('Pagamento confirmado (simulado).', 'success');
+                esportecToast(error.message || 'Não foi possível confirmar a reserva.', 'danger');
             }
             return;
         }

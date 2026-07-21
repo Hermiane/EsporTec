@@ -246,6 +246,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
   
     // INTEGRAÇÃO COM API + FALLBACK
@@ -305,6 +306,9 @@
     //  FUNÇÃO PRINCIPAL: Carrega reservas da API ou usa fallback
     async function carregarReservas() {
         try {
+            const reservas = await EsporTecApi.request(`${API_BASE}/reservas`);
+            renderizarTodasReservas(reservas);
+            return;
             // quando as apis estiverem pronta desconta essas linhas e remover o throw
             // const response = await fetch(`${API_BASE}/reservas`);
             // if (!response.ok) throw new Error('Erro na API');
@@ -314,7 +318,7 @@
             throw new Error('API ainda não implementada');
         } catch (error) {
             console.log('Usando dados de teste para reservas.');
-            renderizarTodasReservas(MOCK_RESERVAS);
+            renderizarTodasReservas([]);
         }
     }
 
@@ -360,8 +364,8 @@
                     <div class="reserva-title">${reserva.quadra?.nome || 'Quadra'}</div>
                     <div class="reserva-meta">
                         <span><i class="bi bi-calendar3"></i> ${formatarData(reserva.data)}</span>
-                        <span><i class="bi bi-clock"></i> ${reserva.hora_inicio} - ${reserva.hora_fim}</span>
-                        <span><i class="bi bi-cash-stack"></i> R$ ${reserva.pagamento?.valor?.toFixed(2).replace('.', ',') || '0,00'}</span>
+                        <span><i class="bi bi-clock"></i> ${formatarHora(reserva.hora_inicio)} - ${formatarHora(reserva.hora_fim)}</span>
+                        <span><i class="bi bi-cash-stack"></i> R$ ${formatarValor(reserva.pagamento?.valor)}</span>
                     </div>
                     ${badges}
                 </div>
@@ -411,9 +415,11 @@
     //  Funções de utilidade
     function formatarData(dataISO) {
         if (!dataISO) return '-';
-        const [ano, mes, dia] = dataISO.split('-');
+        const [ano, mes, dia] = String(dataISO).slice(0, 10).split('-');
         return `${dia}/${mes}/${ano}`;
     }
+    function formatarHora(hora) { return hora ? String(hora).slice(0, 5) : '-'; }
+    function formatarValor(valor) { return Number(valor || 0).toFixed(2).replace('.', ','); }
     function formatarStatus(status) {
         const map = { 'pendente': 'Pendente', 'confirmada': 'Confirmada', 'concluida': 'Concluída', 'cancelada': 'Cancelada' };
         return map[status] || status;
@@ -441,8 +447,8 @@
 
         document.getElementById('detalhe-quadra').textContent = reserva.quadra?.nome || '-';
         document.getElementById('detalhe-data').textContent = formatarData(reserva.data);
-        document.getElementById('detalhe-horario').textContent = `${reserva.hora_inicio} - ${reserva.hora_fim}`;
-        document.getElementById('detalhe-valor').textContent = `R$ ${reserva.pagamento?.valor?.toFixed(2).replace('.', ',') || '0,00'}`;
+        document.getElementById('detalhe-horario').textContent = `${formatarHora(reserva.hora_inicio)} - ${formatarHora(reserva.hora_fim)}`;
+        document.getElementById('detalhe-valor').textContent = `R$ ${formatarValor(reserva.pagamento?.valor)}`;
         document.getElementById('detalhe-responsavel').textContent = reserva.responsavel || '-';
         document.getElementById('detalhe-status').textContent = formatarStatus(reserva.status);
         document.getElementById('detalhe-pagamento').textContent = `${reserva.pagamento?.metodo || '-'} - ${formatarStatusPagamento(reserva.pagamento?.status)}`;

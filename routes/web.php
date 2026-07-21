@@ -1,9 +1,23 @@
 <?php
 
+use App\Models\Arena;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $arenas = Arena::query()
+        ->where('ativo', true)
+        ->where('status_aprovacao', 'aprovada')
+        ->with([
+            'criadoPor:id,nome_completo',
+            'quadras' => fn ($query) => $query->where('ativo', true)->with([
+                'horariosFuncionamento' => fn ($horarios) => $horarios->where('ativo', true),
+            ]),
+        ])
+        ->withCount(['quadras as quadras_ativas_count' => fn ($query) => $query->where('ativo', true)])
+        ->orderBy('nome')
+        ->get();
+
+    return view('welcome', compact('arenas'));
 });
 
 Route::get('/login', function () {
@@ -43,6 +57,63 @@ Route::get('/detalhes-quadra', function () {
 });
 
 Route::get('/arenas/{arena}/quadras', function ($arena) {
+    $arenaModel = Arena::query()
+        ->whereKey($arena)
+        ->where('ativo', true)
+        ->where('status_aprovacao', 'aprovada')
+        ->with([
+            'criadoPor:id,nome_completo',
+            'quadras' => fn ($query) => $query->where('ativo', true)->with([
+                'horariosFuncionamento' => fn ($horarios) => $horarios->where('ativo', true),
+            ]),
+        ])
+        ->first();
+
+    if ($arenaModel) {
+        $horarios = $arenaModel->quadras->flatMap->horariosFuncionamento;
+        $inicio = $horarios->min('hora_inicio');
+        $fim = $horarios->max('hora_fim');
+        $funcionamento = $inicio && $fim ? substr($inicio, 0, 5).' - '.substr($fim, 0, 5) : 'Horários a consultar';
+
+        $dadosArena = [
+            'nome' => $arenaModel->nome,
+            'dono' => $arenaModel->criadoPor?->nome_completo ?? 'Não informado',
+            'endereco' => collect([$arenaModel->logradouro, $arenaModel->numero, $arenaModel->bairro, $arenaModel->cidade, $arenaModel->estado])->filter()->implode(', '),
+            'telefone' => $arenaModel->telefone,
+            'email' => $arenaModel->email,
+            'dias_funcionamento' => $horarios->isEmpty() ? 'A consultar' : 'Conforme disponibilidade da quadra',
+            'funcionamento' => $funcionamento,
+            'formas_pagamento' => array_filter(['PIX', 'Dinheiro']),
+            'descricao' => $arenaModel->descricao,
+            'imagem' => $arenaModel->foto_capa ?: ($arenaModel->quadras->first()?->foto ?: ''),
+            'quadras' => $arenaModel->quadras->map(fn ($quadra) => [
+                'slug' => (string) $quadra->id,
+                'nome' => $quadra->nome,
+                'tipo' => ucfirst($quadra->tipo),
+                'preco' => 'R$ '.number_format((float) $quadra->preco_hora, 2, ',', '.').'/hora',
+                'capacidade' => $quadra->capacidade_jogador.' jogadores',
+                'coberta' => $quadra->coberta ? 'Sim' : 'Não',
+                'descricao' => $quadra->descricao ?: 'Sem descrição informada.',
+                'imagem' => $quadra->foto ?: $arenaModel->foto_capa ?: '',
+            ])->all(),
+        ];
+
+        $arenasMenu = Arena::query()
+            ->where('ativo', true)->where('status_aprovacao', 'aprovada')
+            ->withCount(['quadras as quadras_ativas_count' => fn ($query) => $query->where('ativo', true)])
+            ->orderBy('nome')->get()
+            ->map(fn ($item) => ['slug' => (string) $item->id, 'nome' => $item->nome, 'quadras' => $item->quadras_ativas_count])
+            ->all();
+
+        return view('arena-quadras', [
+            'slug' => (string) $arenaModel->id,
+            'arena' => $dadosArena,
+            'arenasMenu' => $arenasMenu,
+        ]);
+    }
+
+    abort(404);
+
     $arenas = [
         'esportec-arena' => [
             'nome' => 'EsporTec Arena',

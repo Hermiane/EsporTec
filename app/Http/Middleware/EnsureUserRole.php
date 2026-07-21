@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\AdminArena;
 use App\Models\FuncionarioArena;
+use App\Models\SuperAdmin;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,19 +19,30 @@ class EnsureUserRole
             abort(401, 'Não autenticado.');
         }
 
-        $isSuperAdmin = $user->superAdmin()->where('ativo', true)->exists();
+        $isSuperAdmin = SuperAdmin::where('usuarios_id', $user->id)->where('ativo', true)->exists();
+        $temAdminArenaAprovada = AdminArena::where('usuarios_id', $user->id)->where('ativo', true)
+            ->whereHas('arena', fn ($arena) => $arena->where('ativo', true)->where('status_aprovacao', 'aprovada'))
+            ->exists();
+        $temFuncionarioArenaAprovada = FuncionarioArena::where('usuarios_id', $user->id)->where('ativo', true)
+            ->whereHas('arena', fn ($arena) => $arena->where('ativo', true)->where('status_aprovacao', 'aprovada'))
+            ->exists();
 
-        if ($role === 'admin' && !$isSuperAdmin) {
-            abort(403, 'Acesso restrito a super administradores.');
+        if ($role === 'super_admin' && !$isSuperAdmin) {
+            abort(403, 'Acesso restrito à equipe superadministradora da plataforma.');
         }
 
-        if ($role === 'equipe' && !$isSuperAdmin) {
-            $hasArenaRole = AdminArena::where('usuarios_id', $user->id)->where('ativo', true)->exists()
-                || FuncionarioArena::where('usuarios_id', $user->id)->where('ativo', true)->exists();
-
-            if (!$hasArenaRole) {
-                abort(403, 'Acesso restrito à equipe da arena.');
+        if ($role === 'admin') {
+            if (!$temAdminArenaAprovada) {
+                abort(403, 'Acesso restrito a administradores de arena.');
             }
+        }
+
+        if ($role === 'funcionario' && !$temFuncionarioArenaAprovada) {
+            abort(403, 'Acesso restrito a funcionários ativos da arena.');
+        }
+
+        if ($role === 'equipe' && !$temAdminArenaAprovada && !$temFuncionarioArenaAprovada) {
+                abort(403, 'Acesso restrito à equipe da arena.');
         }
 
         return $next($request);

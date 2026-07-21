@@ -125,25 +125,17 @@
             <div class="access-panel" id="adminPanel">
                 <span class="access-badge"><i class="bi bi-speedometer2"></i>Admin da arena</span>
                 <p class="access-description">Acesso para o proprietário ou gestor administrar a própria arena: agendamentos, financeiro, quadras, equipe, clientes e configurações.</p>
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Código da arena</label>
-                    <input type="text" class="form-control admin-required" placeholder="Ex: ADM-ESPORTEC">
-                </div>
                 <div class="login-support">
                     <i class="bi bi-building me-1"></i>
-                    Use este acesso para o dono ou gerente de uma arena cadastrada.
+                    O acesso é liberado automaticamente para o dono ou gestor vinculado a uma arena aprovada.
                 </div>
             </div>
             <div class="access-panel" id="superAdminPanel">
                 <span class="access-badge"><i class="bi bi-stars"></i>Super admin da plataforma</span>
                 <p class="access-description">Acesso para quem mantém o SaaS EsporTec: cadastrar arenas, acompanhar proprietários, planos, suporte e logs globais.</p>
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Código da plataforma</label>
-                    <input type="text" class="form-control super-required" placeholder="Ex: SUPER-ESPORTEC">
-                </div>
-                <div class="mb-0">
-                    <label class="form-label fw-medium">Chave de suporte</label>
-                    <input type="text" class="form-control super-required" placeholder="Ex: SUPORTE-2026">
+                <div class="login-support mb-0">
+                    <i class="bi bi-shield-check me-1"></i>
+                    O acesso é liberado automaticamente para contas cadastradas como superadministradoras.
                 </div>
             </div>
 
@@ -171,6 +163,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/esportec-ui.js"></script>
+    <script src="/js/esportec-api.js"></script>
     <script>
         const accessInputs = document.querySelectorAll('input[name="tipo-acesso"]');
         const panels = {
@@ -208,16 +201,18 @@
                 super_admin: '/super-admin/dashboard'
             };
             const perfil = getSelectedPerfil();
-            const requiredSelector = perfil === 'funcionario' ? '.staff-required' : perfil === 'admin' ? '.admin-required' : perfil === 'super_admin' ? '.super-required' : '';
+            const requiredSelector = perfil === 'funcionario' ? '.staff-required' : '';
             if (requiredSelector && [...document.querySelectorAll(requiredSelector)].some(input => !input.value.trim())) {
                 esportecToast('Preencha os dados profissionais para continuar.', 'warning');
                 return;
             }
-            esportecWithLoading(submitButton, 'Entrando...', () => esportecMockApi('auth.login', { perfil })).then(() => {
-                sessionStorage.setItem('esportecRole', perfil);
-                esportecToast('Login validado. Redirecionando...', 'success');
-                setTimeout(() => window.location.href = routes[perfil], 500);
-            });
+            const email = document.querySelector('#loginForm input[type="email"]').value;
+            const senha = document.querySelector('#loginForm input[type="password"]').value;
+            esportecWithLoading(submitButton, 'Entrando...', async () => {
+                const data = await EsporTecApi.request('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, senha, tipo_acesso: perfil }) });
+                EsporTecApi.saveSession(data);
+                return data;
+            }).then(data => { sessionStorage.setItem('esportecRole', data.acesso_atual); window.location.href = routes[data.acesso_atual]; }).catch(error => esportecToast(error.message, 'warning'));
         });
     </script>
 </body>

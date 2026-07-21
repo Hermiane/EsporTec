@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\AdminArena;
 use App\Models\BloqueioQuadra;
+use App\Models\Configuracao;
 use App\Models\FuncionarioArena;
+use App\Models\Pagamento;
 use App\Models\Quadra;
 use App\Models\Reserva;
 use App\Models\Usuario;
@@ -29,7 +31,7 @@ class ReservaController extends Controller
         $userId = $this->usuarioAutenticado()->id;
 
         $quadra = Quadra::with('horariosFuncionamento')->findOrFail($validated['quadra_id']);
-        if (!$quadra->ativa) {
+        if (!$quadra->ativo) {
             return response()->json(['message' => 'Quadra inativa'], 403);
         }
 
@@ -107,7 +109,7 @@ class ReservaController extends Controller
     public function quadrasDisponiveis()
     {
 
-        return response()->json(Quadra::with('arena')->where('ativa', true)->get());
+        return response()->json(Quadra::with('arena')->where('ativo', true)->whereHas('arena', fn ($q) => $q->where('ativo', true)->where('status_aprovacao', 'aprovada'))->get());
 
     }
 
@@ -118,7 +120,10 @@ class ReservaController extends Controller
             'duracao' => ['nullable', 'integer', 'min:30', 'max:240'],
         ]);
         $duracao = $validated['duracao'] ?? 60;
-        $quadra = Quadra::with('horariosFuncionamento')->where('ativa', true)->findOrFail($id);
+        $quadra = Quadra::with('horariosFuncionamento')
+            ->where('ativo', true)
+            ->whereHas('arena', fn ($q) => $q->where('ativo', true)->where('status_aprovacao', 'aprovada'))
+            ->findOrFail($id);
         $diaSemana = $this->diaSemana(Carbon::parse($validated['data']));
         $bloqueios = BloqueioQuadra::where('quadras_id', $quadra->id)->where('data', $validated['data'])->get();
         $reservas = Reserva::where('quadras_id', $quadra->id)->where('data', $validated['data'])
@@ -139,7 +144,14 @@ class ReservaController extends Controller
             }
         }
 
-        return response()->json(array_values(array_unique($horarios)));
+        return response()->json([
+            'horarios_disponiveis' => array_values(array_unique($horarios)),
+            'bloqueios' => $bloqueios->map(fn ($bloqueio) => [
+                'hora_inicio' => substr($bloqueio->hora_inicio, 0, 5),
+                'hora_fim' => substr($bloqueio->hora_fim, 0, 5),
+                'motivo' => $bloqueio->motivo,
+            ])->values(),
+        ]);
     }
 
     public function minhasReservas()
@@ -166,14 +178,32 @@ class ReservaController extends Controller
         }
 
         $validated = $request->validate(['observacao' => ['nullable', 'string']]);
-        $reserva->update([
+        $resultado = DB::transaction(function () use ($reserva, $userId, $validated) {
+            $config = Configuracao::where('arenas_id', $reserva->quadra->arenas_id)
+                ->whereIn('chave', ['cancelamento_horas', 'cancelamento_retencao_percentual'])
+                ->pluck('valor', 'chave');
+            $limite = (int) $config->get('cancelamento_horas', 0);
+            $retencao = (float) $config->get('cancelamento_retencao_percentual', 0);
+            $inicio = Carbon::parse($reserva->data->format('Y-m-d').' '.$reserva->hora_inicio);
+            if ($limite > 0 && now()->diffInHours($inicio, false) < $limite) {
+                $retencao = 100;
+            }
+            $pago = (float) Pagamento::where('reservas_id', $reserva->id)->where('status', 'pago')->sum('valor');
+            $reembolso = round($pago * (1 - $retencao / 100), 2);
+            if ($reembolso > 0) {
+                $metodo = Pagamento::where('reservas_id', $reserva->id)->where('status', 'pago')->latest('pago_em')->value('metodo') ?? 'pix';
+                Pagamento::create(['reservas_id' => $reserva->id, 'metodo' => $metodo, 'tipo' => 'reembolso', 'status' => 'estornado', 'valor' => $reembolso, 'pago_em' => now(), 'confirmados_por' => $userId]);
+            }
+            $reserva->update([
             'status' => 'cancelada',
             'cancelados_por' => $userId,
             'cancelada_em' => now(),
             'observacao' => $validated['observacao'] ?? $reserva->observacao,
-        ]);
+            ]);
+            return ['retencao_percentual' => $retencao, 'valor_pago' => $pago, 'valor_reembolso' => $reembolso];
+        });
 
-        return response()->json($reserva->fresh());
+        return response()->json(['reserva' => $reserva->fresh(), 'cancelamento' => $resultado]);
     }
 
     private function estaNoHorarioFuncionamento(Quadra $quadra, string $data, string $inicio, string $fim): bool
