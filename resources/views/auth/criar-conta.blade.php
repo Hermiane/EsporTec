@@ -89,6 +89,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/esportec-ui.js"></script>
+    <script src="/js/esportec-api.js"></script>
     <script>
         document.getElementById('createAccountForm').addEventListener('submit', event => {
             event.preventDefault();
@@ -97,11 +98,9 @@
                 esportecToast('As senhas precisam ser iguais.', 'warning');
                 return;
             }
-            esportecWithLoading(submitButton, 'Cadastrando...', () => esportecMockApi('usuarios.criar')).then(() => {
-                sessionStorage.setItem('esportecRole', 'cliente');
-                esportecToast('Conta criada com sucesso.', 'success');
-                setTimeout(() => window.location.href = '/painel', 600);
-            });
+            const inputs = document.querySelectorAll('#createAccountForm input');
+            const payload = { nome_completo: inputs[1].value, nome_usuario: inputs[2].value, email: inputs[3].value, telefone: inputs[4].value.replace(/\D/g, ''), data_nascimento: inputs[5].value, senha: document.getElementById('senha').value, senha_confirmation: document.getElementById('confirmarSenha').value };
+            esportecWithLoading(submitButton, 'Cadastrando...', async () => { const data = await EsporTecApi.request('/api/auth/registro', { method: 'POST', body: JSON.stringify(payload) }); EsporTecApi.saveSession(data); }).then(() => { sessionStorage.setItem('esportecRole', 'cliente'); window.location.replace('/painel'); }).catch(error => esportecToast(error.message, 'warning'));
         });
 </script>
 </body>

@@ -76,6 +76,18 @@ class Quadra extends Model
         ];
     }
 
+    /** Mantém imagens públicas no mesmo host/porta usado pelo navegador. */
+    public function getFotoAttribute(?string $valor): ?string
+    {
+        if (!$valor) {
+            return $valor;
+        }
+
+        $caminho = parse_url($valor, PHP_URL_PATH);
+
+        return is_string($caminho) && str_starts_with($caminho, '/storage/') ? $caminho : $valor;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relacionamentos N:1

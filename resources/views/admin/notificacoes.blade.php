@@ -55,6 +55,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     
     //  INTEGRAÇÃO COM API - ADMIN NOTIFICAÇÕES
@@ -78,16 +79,15 @@
             const notificacoes = await response.json();
             
             if (!notificacoes || notificacoes.length === 0) {
-                console.log(' API retornou vazio, usando mock');
-                renderizarNotificacoes(MOCK_NOTIFICACOES);
+                renderizarNotificacoes([]);
                 return;
             }
             
             renderizarNotificacoes(notificacoes);
             console.log(' Notificações carregadas:', notificacoes.length);
         } catch (error) {
-            console.log(' Erro na API, usando mock:', error.message);
-            renderizarNotificacoes(MOCK_NOTIFICACOES);
+            console.error('Erro ao carregar notificações:', error.message);
+            renderizarNotificacoes([]);
         }
     }
 
@@ -128,14 +128,7 @@
             
             esportecToast('Notificações marcadas como lidas.', 'success');
             carregarNotificacoes();
-        } catch (error) {
-            console.log(' Fallback: marcando visualmente');
-            // Fallback visual
-            document.querySelectorAll('.notice-card:not(.lida)').forEach(card => {
-                card.classList.add('lida');
-            });
-            esportecToast('Notificações marcadas como lidas (simulado).', 'success');
-        }
+        } catch (error) { esportecToast(error.message, 'danger'); }
     });
 
     //  MARCAR INDIVIDUAL COMO LIDA (ao clicar no card)
@@ -153,11 +146,7 @@
             if (!response.ok) throw new Error('Erro');
             
             card.classList.add('lida');
-        } catch (error) {
-            // Fallback visual
-            card.classList.add('lida');
-            console.log(' Notificação marcada como lida (simulado)');
-        }
+        } catch (error) { esportecToast(error.message, 'danger'); }
     });
 
     // Inicialização

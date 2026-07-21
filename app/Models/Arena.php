@@ -67,6 +67,14 @@ class Arena extends Model
         'pix_chave',
 
         'ativo',
+
+        'status_aprovacao',
+
+        'motivo_recusa',
+
+        'analisada_em',
+
+        'analisada_por',
     ];
 
     /**
@@ -78,10 +86,29 @@ class Arena extends Model
 
             'ativo' => 'boolean',
 
+            'analisada_em' => 'datetime',
+
             'created_at' => 'datetime',
 
             'updated_at' => 'datetime',
         ];
+    }
+
+    /** Mantém imagens públicas no mesmo host/porta usado pelo navegador. */
+    public function getFotoCapaAttribute(?string $valor): ?string
+    {
+        return $this->urlPublicaRelativa($valor);
+    }
+
+    private function urlPublicaRelativa(?string $valor): ?string
+    {
+        if (!$valor) {
+            return $valor;
+        }
+
+        $caminho = parse_url($valor, PHP_URL_PATH);
+
+        return is_string($caminho) && str_starts_with($caminho, '/storage/') ? $caminho : $valor;
     }
 
     /*

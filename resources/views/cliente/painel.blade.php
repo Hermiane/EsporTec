@@ -150,8 +150,8 @@
                 </button>
                 <div>
                     <!-- DADO DINÂMICO: Nome do usuário logado -->
-                    <h1>Olá, {{ auth()->user()->nome_completo ?? 'Cliente' }}!</h1>
-                    <p>Bem-vindo de volta. Você tem <span id="reservasHojeCount">1</span> reserva confirmada para hoje.</p>
+                    <h1 id="boasVindasCliente">Olá!</h1>
+                    <p id="resumoReservasHoje">Bem-vindo de volta. Carregando suas reservas...</p>
                 </div>
             </div>
             <div class="d-flex gap-2 align-items-center">
@@ -411,8 +411,11 @@
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/js/esportec-ui.js"></script>
-<script>
+    <script src="/js/esportec-ui.js"></script>
+    <script src="/js/esportec-api.js"></script>
+    <script>
+    const usuarioSessao = JSON.parse(localStorage.getItem('esportec_user') || 'null');
+    if (usuarioSessao?.nome_completo) document.getElementById('boasVindasCliente').textContent = `Olá, ${usuarioSessao.nome_completo}!`;
     //  VARIÁVEIS GLOBAIS PARA INTEGRAÇÃO
     const API_BASE = '/api/cliente'; // CORRIGIDO: agora aponta para o prefixo correto
     let currentArenaFilter = 'todas';
@@ -443,47 +446,41 @@
         }
     ];
 
-    const MOCK_RESERVAS = [
-        { id: 101, data: '2026-06-12', hora_inicio: '16:00', status: 'confirmada', quadra: { nome: 'Quadra Futsal Arena' }, pagamento: { status: 'pendente' } },
-        { id: 102, data: '2026-06-10', hora_inicio: '10:00', status: 'concluida', quadra: { nome: 'Quadra Society Descoberta' }, pagamento: { status: 'pago' } },
-        { id: 103, data: '2026-06-05', hora_inicio: '20:00', status: 'cancelada', quadra: { nome: 'Society Premium' }, pagamento: { status: 'cancelado' } }
-    ];
-
-    const MOCK_PROXIMA_RESERVA = {
-        id: 'ESP-1900', data: '2026-06-21', hora_inicio: '19:00', hora_fim: '20:30', status: 'confirmada',
-        quadra: { nome: 'Quadra Society Premium', descricao: 'Grama sintética, iluminação LED.', endereco: 'Rua dos Esportes, 123' },
-        pagamento: { status: 'pendente' }
-    };
-
-    //  FUNÇÕES DE CARREGAMENTO DE DADOS (API + fallback mock)
+    //  FUNÇÕES DE CARREGAMENTO DE DADOS
     
     // Carregar próxima reserva do usuário
     async function carregarProximaReserva() {
         try {
-            // API ainda não existe - usar mock
-            throw new Error('API não implementada ainda');
+            const reservas = await EsporTecApi.request(`${API_BASE}/reservas`);
+            const agora = new Date();
+            agora.setHours(0, 0, 0, 0);
+            const reserva = reservas.find(item => {
+                const dataReserva = new Date(`${String(item.data).slice(0, 10)}T${item.hora_inicio}`);
+                return !['cancelada', 'concluida'].includes(item.status) && dataReserva >= agora;
+            });
+
+            if (!reserva) {
+                document.getElementById('proximaReservaCard').innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="bi bi-calendar-plus fs-2"></i>
+                        <h3 class="mt-2 mb-1">Você ainda não tem reservas</h3>
+                        <p class="mb-3 opacity-75">Escolha uma quadra e faça sua primeira reserva.</p>
+                        <a href="/nova-reserva" class="btn btn-light fw-semibold">Nova Reserva</a>
+                    </div>`;
+                return;
+            }
+
+            document.getElementById('proximaReservaCard').innerHTML = `
+                <h3 class="mb-2">${reserva.quadra?.nome || 'Quadra não identificada'}</h3>
+                <p class="mb-3 opacity-75">${formatarData(reserva.data)}, ${String(reserva.hora_inicio).slice(0, 5)} - ${String(reserva.hora_fim).slice(0, 5)}</p>
+                <div class="d-flex gap-4 align-items-center flex-wrap">
+                    <div><small class="d-block opacity-75">Duração</small><strong>${calcularDuracao(reserva.hora_inicio, reserva.hora_fim)}</strong></div>
+                    <div><small class="d-block opacity-75">Reserva</small><span class="badge bg-light ${getBadgeClass(reserva.status)} px-4 py-2 rounded-pill fw-bold">${formatarStatus(reserva.status)}</span></div>
+                    <div><small class="d-block opacity-75">Pagamento</small><strong>${reserva.pagamento?.status === 'pago' ? 'Pago' : 'Pendente'}</strong></div>
+                    <a href="/minhas-reservas" class="btn btn-light ms-auto fw-semibold px-4">Ver detalhes</a>
+                </div>`;
         } catch (error) {
-            // Fallback com dados fictícios
-            const reserva = MOCK_PROXIMA_RESERVA;
-            document.getElementById('proximaReservaQuadra').textContent = reserva.quadra?.nome || 'Quadra não identificada';
-            document.getElementById('proximaReservaInfo').textContent = `${formatarData(reserva.data)}, ${reserva.hora_inicio}`;
-            document.getElementById('proximaReservaDuracao').textContent = calcularDuracao(reserva.hora_inicio, reserva.hora_fim);
-            document.getElementById('proximaReservaStatus').textContent = formatarStatus(reserva.status);
-            document.getElementById('proximaReservaStatus').className = `badge bg-light ${getBadgeClass(reserva.status)} px-4 py-2 rounded-pill fw-bold`;
-            
-            document.getElementById('modalReservaId').textContent = `Reserva #${reserva.id}`;
-            document.getElementById('modalQuadraNome').textContent = reserva.quadra?.nome;
-            document.getElementById('modalQuadraDesc').textContent = reserva.quadra?.descricao || '';
-            document.getElementById('modalDataHora').textContent = `${formatarData(reserva.data)}, ${reserva.hora_inicio} - ${reserva.hora_fim}`;
-            document.getElementById('modalDuracao').textContent = calcularDuracao(reserva.hora_inicio, reserva.hora_fim);
-            document.getElementById('modalStatus').textContent = formatarStatus(reserva.status);
-            document.getElementById('modalStatus').className = `badge-status ${getBadgeClass(reserva.status)}`;
-            document.getElementById('modalPagamento').textContent = reserva.pagamento?.status === 'pago' ? 'Pago' : 'Pendente';
-            document.getElementById('modalPagamento').className = `badge-status ${reserva.pagamento?.status === 'pago' ? 'badge-pago' : 'badge-pendente'}`;
-            document.getElementById('modalEndereco').textContent = reserva.quadra?.endereco || '';
-            
-            document.getElementById('proximaReservaLoading').classList.add('d-none');
-            document.getElementById('proximaReservaContent').classList.remove('d-none');
+            document.getElementById('proximaReservaCard').innerHTML = '<div class="text-center py-3"><p class="mb-0">Não foi possível carregar suas reservas agora.</p></div>';
         }
     }
 
@@ -533,7 +530,7 @@
                 card.dataset.arena = quadra.arena?.slug || 'sem-arena';
                 card.innerHTML = `
                     <div class="quadra-card">
-                        <img src="${quadra.imagem || 'https://via.placeholder.com/800x220?text=Sem+imagem'}" 
+                            <img src="${quadra.foto || quadra.imagem || 'https://via.placeholder.com/800x220?text=Sem+imagem'}"
                              alt="${quadra.nome}" class="quadra-img">
                         <div class="quadra-content">
                             <span class="arena-badge"><i class="bi bi-building"></i>${quadra.arena?.nome || 'Arena'}</span>
@@ -544,10 +541,10 @@
                             </div>
                             <p class="quadra-info">${quadra.descricao || ''}</p>
                             <p class="quadra-info"><strong>Tipo:</strong> ${quadra.tipo}</p>
-                            <p class="quadra-info"><strong>Capacidade:</strong> ${quadra.capacidade_jogadores} jogadores</p>
+                            <p class="quadra-info"><strong>Capacidade:</strong> ${quadra.capacidade_jogador || quadra.capacidade_jogadores || 0} jogadores</p>
                             <p class="quadra-info"><strong>Coberta:</strong> ${quadra.coberta ? 'Sim' : 'Não'}</p>
                             <div class="price">R$ ${parseFloat(quadra.preco_hora).toFixed(2).replace('.', ',')}/hora</div>
-                            <a href="/nova-reserva?arena=${quadra.arena?.slug}&quadra=${quadra.slug}&etapa=data" class="btn-select-quadra">
+                            <a href="/nova-reserva?arena=${quadra.arena?.id || quadra.arenas_id}&quadra=${quadra.id}&etapa=data" class="btn-select-quadra">
                                 Selecionar <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
@@ -568,18 +565,24 @@
             document.getElementById('reservasBody').innerHTML = '';
             
             // ROTA CORRIGIDA: /api/cliente/reservas (sem /recentes)
-            const response = await fetch(`${API_BASE}/reservas?limit=5`);
-            if (!response.ok) throw new Error('Erro ao carregar reservas');
-            
-            const reservas = await response.json();
+            const reservas = await EsporTecApi.request(`${API_BASE}/reservas`);
             renderizarReservas(reservas);
+            atualizarResumoReservasHoje(reservas);
         } catch (error) {
-            console.log('Usando dados fictícios para reservas:', error.message);
-            // Fallback com mock
-            renderizarReservas(MOCK_RESERVAS);
+            console.error('Erro ao carregar reservas:', error.message);
+            renderizarReservas([]);
+            atualizarResumoReservasHoje([]);
         } finally {
             document.getElementById('reservasLoading').classList.add('d-none');
         }
+    }
+
+    function atualizarResumoReservasHoje(reservas) {
+        const hoje = new Date().toISOString().slice(0, 10);
+        const total = reservas.filter(reserva => String(reserva.data).slice(0, 10) === hoje && reserva.status === 'confirmada').length;
+        document.getElementById('resumoReservasHoje').textContent = total === 0
+            ? 'Bem-vindo de volta. Você não tem reservas confirmadas para hoje.'
+            : `Bem-vindo de volta. Você tem ${total} reserva${total > 1 ? 's' : ''} confirmada${total > 1 ? 's' : ''} para hoje.`;
     }
 
     // Função auxiliar para renderizar reservas
@@ -703,7 +706,6 @@
         carregarQuadras(currentArenaFilter);
         carregarReservasRecentes();
         carregarNotificacoesCount();
-        document.getElementById('reservasHojeCount').textContent = 1;
     });
 </script>
 </body>

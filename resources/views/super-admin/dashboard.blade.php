@@ -70,89 +70,60 @@
             <article class="stat-card">
                 <span class="stat-icon"><i class="bi bi-buildings"></i></span>
                 <div class="stat-label">Arenas cadastradas</div>
-                <div class="stat-value">8</div>
-                <small class="text-success">6 ativas e 2 em análise</small>
+                <div class="stat-value" id="totalArenas">-</div>
+                <small class="text-success" id="resumoArenas">Carregando...</small>
             </article>
             <article class="stat-card">
                 <span class="stat-icon"><i class="bi bi-person-badge"></i></span>
                 <div class="stat-label">Admins de arena</div>
-                <div class="stat-value">12</div>
+                <div class="stat-value" id="totalAdmins">-</div>
                 <small class="text-muted">Proprietários e gestores</small>
             </article>
             <article class="stat-card">
                 <span class="stat-icon"><i class="bi bi-cash-stack"></i></span>
-                <div class="stat-label">Receita da plataforma</div>
-                <div class="stat-value">R$ 2.400</div>
-                <small class="text-success">Planos mensais mockados</small>
+                <div class="stat-label">Faturamento confirmado</div>
+                <div class="stat-value" id="faturamentoConfirmado">R$ 0,00</div>
+                <small class="text-success">Pagamentos confirmados nas arenas</small>
             </article>
             <article class="stat-card">
                 <span class="stat-icon"><i class="bi bi-life-preserver"></i></span>
                 <div class="stat-label">Chamados abertos</div>
-                <div class="stat-value">3</div>
-                <small class="text-warning">Aguardando suporte</small>
+                <div class="stat-value" id="chamadosAbertos">-</div>
+                <small class="text-warning">Chamados de suporte em aberto</small>
             </article>
         </div>
 
         <section class="section-card" id="arenas">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <div>
-                    <h5 class="fw-bold mb-1">Arenas da plataforma</h5>
-                    <p class="text-muted mb-0">O Super admin vê todas as arenas cadastradas no EsporTec.</p>
+                    <h5 class="fw-bold mb-1">Solicitações e arenas da plataforma</h5>
+                    <p class="text-muted mb-0">Solicitações em análise exibem as ações de aprovar ou recusar.</p>
                 </div>
                 <button class="btn btn-outline-success" id="btnExportarArenas"><i class="bi bi-download me-2"></i>Exportar</button>
             </div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead><tr><th>Arena</th><th>Proprietário/Admin</th><th>Plano</th><th>Status</th><th>Ações</th></tr></thead>
-                    <tbody>
-                        <tr><td class="fw-semibold">EsporTec Arena</td><td>Maria Admin</td><td>Profissional</td><td><span class="status-dot dot-green"></span>Ativa</td><td><button class="btn btn-sm btn-outline-success" data-platform-action="ver-arena">Ver</button></td></tr>
-                        <tr><td class="fw-semibold">Arena Society Cametá</td><td>Rafael Costa</td><td>Essencial</td><td><span class="status-dot dot-yellow"></span>Em análise</td><td><button class="btn btn-sm btn-outline-success" data-platform-action="aprovar">Aprovar</button></td></tr>
-                        <tr><td class="fw-semibold">Unidade Zona Norte</td><td>Ana Lima</td><td>Profissional</td><td><span class="status-dot dot-green"></span>Ativa</td><td><button class="btn btn-sm btn-outline-secondary" data-platform-action="suspender">Suspender</button></td></tr>
-                    </tbody>
+                    <tbody id="arenasBody"><tr><td colspan="5" class="text-center text-muted">Carregando arenas...</td></tr></tbody>
                 </table>
             </div>
         </section>
 
         <section class="section-card" id="admins">
             <h5 class="fw-bold mb-3">Admins das arenas</h5>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="p-3 rounded border">
-                        <div class="fw-bold">Maria Admin</div>
-                        <small class="text-muted d-block">Proprietária - EsporTec Arena</small>
-                        <span class="badge bg-success mt-2">Ativa</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3 rounded border">
-                        <div class="fw-bold">Rafael Costa</div>
-                        <small class="text-muted d-block">Gestor - Arena Society Cametá</small>
-                        <span class="badge bg-warning text-dark mt-2">Pendente</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-3 rounded border">
-                        <div class="fw-bold">Ana Lima</div>
-                        <small class="text-muted d-block">Gestora - Unidade Zona Norte</small>
-                        <span class="badge bg-success mt-2">Ativa</span>
-                    </div>
-                </div>
-            </div>
+            <div class="row g-3" id="adminsBody"><p class="text-muted mb-0">Carregando administradores...</p></div>
         </section>
 
         <section class="section-card" id="logs">
             <h5 class="fw-bold mb-3">Logs globais da plataforma</h5>
-            <div class="list-group list-group-flush">
-                <div class="list-group-item px-0 d-flex justify-content-between flex-wrap gap-2"><span>Plataforma aprovou nova arena</span><small class="text-muted">Hoje, 10:12</small></div>
-                <div class="list-group-item px-0 d-flex justify-content-between flex-wrap gap-2"><span>Admin da arena alterou forma de pagamento</span><small class="text-muted">Hoje, 09:40</small></div>
-                <div class="list-group-item px-0 d-flex justify-content-between flex-wrap gap-2"><span>Suporte acessou logs da arena EsporTec</span><small class="text-muted">Ontem, 17:25</small></div>
-            </div>
+            <div class="list-group list-group-flush" id="logsBody"><div class="list-group-item px-0 text-muted">Carregando atividades...</div></div>
         </section>
     </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     document.querySelectorAll('[data-scroll-target]').forEach(button => {
         button.addEventListener('click', () => {
@@ -162,27 +133,54 @@
         });
     });
 
-    document.getElementById('btnNovaArena').addEventListener('click', () => {
-        esportecToast('Fluxo de cadastro de arena preparado para integração com o backend.', 'info');
-    });
+    document.getElementById('btnNovaArena').addEventListener('click', () => window.location.href = '/cadastrar-arena');
 
-    document.getElementById('btnExportarArenas').addEventListener('click', () => {
-        esportecToast('Exportação das arenas simulada no front.', 'success');
-    });
+    document.getElementById('btnExportarArenas').addEventListener('click', () => window.print());
 
-    document.addEventListener('click', event => {
-        const button = event.target.closest('[data-platform-action]');
-        if (!button) {
-            return;
+    const statusArena = { pendente: ['dot-yellow', 'Em análise'], aprovada: ['dot-green', 'Ativa'], recusada: ['dot-red', 'Recusada'] };
+    function escapar(valor = '') { const elemento = document.createElement('span'); elemento.textContent = valor; return elemento.innerHTML; }
+    function renderizarArenas(arenas) {
+        document.getElementById('totalArenas').textContent = arenas.length;
+        const pendentes = arenas.filter(arena => arena.status_aprovacao === 'pendente').length;
+        const ativas = arenas.filter(arena => arena.status_aprovacao === 'aprovada' && arena.ativo).length;
+        document.getElementById('resumoArenas').textContent = `${ativas} ativa${ativas !== 1 ? 's' : ''} e ${pendentes} em análise`;
+        document.getElementById('arenasBody').innerHTML = arenas.length ? arenas.map(arena => {
+            const status = !arena.ativo && arena.status_aprovacao === 'aprovada' ? ['dot-red', 'Inativa'] : (statusArena[arena.status_aprovacao] || statusArena.pendente);
+            const dono = arena.criado_por?.nome_completo || 'Não informado';
+            const excluir = `<button class="btn btn-sm btn-outline-danger ms-1" data-action="excluir" data-id="${arena.id}">Excluir</button>`;
+            const acoes = arena.status_aprovacao === 'pendente' ? `<button class="btn btn-sm btn-success me-1" data-action="aprovar" data-id="${arena.id}">Aprovar</button><button class="btn btn-sm btn-outline-danger" data-action="recusar" data-id="${arena.id}">Recusar</button>${excluir}` : arena.status_aprovacao === 'aprovada' ? `<button class="btn btn-sm ${arena.ativo ? 'btn-outline-danger' : 'btn-success'}" data-action="ativacao" data-id="${arena.id}" data-ativo="${arena.ativo ? '1' : '0'}">${arena.ativo ? 'Inativar' : 'Ativar'}</button>${excluir}` : excluir;
+            return `<tr><td class="fw-semibold">${escapar(arena.nome)}<small class="d-block text-muted">${arena.quadras_count} quadra(s)</small></td><td>${escapar(dono)}<small class="d-block text-muted">${escapar(arena.email)}</small></td><td>-</td><td><span class="status-dot ${status[0]}"></span>${status[1]}</td><td>${acoes}</td></tr>`;
+        }).join('') : '<tr><td colspan="5" class="text-center text-muted">Nenhuma arena cadastrada.</td></tr>';
+    }
+    function moeda(valor) { return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+    function formatarData(data) { return data ? new Date(data).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : ''; }
+    function renderizarResumo(dados) {
+        const { metricas, admins, logs } = dados;
+        document.getElementById('totalAdmins').textContent = metricas.admins_ativos;
+        document.getElementById('faturamentoConfirmado').textContent = moeda(metricas.faturamento_confirmado);
+        document.getElementById('chamadosAbertos').textContent = metricas.chamados_abertos;
+        document.getElementById('adminsBody').innerHTML = admins.length ? admins.map(admin => `<div class="col-md-4"><div class="p-3 rounded border"><div class="fw-bold">${escapar(admin.usuario?.nome_completo || 'Usuário')}</div><small class="text-muted d-block">${escapar(admin.cargo)} - ${escapar(admin.arena?.nome || 'Arena')}</small><span class="badge bg-success mt-2">Ativo</span></div></div>`).join('') : '<p class="text-muted mb-0">Nenhum administrador de arena ativo.</p>';
+        document.getElementById('logsBody').innerHTML = logs.length ? logs.map(log => `<div class="list-group-item px-0 d-flex justify-content-between flex-wrap gap-2"><span>${escapar(log.descricao)}</span><small class="text-muted">${formatarData(log.created_at)}</small></div>`).join('') : '<div class="list-group-item px-0 text-muted">Nenhuma atividade registrada.</div>';
+    }
+    async function carregarPainel() {
+        try {
+            const [dados, arenas] = await Promise.all([EsporTecApi.request('/api/super-admin/dashboard'), EsporTecApi.request('/api/super-admin/arenas')]);
+            renderizarResumo(dados); renderizarArenas(arenas);
+        } catch (erro) {
+            document.getElementById('arenasBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger">${escapar(erro.message)}</td></tr>`;
+            setTimeout(() => window.location.replace('/painel'), 600);
         }
-
-        const messages = {
-            'ver-arena': 'Detalhes da arena abertos no mock.',
-            aprovar: 'Arena aprovada visualmente para demonstração.',
-            suspender: 'Arena marcada para suspensão no mock.'
-        };
-        esportecToast(messages[button.dataset.platformAction], 'success');
+    }
+    document.addEventListener('click', async event => {
+        const botao = event.target.closest('[data-action]'); if (!botao) return;
+        const { action, id } = botao.dataset; let body;
+        if (action === 'ativacao' && !confirm(botao.dataset.ativo === '1' ? 'Inativar esta arena? Ela deixará de aparecer para clientes.' : 'Ativar esta arena novamente?')) return;
+        if (action === 'excluir' && !confirm('Excluir permanentemente esta arena? Essa ação não pode ser desfeita.')) return;
+        if (action === 'recusar') { const motivo = prompt('Informe o motivo da recusa:'); if (!motivo) return; body = JSON.stringify({ motivo_recusa: motivo }); }
+        try { botao.disabled = true; const rota = action === 'excluir' ? `/api/super-admin/arenas/${id}` : `/api/super-admin/arenas/${id}/${action}`; await EsporTecApi.request(rota, { method: action === 'excluir' ? 'DELETE' : 'PATCH', body }); esportecToast(action === 'aprovar' ? 'Arena aprovada com sucesso.' : action === 'recusar' ? 'Arena recusada com sucesso.' : action === 'excluir' ? 'Arena excluída.' : 'Status da arena atualizado.', 'success'); carregarPainel(); }
+        catch (erro) { esportecToast(erro.message, 'danger'); } finally { botao.disabled = false; }
     });
+    carregarPainel();
 </script>
 </body>
 </html>

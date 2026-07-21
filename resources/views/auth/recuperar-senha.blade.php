@@ -97,6 +97,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/esportec-ui.js"></script>
+    <script src="/js/esportec-api.js"></script>
     <script>
         function nextStep(step) {
             // Esconde todos os passos
@@ -151,6 +152,22 @@
             esportecToast('Senha alterada com sucesso. Redirecionando para login...', 'success');
             setTimeout(() => window.location.href = '/login', 1500);
         });
+    </script>
+    <script>
+        let emailReset = '';
+        const mudarPasso = step => {
+            document.querySelectorAll('.step-content,.step-dot').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active'); document.getElementById(`dot-${step}`).classList.add('active');
+            if (step === 2) startTimer();
+        };
+        window.nextStep = async step => {
+            try {
+                if (step === 2) { emailReset = document.querySelector('#form-step-1 input[type="email"]').value; if (!emailReset) throw new Error('Informe seu e-mail.'); await EsporTecApi.request('/api/auth/recuperar-senha',{method:'POST',body:JSON.stringify({email:emailReset})}); }
+                if (step === 3) { const codigo=[...document.querySelectorAll('.otp-input')].map(i=>i.value).join(''); if (!/^\d{6}$/.test(codigo)) throw new Error('Digite os 6 números do código.'); await EsporTecApi.request('/api/auth/verificar-codigo',{method:'POST',body:JSON.stringify({email:emailReset,codigo})}); }
+                mudarPasso(step);
+            } catch (error) { esportecToast(error.message,'warning'); }
+        };
+        document.getElementById('form-step-3').addEventListener('submit', async event => { event.preventDefault(); event.stopImmediatePropagation(); const senhas=[...document.querySelectorAll('#form-step-3 input')]; const codigo=[...document.querySelectorAll('.otp-input')].map(i=>i.value).join(''); try { await EsporTecApi.request('/api/auth/redefinir-senha',{method:'POST',body:JSON.stringify({email:emailReset,codigo,senha:senhas[0].value,senha_confirmation:senhas[1].value})}); window.location.href='/login'; } catch(error) { esportecToast(error.message,'warning'); } }, true);
     </script>
 </body>
 </html>

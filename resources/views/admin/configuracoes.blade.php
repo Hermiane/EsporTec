@@ -127,11 +127,11 @@
                     <label class="form-label">Dias de Funcionamento</label>
                     <select class="form-select" id="configDiasFuncionamento" multiple size="3">
                         <option value="domingo">Domingo</option>
-                        <option value="segunda">Segunda-feira</option>
-                        <option value="terca">Terça-feira</option>
-                        <option value="quarta">Quarta-feira</option>
-                        <option value="quinta">Quinta-feira</option>
-                        <option value="sexta">Sexta-feira</option>
+                        <option value="segunda-feira">Segunda-feira</option>
+                        <option value="terca-feira">Terça-feira</option>
+                        <option value="quarta-feira">Quarta-feira</option>
+                        <option value="quinta-feira">Quinta-feira</option>
+                        <option value="sexta-feira">Sexta-feira</option>
                         <option value="sabado">Sábado</option>
                     </select>
                     <div class="help-text">Segure Ctrl para selecionar múltiplos dias</div>
@@ -285,6 +285,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     
     //  INTEGRAÇÃO COM API - ADMIN CONFIGURAÇÕES
@@ -352,10 +353,7 @@
             
             throw new Error('Estrutura inesperada');
             
-        } catch (error) {
-            console.log(' Usando dados de teste:', error.message);
-            preencherFormulario(MOCK_CONFIG);
-        }
+        } catch (error) { esportecToast(error.message, 'danger'); }
     }
 
     function preencherFormulario(config) {
@@ -496,19 +494,7 @@
                 document.getElementById('configResumo').classList.add('d-none');
             }, 3000);
             
-        } catch (error) {
-            console.error('Erro ao salvar configurações:', error);
-            
-            // Fallback visual
-            button.disabled = false;
-            button.innerHTML = original;
-            document.getElementById('configResumo').classList.remove('d-none');
-            esportecToast('Configurações salvas (simulado).', 'success');
-            
-            setTimeout(() => {
-                document.getElementById('configResumo').classList.add('d-none');
-            }, 3000);
-        }
+        } catch (error) { button.disabled = false; button.innerHTML = original; esportecToast('Não foi possível salvar as configurações.', 'danger'); }
     });
 
     // Inicialização

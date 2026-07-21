@@ -97,9 +97,7 @@
             <div class="mb-3">
                 <label class="form-label fw-medium">Selecione a Arena</label>
                 <select class="form-select" id="arena">
-                    <option value="esportec-arena">EsporTec Arena</option>
-                    <option value="society-cameta">Arena Society Cametá</option>
-                    <option value="zona-norte">Unidade Zona Norte</option>
+                    <option value="">Carregando arenas...</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -259,7 +257,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/js/esportec-ui.js"></script>
+    <script src="/js/esportec-ui.js"></script>
+    <script src="/js/esportec-api.js"></script>
 <script>
     //  CONFIGURAÇÃO - API PURA, SEM FALLBACK
     const API_BASE = '/api';
@@ -268,6 +267,7 @@
     let selectedSlots = [];
     let pricePerHour = 0;
     let selectedQuadraId = null;
+    const params = new URLSearchParams(window.location.search);
 
     const arenaSelect = document.getElementById('arena');
     const quadraSelect = document.getElementById('quadra');
@@ -287,38 +287,53 @@
 
     //  CARREGAR QUADRAS DA API (SEM FALLBACK)
     async function carregarQuadras() {
-        const response = await fetch(`${API_BASE}/cliente/quadras`);
-        if (!response.ok) {
-            console.error(' Erro ao carregar quadras:', response.status, response.statusText);
+        let quadras;
+        try { quadras = await EsporTecApi.request(`${API_BASE}/cliente/quadras`); } catch (error) {
+            console.error(' Erro ao carregar quadras:', error.message);
             quadraSelect.innerHTML = '<option value="">Erro ao carregar quadras</option>';
             return;
         }
-        const quadras = await response.json();
         
+        const arenas = new Map();
+        quadras.forEach(quadra => {
+            if (quadra.arena?.id) arenas.set(String(quadra.arena.id), quadra.arena.nome);
+        });
+        arenaSelect.innerHTML = arenas.size ? [...arenas].map(([id, nome]) => `<option value="${id}">${nome}</option>`).join('') : '<option value="">Nenhuma arena disponível</option>';
+
         quadraSelect.innerHTML = '<option value="">Selecione uma quadra</option>';
         quadras.filter(q => q.ativo !== false).forEach(quadra => {
             const option = document.createElement('option');
             option.value = quadra.id;
             option.textContent = `${quadra.nome} (R$ ${parseFloat(quadra.preco_hora).toFixed(2).replace('.', ',')}/h)`;
-            option.dataset.arena = quadra.arenas_id || 'esportec-arena';
+            option.dataset.arena = String(quadra.arenas_id || quadra.arena?.id || '');
             option.dataset.price = quadra.preco_hora;
             option.dataset.nome = quadra.nome;
             quadraSelect.appendChild(option);
         });
-        updatePriceFromQuadra();
+
+        const arenaSolicitada = params.get('arena');
+        const quadraSolicitada = params.get('quadra');
+        if (arenaSolicitada && [...arenaSelect.options].some(option => option.value === arenaSolicitada)) {
+            arenaSelect.value = arenaSolicitada;
+        }
+        updateQuadrasByArena();
+        if (quadraSolicitada && [...quadraSelect.options].some(option => option.value === quadraSolicitada && !option.disabled)) {
+            quadraSelect.value = quadraSolicitada;
+            updatePriceFromQuadra();
+        }
         console.log(' Quadras carregadas da API');
     }
 
     //  CARREGAR HORÁRIOS DA API (SEM FALLBACK)
     async function carregarHorarios(quadraId, data) {
-        const response = await fetch(`${API_BASE}/cliente/quadras/${quadraId}/horarios?data=${data}`);
-        if (!response.ok) {
-            console.error(' Erro ao carregar horários:', response.status, response.statusText);
-            return [];
+        try {
+            const dados = await EsporTecApi.request(`${API_BASE}/cliente/quadras/${quadraId}/horarios?data=${data}`);
+            console.log(' Horários carregados da API:', dados);
+            return Array.isArray(dados) ? { horarios_disponiveis: dados, bloqueios: [] } : dados;
+        } catch (error) {
+            console.error(' Erro ao carregar horários:', error.message);
+            return { horarios_disponiveis: [], bloqueios: [] };
         }
-        const horarios = await response.json();
-        console.log(' Horários carregados da API:', horarios);
-        return horarios;
     }
 
     function updateQuadrasByArena() {
@@ -369,10 +384,26 @@
         grid.innerHTML = '';
         selectedSlots = [];
         
-        const horarios = await carregarHorarios(selectedQuadraId, dataReserva.value);
+        const quadraId = quadraSelect.value || selectedQuadraId;
+        if (!quadraId) {
+            grid.innerHTML = '<p class="text-muted">Selecione uma quadra antes de consultar os horários.</p>';
+            return;
+        }
+        selectedQuadraId = quadraId;
+        const dadosHorarios = await carregarHorarios(quadraId, dataReserva.value);
+        const horarios = dadosHorarios.horarios_disponiveis || [];
+        const bloqueios = dadosHorarios.bloqueios || [];
+
+        if (bloqueios.length) {
+            const aviso = document.createElement('div');
+            aviso.className = 'alert alert-warning mb-2';
+            aviso.style.gridColumn = '1 / -1';
+            aviso.textContent = `Bloqueio(s) nesta data: ${bloqueios.map(b => `${b.hora_inicio}–${b.hora_fim}${b.motivo ? ` (${b.motivo})` : ''}`).join(', ')}.`;
+            grid.appendChild(aviso);
+        }
         
         if (horarios.length === 0) {
-            grid.innerHTML = '<p class="text-muted">Nenhum horário disponível.</p>';
+            grid.insertAdjacentHTML('beforeend', '<p class="text-muted" style="grid-column: 1 / -1;">Nenhum horário livre nesta data.</p>');
             return;
         }
 
@@ -475,6 +506,16 @@
         navigator.clipboard.writeText(code).then(() => esportecToast('Código PIX copiado.', 'success'));
     }
 
+    function minutosDoHorario(horario) {
+        const [hora, minuto] = horario.split(':').map(Number);
+        return (hora * 60) + minuto;
+    }
+
+    function horarioApos(horario, minutos) {
+        const total = (minutosDoHorario(horario) + minutos) % (24 * 60);
+        return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+    }
+
     // CRIAR RESERVA VIA API (SEM FALLBACK)
     async function finalizarReserva() {
         const selectedPayment = document.querySelector('input[name="forma-pagamento"]:checked');
@@ -486,14 +527,25 @@
         const selectedCourtOption = quadraSelect.options[quadraSelect.selectedIndex];
         const selectedCourt = selectedCourtOption.dataset.nome || selectedCourtOption.textContent.replace(/\s*\(R\$.*/, '');
         const selectedArena = arenaSelect.options[arenaSelect.selectedIndex].textContent;
+        const horariosSelecionados = [...selectedSlots].sort((a, b) => minutosDoHorario(a) - minutosDoHorario(b));
+
+        if (!horariosSelecionados.length) {
+            esportecToast('Selecione pelo menos um horário.', 'warning');
+            return;
+        }
+
+        if (horariosSelecionados.some((horario, indice) => indice > 0 && minutosDoHorario(horario) !== minutosDoHorario(horariosSelecionados[indice - 1]) + 60)) {
+            esportecToast('Selecione horários contínuos para realizar uma única reserva.', 'warning');
+            return;
+        }
 
         const payload = {
             usuario_id: 1,
             quadra_id: selectedQuadraId || selectedCourtOption.value,
             data: dataReserva.value,
-            hora_inicio: selectedSlots[0],
-            hora_fim: selectedSlots[selectedSlots.length - 1],
-            valor_total: pricePerHour * selectedSlots.length,
+            hora_inicio: horariosSelecionados[0],
+            hora_fim: horarioApos(horariosSelecionados[horariosSelecionados.length - 1], 60),
+            valor_total: pricePerHour * horariosSelecionados.length,
             observacao: document.getElementById('observacoes').value || null,
             metodo_pagamento: selectedPayment.value
         };
@@ -503,7 +555,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    'Authorization': `Bearer ${EsporTecApi.token()}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -514,6 +566,15 @@
             }
 
             const reserva = await response.json();
+            await EsporTecApi.request(`${API_BASE}/cliente/pagamentos`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    reserva_id: reserva.id,
+                    valor: payload.valor_total,
+                    metodo: selectedPayment.value,
+                    pix_copia_cola: selectedPayment.value === 'pix' ? document.getElementById('pix-code').textContent : undefined
+                })
+            });
             console.log(' Reserva criada:', reserva);
             
         } catch (error) {
@@ -540,7 +601,6 @@
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
     dataReserva.min = today.toISOString().split('T')[0];
 
-    const params = new URLSearchParams(window.location.search);
     if (params.get('etapa') === 'data') nextStep(2);
 </script>
 </body>

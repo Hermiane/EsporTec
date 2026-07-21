@@ -67,16 +67,16 @@
                 </select>
             </div>
             <div class="week-grid">
-                @foreach (['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'] as $dia)
+                @foreach (['segunda-feira' => 'Seg', 'terca-feira' => 'Ter', 'quarta-feira' => 'Qua', 'quinta-feira' => 'Qui', 'sexta-feira' => 'Sex', 'sabado' => 'Sáb', 'domingo' => 'Dom'] as $valorDia => $dia)
                     <div class="day-box">
                         <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" checked>
+                            <input class="form-check-input horario-ativo" type="checkbox" data-dia="{{ $valorDia }}" checked>
                             <label class="form-check-label fw-semibold">{{ $dia }}</label>
                         </div>
                         <label class="form-label small">Início</label>
-                        <input type="time" class="form-control form-control-sm mb-2" value="07:00">
+                        <input type="time" class="form-control form-control-sm mb-2 horario-inicio" data-dia="{{ $valorDia }}" value="07:00">
                         <label class="form-label small">Fim</label>
-                        <input type="time" class="form-control form-control-sm" value="23:00">
+                        <input type="time" class="form-control form-control-sm horario-fim" data-dia="{{ $valorDia }}" value="23:00">
                     </div>
                 @endforeach
             </div>
@@ -113,6 +113,8 @@
                 <div class="col-md-6"><input class="form-control" id="quadraValorAdmin" placeholder="Valor/hora"></div>
                 <div class="col-md-6"><input class="form-control" id="quadraCapacidadeAdmin" placeholder="Capacidade"></div>
                 <div class="col-md-6"><select class="form-select" id="quadraCoberturaAdmin"><option>Coberta</option><option>Descoberta</option></select></div>
+                <div class="col-12"><textarea class="form-control" id="quadraDescricaoAdmin" placeholder="Descrição da quadra"></textarea></div>
+                <div class="col-12"><label class="form-label">Foto da quadra</label><input type="file" class="form-control" id="quadraFotoAdmin" accept="image/jpeg,image/png,image/webp"><small class="text-muted">JPG, PNG ou WebP, até 5 MB.</small></div>
             </div>
         </div>
         <div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-success" id="btnSalvarQuadra">Salvar</button></div>
@@ -134,18 +136,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     
     //  INTEGRAÇÃO COM API - ADMIN QUADRAS
     
     const API_BASE = '/api';
     
-    // Mock data para fallback
-    let MOCK_QUADRAS = [
-        { id: 1, nome: 'Quadra Futsal Arena', tipo: 'Futsal', capacidade: 10, coberta: true, preco_hora: 120.00, ativo: true, imagem: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=900&q=80' },
-        { id: 2, nome: 'Quadra Society Premium', tipo: 'Society', capacidade: 14, coberta: false, preco_hora: 150.00, ativo: true, imagem: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?auto=format&fit=crop&w=900&q=80' },
-        { id: 3, nome: 'Quadra Society Descoberta', tipo: 'Society', capacidade: 14, coberta: false, preco_hora: 100.00, ativo: false, imagem: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=900&q=80' }
-    ];
+    let quadrasAtuais = [];
     
     const MOCK_BLOQUEIOS = [
         { id: 1, data: '2026-06-22', quadra_id: 3, quadra_nome: 'Society Descoberta', motivo: 'Manutenção do gramado', status: 'bloqueada' },
@@ -155,24 +153,23 @@
     //  CARREGAR QUADRAS
     async function carregarQuadras() {
         try {
-            const response = await fetch(`${API_BASE}/admin/quadras`);
-            if (!response.ok) throw new Error(`Erro ${response.status}`);
-            const quadras = await response.json();
+            const quadras = await EsporTecApi.request(`${API_BASE}/admin/quadras`);
             
             if (!quadras || quadras.length === 0) {
-                console.log('️ API retornou vazio, usando mock');
-                renderizarQuadras(MOCK_QUADRAS);
-                atualizarSelects(MOCK_QUADRAS);
+                renderizarQuadras([]);
+                atualizarSelects([]);
                 return;
             }
             
             renderizarQuadras(quadras);
             atualizarSelects(quadras);
+            quadrasAtuais = quadras;
             console.log(' Quadras carregadas da API:', quadras.length);
         } catch (error) {
-            console.log(' Erro na API, usando mock:', error.message);
-            renderizarQuadras(MOCK_QUADRAS);
-            atualizarSelects(MOCK_QUADRAS);
+            console.error('Erro ao carregar quadras:', error.message);
+            renderizarQuadras([]);
+            atualizarSelects([]);
+            esportecToast(error.message, 'warning');
         }
     }
 
@@ -197,13 +194,13 @@
             container.innerHTML += `
                 <div class="col-lg-4" data-quadra-id="${quadra.id}">
                     <div class="card card-soft h-100">
-                        <img class="court-img" src="${quadra.imagem || 'https://via.placeholder.com/900x170?text=Sem+imagem'}" alt="${quadra.nome}">
+                        <img class="court-img" src="${quadra.foto || quadra.imagem || 'https://via.placeholder.com/900x170?text=Sem+imagem'}" alt="${quadra.nome}">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start">
                                 <h5 class="fw-bold">${quadra.nome}</h5>
                                 ${badge}
                             </div>
-                            <p class="text-muted small mb-2">${quadra.tipo} • ${quadra.coberta ? 'Coberta' : 'Aberta'} • ${quadra.capacidade} jogadores</p>
+                            <p class="text-muted small mb-2">${quadra.tipo} • ${quadra.coberta ? 'Coberta' : 'Aberta'} • ${quadra.capacidade_jogador || quadra.capacidade || 0} jogadores</p>
                             <strong class="text-success">R$ ${parseFloat(quadra.preco_hora).toFixed(2).replace('.', ',')}/hora</strong>
                             <div class="d-flex flex-wrap gap-2 mt-3">
                                 <button class="btn btn-sm btn-outline-success" data-court-action="editar" data-id="${quadra.id}"><i class="bi bi-pencil"></i> Editar</button>
@@ -231,37 +228,69 @@
         });
     }
 
+    async function carregarHorariosAdmin(quadraId) {
+        if (!quadraId) return;
+        try {
+            const horarios = await EsporTecApi.request(`${API_BASE}/admin/quadras/${quadraId}/horarios`);
+            const porDia = Object.fromEntries(horarios.map(h => [h.dia_semana, h]));
+            document.querySelectorAll('.horario-ativo').forEach(checkbox => {
+                const horario = porDia[checkbox.dataset.dia];
+                checkbox.checked = Boolean(horario?.ativo);
+                document.querySelector(`.horario-inicio[data-dia="${checkbox.dataset.dia}"]`).value = (horario?.hora_inicio || '07:00').slice(0, 5);
+                document.querySelector(`.horario-fim[data-dia="${checkbox.dataset.dia}"]`).value = (horario?.hora_fim || '23:00').slice(0, 5);
+            });
+        } catch (error) {
+            esportecToast(error.message || 'Não foi possível carregar os horários.', 'warning');
+        }
+    }
+
+    function renderizarBloqueios(bloqueios) {
+        const lista = document.getElementById('listaBloqueios');
+        lista.innerHTML = bloqueios.length ? bloqueios.map(bloqueio => `
+            <tr>
+                <td>${formatarData(String(bloqueio.data).slice(0, 10))}</td>
+                <td>${bloqueio.quadra?.nome || 'Quadra'}</td>
+                <td>${bloqueio.motivo}</td>
+                <td><span class="badge badge-off">Bloqueada</span></td>
+                <td><button class="btn btn-sm btn-outline-success" data-unblock="${bloqueio.id}">Desbloquear</button></td>
+            </tr>`).join('') : '<tr><td colspan="5" class="text-center text-muted">Nenhum bloqueio cadastrado.</td></tr>';
+    }
+
+    async function carregarBloqueios() {
+        try {
+            renderizarBloqueios(await EsporTecApi.request(`${API_BASE}/admin/bloqueios-quadras`));
+        } catch (error) {
+            console.error('Erro ao carregar bloqueios:', error);
+            renderizarBloqueios([]);
+        }
+    }
+
     //  SALVAR NOVA QUADRA
     document.getElementById('btnSalvarQuadra').addEventListener('click', async () => {
-        const payload = {
-            nome: document.getElementById('quadraNomeAdmin').value.trim(),
-            tipo: document.getElementById('quadraTipoAdmin').value,
-            preco_hora: parseFloat(document.getElementById('quadraValorAdmin').value) || 0,
-            capacidade: parseInt(document.getElementById('quadraCapacidadeAdmin').value) || 10,
-            coberta: document.getElementById('quadraCoberturaAdmin').value === 'Coberta',
-            ativo: true
-        };
+        const payload = new FormData();
+        payload.append('nome', document.getElementById('quadraNomeAdmin').value.trim());
+        payload.append('tipo', document.getElementById('quadraTipoAdmin').value.toLowerCase());
+        payload.append('preco_hora', parseFloat(document.getElementById('quadraValorAdmin').value) || 0);
+        payload.append('capacidade_jogador', parseInt(document.getElementById('quadraCapacidadeAdmin').value) || 10);
+        payload.append('coberta', document.getElementById('quadraCoberturaAdmin').value === 'Coberta' ? '1' : '0');
+        payload.append('descricao', document.getElementById('quadraDescricaoAdmin').value.trim());
+        payload.append('ativo', '1');
+        const foto = document.getElementById('quadraFotoAdmin').files[0]; if (foto) payload.append('foto', foto);
 
-        if (!payload.nome) { esportecToast('Informe o nome da quadra.', 'warning'); return; }
+        if (!payload.get('nome')) { esportecToast('Informe o nome da quadra.', 'warning'); return; }
 
         try {
-            const response = await fetch(`${API_BASE}/admin/quadras`, {
+            await EsporTecApi.request(`${API_BASE}/admin/quadras`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
-                body: JSON.stringify(payload)
+                body: payload
             });
-            if (!response.ok) throw new Error('Erro');
             
-            bootstrap.Modal.getInstance(document.getElementById('modalQuadra')).hide();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQuadra')).hide();
             esportecToast('Quadra cadastrada.', 'success');
-            carregarQuadras();
+            await carregarQuadras();
         } catch (error) {
             console.error('Erro ao salvar quadra:', error);
-            bootstrap.Modal.getInstance(document.getElementById('modalQuadra')).hide();
-            esportecToast('Quadra cadastrada (simulado).', 'success');
-            MOCK_QUADRAS.push({ id: Date.now(), ...payload, imagem: 'https://via.placeholder.com/900x170?text=Nova' });
-            renderizarQuadras(MOCK_QUADRAS);
-            atualizarSelects(MOCK_QUADRAS);
+            esportecToast(error.message, 'danger');
         }
     });
 
@@ -274,7 +303,7 @@
         const id = button.dataset.id;
 
         if (action === 'editar') {
-            const quadra = MOCK_QUADRAS.find(q => q.id == id);
+            const quadra = quadrasAtuais.find(q => q.id == id);
             if (quadra) {
                 document.getElementById('quadraNomeAdmin').value = quadra.nome;
                 document.getElementById('quadraTipoAdmin').value = quadra.tipo;
@@ -288,6 +317,7 @@
 
         if (action === 'horarios') {
             document.getElementById('selectQuadraHorarios').value = id;
+            await carregarHorariosAdmin(id);
             document.getElementById('secaoHorarios').scrollIntoView({ behavior: 'smooth' });
             return;
         }
@@ -302,7 +332,7 @@
             if (!confirm('Alterar status desta quadra?')) return;
             
             try {
-                const quadra = MOCK_QUADRAS.find(q => q.id == id);
+                const quadra = quadrasAtuais.find(q => q.id == id);
                 if (!quadra) return;
                 
                 const response = await fetch(`${API_BASE}/admin/quadras/${id}`, {
@@ -314,18 +344,7 @@
                 
                 esportecToast(quadra.ativo ? 'Quadra inativada.' : 'Quadra ativada.', 'success');
                 carregarQuadras();
-            } catch (error) {
-                const card = button.closest('.col-lg-4');
-                const badge = card.querySelector('.badge');
-                const ativando = button.textContent.trim() === 'Ativar';
-                
-                badge.className = ativando ? 'badge badge-on' : 'badge badge-off';
-                badge.textContent = ativando ? 'Ativa' : 'Bloqueada';
-                button.className = ativando ? 'btn btn-sm btn-outline-danger' : 'btn btn-sm btn-outline-success';
-                button.innerHTML = ativando ? '<i class="bi bi-ban"></i> Inativar' : '<i class="bi bi-check2"></i> Ativar';
-                
-                esportecToast(ativando ? 'Quadra inativada (simulado).' : 'Quadra ativada (simulado).', 'success');
-            }
+            } catch (error) { esportecToast('Não foi possível alterar a quadra.', 'danger'); }
         }
 
         //  EXCLUIR QUADRA
@@ -341,57 +360,65 @@
                 
                 esportecToast('Quadra excluída com sucesso.', 'success');
                 carregarQuadras();
-            } catch (error) {
-                console.error('Erro ao excluir quadra:', error);
-                // Fallback visual - remove do mock
-                MOCK_QUADRAS = MOCK_QUADRAS.filter(q => q.id != id);
-                renderizarQuadras(MOCK_QUADRAS);
-                atualizarSelects(MOCK_QUADRAS);
-                esportecToast('Quadra excluída (simulado).', 'success');
-            }
+            } catch (error) { console.error('Erro ao excluir quadra:', error); esportecToast('Não foi possível excluir a quadra.', 'danger'); }
         }
     });
 
     //  SALVAR BLOQUEIO
-    document.getElementById('btnSalvarBloqueio').addEventListener('click', () => {
+    document.getElementById('btnSalvarBloqueio').addEventListener('click', async () => {
         const data = document.getElementById('bloqueioDataAdmin').value;
         const quadraId = document.getElementById('bloqueioQuadraAdmin').value;
         const motivo = document.getElementById('bloqueioMotivoAdmin').value.trim() || 'Bloqueio operacional';
-        const quadra = MOCK_QUADRAS.find(q => q.id == quadraId)?.nome || 'Quadra';
-
         if (!data || !quadraId) { esportecToast('Preencha data e quadra.', 'warning'); return; }
 
-        document.getElementById('listaBloqueios').insertAdjacentHTML('afterbegin', `
-            <tr>
-                <td>${formatarData(data)}</td>
-                <td>${quadra}</td>
-                <td>${motivo}</td>
-                <td><span class="badge badge-off">Bloqueada</span></td>
-                <td><button class="btn btn-sm btn-outline-success" data-unblock="${Date.now()}">Desbloquear</button></td>
-            </tr>
-        `);
-        
-        bootstrap.Modal.getInstance(document.getElementById('modalBloqueio')).hide();
-        esportecToast('Bloqueio registrado.', 'success');
+        try {
+            await EsporTecApi.request(`${API_BASE}/admin/bloqueios-quadras`, {
+                method: 'POST',
+                body: JSON.stringify({ quadras_id: Number(quadraId), data, motivo })
+            });
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBloqueio')).hide();
+            await carregarBloqueios();
+            esportecToast('Bloqueio registrado.', 'success');
+        } catch (error) {
+            esportecToast(error.message || 'Não foi possível registrar o bloqueio.', 'danger');
+        }
     });
 
     // Desbloquear
-    document.addEventListener('click', event => {
+    document.addEventListener('click', async event => {
         const btn = event.target.closest('[data-unblock]');
         if (btn) {
-            const row = btn.closest('tr');
-            row.querySelector('.badge').className = 'badge badge-on';
-            row.querySelector('.badge').textContent = 'Liberada';
-            btn.textContent = 'Liberado';
-            btn.disabled = true;
-            esportecToast('Bloqueio liberado.', 'success');
+            try {
+                await EsporTecApi.request(`${API_BASE}/admin/bloqueios-quadras/${btn.dataset.unblock}`, { method: 'DELETE' });
+                await carregarBloqueios();
+                esportecToast('Bloqueio removido.', 'success');
+            } catch (error) {
+                esportecToast(error.message || 'Não foi possível remover o bloqueio.', 'danger');
+            }
         }
     });
 
     // Salvar horários
-    document.getElementById('btnSalvarHorarios')?.addEventListener('click', () => {
-        esportecToast('Horários salvos.', 'success');
+    document.getElementById('btnSalvarHorarios')?.addEventListener('click', async () => {
+        const quadraId = document.getElementById('selectQuadraHorarios').value;
+        if (!quadraId) { esportecToast('Selecione uma quadra.', 'warning'); return; }
+        const horarios = [...document.querySelectorAll('.horario-ativo')].map(checkbox => ({
+            dia_semana: checkbox.dataset.dia,
+            ativo: checkbox.checked,
+            hora_inicio: document.querySelector(`.horario-inicio[data-dia="${checkbox.dataset.dia}"]`).value,
+            hora_fim: document.querySelector(`.horario-fim[data-dia="${checkbox.dataset.dia}"]`).value,
+        }));
+        try {
+            await EsporTecApi.request(`${API_BASE}/admin/quadras/${quadraId}/horarios`, {
+                method: 'PUT', body: JSON.stringify({ horarios })
+            });
+            esportecToast('Horários salvos.', 'success');
+        } catch (error) {
+            esportecToast(error.message || 'Não foi possível salvar os horários.', 'danger');
+        }
     });
+
+    document.getElementById('selectQuadraHorarios').addEventListener('change', event => carregarHorariosAdmin(event.target.value));
 
     function formatarData(dataISO) {
         if (!dataISO) return '-';
@@ -403,8 +430,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         console.log(' Carregando quadras...');
         carregarQuadras();
+        carregarBloqueios();
     });
 </script>
 </body>
 </html>
-

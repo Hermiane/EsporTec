@@ -70,9 +70,7 @@
             <div>
                 <label class="form-label small text-muted mb-1">Arena ativa</label>
                 <select class="form-select" id="arenaAtiva">
-                    <option value="1">EsporTec Arena</option>
-                    <option value="2">Arena Society Cametá</option>
-                    <option value="3">Unidade Zona Norte</option>
+                    <option>Carregando arenas...</option>
                 </select>
             </div>
         </div>
@@ -136,94 +134,56 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     
     //  INTEGRAÇÃO COM API - ADMIN DASHBOARD
     
     const API_BASE = '/api';
     
-    // Mock data para fallback
-    const MOCK_STATS = {
-        reservas_hoje: 12,
-        reservas_confirmadas: 2,
-        receita_mes: 4850.00,
-        receita_variacao: 12,
-        total_clientes: 342,
-        clientes_novos_semana: 8,
-        pendentes: 5
-    };
-    
-    const MOCK_PROXIMAS_RESERVAS = [
-        { id: 1, hora_inicio: '14:00', hora_fim: '15:30', quadra: { nome: 'Society Premium' }, usuario: { nome: 'João Silva' }, status: 'confirmada' },
-        { id: 2, hora_inicio: '16:00', hora_fim: '17:00', quadra: { nome: 'Futsal Arena' }, usuario: { nome: 'Pedro Santos' }, status: 'pendente' },
-        { id: 3, hora_inicio: '19:00', hora_fim: '20:30', quadra: { nome: 'Society Premium' }, usuario: { nome: 'Grupo F.C. Unidos' }, status: 'confirmada' }
-    ];
-    
-    const MOCK_ATIVIDADES = [
-        { tipo: 'novo_cliente', texto: 'Novo cliente cadastrado', usuario: 'Maria Oliveira', tempo: 'há 15 min', icone: 'bi-person-plus', cor: '#DBEAFE', corTexto: '#3B82F6' },
-        { tipo: 'reserva_confirmada', texto: 'Reserva confirmada', usuario: 'João Silva', tempo: 'há 32 min', icone: 'bi-check-circle', cor: '#D1FAE5', corTexto: '#10B981' },
-        { tipo: 'pagamento', texto: 'Pagamento recebido', valor: 'R$ 150,00', tempo: 'há 1 hora', icone: 'bi-cash', cor: '#FEF3C7', corTexto: '#F59E0B' },
-        { tipo: 'manutencao', texto: 'Manutenção reportada', quadra: 'Quadra 2', tempo: 'há 2 horas', icone: 'bi-tools', cor: '#FEE2E2', corTexto: '#EF4444' }
-    ];
-
     //  CARREGAR DADOS DO DASHBOARD
     async function carregarDashboard(arenaId = null) {
         try {
-            // Tenta buscar stats da API (se endpoint existir)
             const url = arenaId ? `${API_BASE}/admin/dashboard?arena_id=${arenaId}` : `${API_BASE}/admin/dashboard`;
-            const response = await fetch(url);
-            
-            if (!response.ok) throw new Error(`Erro ${response.status}`);
-            
-            const dados = await response.json();
-            
-            // Se API retornar estrutura esperada, usa os dados
-            if (dados.stats) {
-                renderizarStats(dados.stats);
-                if (dados.proximas_reservas) renderizarProximasReservas(dados.proximas_reservas);
-                if (dados.atividades) renderizarAtividades(dados.atividades);
-                console.log(' Dashboard carregado da API');
-                return;
-            }
-            
-            // Se não, usa fallback
-            throw new Error('Estrutura inesperada');
-            
+            const dados = await EsporTecApi.request(url);
+            renderizarStats(dados.stats);
+            renderizarProximasReservas(dados.proximas_reservas);
+            renderizarAtividades(dados.atividades);
+            preencherArenas(dados.arenas, arenaId);
         } catch (error) {
-            console.log(' Usando dados de teste:', error.message);
-            renderizarStats(MOCK_STATS);
-            renderizarProximasReservas(MOCK_PROXIMAS_RESERVAS);
-            renderizarAtividades(MOCK_ATIVIDADES);
+            renderizarStats({ reservas_hoje: 0, reservas_confirmadas: 0, receita_mes: 0, receita_variacao: null, total_clientes: 0, clientes_novos_semana: 0, pendentes: 0 });
+            renderizarProximasReservas([]);
+            renderizarAtividades([]);
+            esportecToast(error.message, 'warning');
         }
+    }
+
+    function preencherArenas(arenas, selecionada) {
+        const select = document.getElementById('arenaAtiva');
+        const atual = selecionada || select.value;
+        select.innerHTML = arenas.length ? arenas.map(arena => `<option value="${arena.id}">${arena.nome}</option>`).join('') : '<option value="">Nenhuma arena vinculada</option>';
+        if (atual && [...select.options].some(opcao => opcao.value === String(atual))) select.value = atual;
     }
 
     function renderizarStats(stats) {
         // Reservas hoje
-        document.getElementById('statReservasHoje').textContent = stats.reservas_hoje || '-';
-        if (stats.reservas_confirmadas) {
-            document.getElementById('statReservasDetalhe').innerHTML = `<i class="bi bi-arrow-up"></i> ${stats.reservas_confirmadas} confirmadas`;
-        }
+        document.getElementById('statReservasHoje').textContent = stats.reservas_hoje ?? 0;
+        document.getElementById('statReservasDetalhe').textContent = `${stats.reservas_confirmadas ?? 0} confirmada${stats.reservas_confirmadas === 1 ? '' : 's'}`;
         
         // Receita do mês
-        if (stats.receita_mes) {
-            document.getElementById('statReceita').textContent = `R$ ${stats.receita_mes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-        }
-        if (stats.receita_variacao) {
+        document.getElementById('statReceita').textContent = Number(stats.receita_mes || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        if (stats.receita_variacao !== null && stats.receita_variacao !== undefined) {
             const sinal = stats.receita_variacao >= 0 ? '+' : '';
             document.getElementById('statReceitaDetalhe').innerHTML = `<i class="bi bi-arrow-${stats.receita_variacao >= 0 ? 'up' : 'down'}"></i> ${sinal}${stats.receita_variacao}% vs mês anterior`;
-        }
+        } else document.getElementById('statReceitaDetalhe').textContent = 'Sem comparação no mês anterior';
         
         // Total de clientes
-        document.getElementById('statClientes').textContent = stats.total_clientes || '-';
-        if (stats.clientes_novos_semana) {
-            document.getElementById('statClientesDetalhe').textContent = `+${stats.clientes_novos_semana} novos esta semana`;
-        }
+        document.getElementById('statClientes').textContent = stats.total_clientes ?? 0;
+        document.getElementById('statClientesDetalhe').textContent = `+${stats.clientes_novos_semana ?? 0} novos esta semana`;
         
         // Pendentes
-        document.getElementById('statPendentes').textContent = stats.pendentes || '-';
-        if (stats.pendentes > 0) {
-            document.getElementById('statPendentesDetalhe').textContent = 'Aguardando confirmação';
-        }
+        document.getElementById('statPendentes').textContent = stats.pendentes ?? 0;
+        document.getElementById('statPendentesDetalhe').textContent = stats.pendentes > 0 ? 'Aguardando confirmação' : 'Nenhuma pendência';
     }
 
     function renderizarProximasReservas(reservas) {
@@ -246,7 +206,7 @@
                 <tr>
                     <td>${reserva.hora_inicio} - ${reserva.hora_fim}</td>
                     <td>${reserva.quadra?.nome || '-'}</td>
-                    <td>${reserva.usuario?.nome || '-'}</td>
+                    <td>${reserva.usuario?.nome_completo || '-'}</td>
                     <td>${statusBadge}</td>
                 </tr>
             `;
@@ -265,12 +225,12 @@
         atividades.slice(0, 5).forEach(atividade => {
             container.innerHTML += `
                 <div class="activity-item">
-                    <div class="activity-icon" style="background:${atividade.cor}; color:${atividade.corTexto};">
-                        <i class="bi bi-${atividade.icone}"></i>
+                    <div class="activity-icon" style="background:${atividade.cor}; color:${atividade.cor_texto || atividade.corTexto};">
+                        <i class="${atividade.icone}"></i>
                     </div>
                     <div class="activity-info">
-                        <div class="activity-text">${atividade.texto}${atividade.usuario ? ` - ${atividade.usuario}` : ''}${atividade.valor ? ` - ${atividade.valor}` : ''}${atividade.quadra ? ` - ${atividade.quadra}` : ''}</div>
-                        <div class="activity-time">${atividade.tempo}</div>
+                        <div class="activity-text">${atividade.texto}${atividade.detalhe ? ` - ${atividade.detalhe}` : ''}</div>
+                        <div class="activity-time">${atividade.data ? new Date(atividade.data).toLocaleString('pt-BR') : ''}</div>
                     </div>
                 </div>
             `;
@@ -282,21 +242,9 @@
         const arenaId = event.target.value;
         const arenaNome = event.target.options[event.target.selectedIndex].text;
         
-        try {
-            // Tenta notificar backend da troca (endpoint opcional)
-            await fetch(`${API_BASE}/admin/arena/${arenaId}/selecionar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }
-            }).catch(() => {}); // Ignora erro se endpoint não existir
-            
-            // Recarrega dashboard com nova arena
-            await carregarDashboard(arenaId);
-            esportecToast(`Dashboard atualizado para ${arenaNome}.`, 'success');
-        } catch (error) {
-            // Fallback: só recarrega com mock
-            await carregarDashboard(arenaId);
-            esportecToast(`Arena alterada para ${arenaNome}.`, 'success');
-        }
+        if (!arenaId) return;
+        await carregarDashboard(arenaId);
+        esportecToast(`Dashboard atualizado para ${arenaNome}.`, 'success');
     });
 
     // Atualiza mês atual no header

@@ -152,57 +152,63 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Nome da Arena</label>
-                            <input type="text" class="form-control" placeholder="Ex: Arena Society Cametá" required>
+                            <input name="nome" type="text" class="form-control" placeholder="Ex: Arena Society Cametá" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">CNPJ</label>
-                            <input type="text" class="form-control" placeholder="00.000.000/0001-00" required>
+                            <input name="cnpj" type="text" class="form-control" placeholder="00.000.000/0001-00" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Responsável</label>
-                            <input type="text" class="form-control" placeholder="Nome do responsável" required>
+                            <input name="responsavel" type="text" class="form-control" placeholder="Nome do responsável" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Telefone</label>
-                            <input type="text" class="form-control" placeholder="(91) 99999-9999" required>
+                            <input name="telefone" type="text" class="form-control" placeholder="(91) 99999-9999" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">E-mail</label>
-                            <input type="email" class="form-control" placeholder="arena@email.com" required>
+                            <input name="email" type="email" class="form-control" placeholder="arena@email.com" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Foto de capa da arena</label>
+                            <input name="foto_capa" type="file" class="form-control" accept="image/jpeg,image/png,image/webp">
+                            <small class="text-muted">JPG, PNG ou WebP, até 5 MB.</small>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Logradouro</label>
-                            <input type="text" class="form-control" placeholder="Rua ou avenida" required>
+                            <input name="logradouro" type="text" class="form-control" placeholder="Rua ou avenida" required>
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Número</label>
-                            <input type="text" class="form-control" placeholder="123">
+                            <input name="numero" type="text" class="form-control" placeholder="123">
                         </div>
 
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Bairro</label>
-                            <input type="text" class="form-control" placeholder="Centro" required>
+                            <input name="bairro" type="text" class="form-control" placeholder="Centro" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Cidade</label>
-                            <input type="text" class="form-control" placeholder="Cametá" required>
+                            <input name="cidade" type="text" class="form-control" placeholder="Cametá" required>
                         </div>
 
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">UF</label>
-                            <input type="text" class="form-control" placeholder="PA" maxlength="2" required>
+                            <input name="estado" type="text" class="form-control" placeholder="PA" maxlength="2" required>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Ponto de referência</label>
-                            <input type="text" class="form-control" placeholder="Próximo ao ginásio">
+                            <input name="ponto_referencia" type="text" class="form-control" placeholder="Próximo ao ginásio">
                         </div>
                     </div>
                 </div>
@@ -216,43 +222,47 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Tipo de Quadra</label>
-                            <select class="form-select" required>
+                            <select name="tipo_quadra" class="form-select" required>
                                 <option value="">Selecione</option>
-                                <option>Society</option>
-                                <option>Futsal</option>
-                                <option>Society e Futsal</option>
-                                <option>Outros</option>
+                                <option value="society">Society</option>
+                                <option value="futsal">Futsal</option>
+                                <option value="misto">Society e Futsal</option>
+                                <option value="futebol">Outros</option>
                             </select>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Quantidade de Quadras</label>
-                            <input type="number" class="form-control" placeholder="Ex: 2" required>
+                            <input name="quantidade_quadras" id="quantidadeQuadras" type="number" min="1" max="20" class="form-control" placeholder="Ex: 2" required>
+                        </div>
+
+                        <div class="col-12" id="camposQuadras">
+                            <div class="alert alert-light border mb-0">Informe a quantidade de quadras para adicionar o nome e a foto de cada uma.</div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Valor por Hora</label>
-                            <input type="text" class="form-control" placeholder="Ex: R$ 120,00" required>
+                            <input name="preco_hora" type="number" min="0" step="0.01" class="form-control" placeholder="Ex: 120,00" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Capacidade</label>
-                            <input type="text" class="form-control" placeholder="Ex: 10 jogadores" required>
+                            <input name="capacidade_jogador" type="number" min="1" class="form-control" placeholder="Ex: 10" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Horário de Abertura</label>
-                            <input type="time" class="form-control" required>
+                            <input name="hora_inicio" type="time" class="form-control" required>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Horário de Fechamento</label>
-                            <input type="time" class="form-control" required>
+                            <input name="hora_fim" type="time" class="form-control" required>
                         </div>
 
                         <div class="col-12">
                             <label class="form-label fw-semibold">Descrição do Espaço</label>
-                            <textarea class="form-control" rows="4" placeholder="Descreva a estrutura, cobertura, iluminação, vestiários..." required></textarea>
+                            <textarea name="descricao" class="form-control" rows="4" placeholder="Descreva a estrutura, cobertura, iluminação, vestiários..." required></textarea>
                         </div>
                     </div>
                 </div>
@@ -266,19 +276,19 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Tipo da chave PIX</label>
-                            <select class="form-select" required>
+                            <select name="pix_tipo" class="form-select" required>
                                 <option value="">Selecione</option>
-                                <option>CPF</option>
-                                <option>CNPJ</option>
-                                <option>E-mail</option>
-                                <option>Telefone</option>
-                                <option>Aleatória</option>
+                                <option value="cpf">CPF</option>
+                                <option value="cnpj">CNPJ</option>
+                                <option value="email">E-mail</option>
+                                <option value="telefone">Telefone</option>
+                                <option value="aleatoria">Aleatória</option>
                             </select>
                         </div>
 
                         <div class="col-md-8">
                             <label class="form-label fw-semibold">Chave PIX</label>
-                            <input type="text" class="form-control" placeholder="Chave usada para receber pagamentos" required>
+                            <input name="pix_chave" type="text" class="form-control" placeholder="Chave usada para receber pagamentos" required>
                         </div>
 
                         <div class="col-md-3">
@@ -394,16 +404,39 @@
     </div>
 </div>
 
+<script src="/js/esportec-api.js"></script>
 <script>
     const formArena = document.getElementById('formArena');
+    const quantidadeQuadras = document.getElementById('quantidadeQuadras');
+    const camposQuadras = document.getElementById('camposQuadras');
 
-    formArena.addEventListener('submit', function(event) {
+    function renderizarCamposQuadras() {
+        const quantidade = Math.min(Math.max(parseInt(quantidadeQuadras.value || '0', 10), 0), 20);
+        if (!quantidade) { camposQuadras.innerHTML = '<div class="alert alert-light border mb-0">Informe a quantidade de quadras para adicionar o nome e a foto de cada uma.</div>'; return; }
+        camposQuadras.innerHTML = `<label class="form-label fw-semibold d-block mb-3">Dados de cada quadra</label>${Array.from({ length: quantidade }, (_, indice) => `<div class="border rounded-3 p-3 mb-3"><strong class="d-block mb-3">Quadra ${indice + 1}</strong><div class="row g-3"><div class="col-md-6"><label class="form-label">Nome da quadra</label><input name="quadras[${indice}][nome]" class="form-control" placeholder="Ex: Society Premium" required></div><div class="col-md-6"><label class="form-label">Foto da quadra</label><input name="quadras[${indice}][foto]" type="file" class="form-control" accept="image/jpeg,image/png,image/webp"><small class="text-muted">JPG, PNG ou WebP, até 5 MB.</small></div></div></div>`).join('')}`;
+    }
+    quantidadeQuadras.addEventListener('input', renderizarCamposQuadras);
+
+    formArena.addEventListener('submit', async function(event) {
         event.preventDefault();
-
-        esportecWithLoading(event.submitter, 'Enviando...', () => esportecMockApi('arenas.solicitarCadastro')).then(() => {
+        if (!EsporTecApi.token()) {
+            window.location.href = '/login?redirect=' + encodeURIComponent('/cadastrar-arena');
+            return;
+        }
+        const botao = event.submitter;
+        const textoOriginal = botao.innerHTML;
+        botao.disabled = true;
+        botao.textContent = 'Enviando...';
+        try {
+            await EsporTecApi.request('/api/arenas/solicitacoes', { method: 'POST', body: new FormData(formArena) });
             const modal = new bootstrap.Modal(document.getElementById('sucessoModal'));
             modal.show();
-        });
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            botao.disabled = false;
+            botao.innerHTML = textoOriginal;
+        }
     });
 </script>
 

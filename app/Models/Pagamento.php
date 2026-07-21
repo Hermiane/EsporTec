@@ -39,6 +39,8 @@ class Pagamento extends Model
 
         'metodo',
 
+        'tipo',
+
         'status',
 
         'valor',

@@ -85,8 +85,8 @@
         const allowed =
             (isPlatformLog && role === 'super_admin') ||
             (isSuperAdmin && role === 'super_admin') ||
-            (isAdmin && !isPlatformLog && (role === 'admin' || role === 'super_admin')) ||
-            (isStaff && (role === 'funcionario' || role === 'admin' || role === 'super_admin')) ||
+            (isAdmin && !isPlatformLog && role === 'admin') ||
+            (isStaff && role === 'funcionario') ||
             (isClient && role === 'cliente');
 
         if (!role) {
