@@ -286,9 +286,7 @@ Route::get('/admin/notificacoes', function () {
 Route::get('/super-admin/dashboard', function () {
      return view('super-admin.dashboard'); });
 
-Route::get('/teste', function () {
-    return view('teste-navegacao');
-});
+
 
 Route::get('/cadastrar-arena', function () {
     return view('cadastrar-arena');

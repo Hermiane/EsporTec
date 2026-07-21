@@ -181,7 +181,7 @@
 <script src="/js/esportec-api.js"></script>
 <script>
     
-    //  INTEGRAÇÃO COM API - ADMIN FINANCEIRO
+    // INTEGRAÇÃO COM API - ADMIN FINANCEIRO
     
     const API_BASE = '/api';
     
@@ -217,12 +217,36 @@
     let barChart = null;
     let pieChart = null;
 
-    //  CARREGAR DADOS FINANCEIROS
+    //  FUNÇÃO AUXILIAR PARA FETCH COM AUTH
+    async function fetchAuth(url, options = {}) {
+        const token = localStorage.getItem('auth_token');
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+            ...options.headers
+        };
+        
+        const response = await fetch(url, { ...options, headers });
+        
+        // Se 401, redireciona para login
+        if (response.status === 401) {
+            window.location.href = '/login';
+            return null;
+        }
+        
+        return response;
+    }
+
+    //  CARREGAR DADOS FINANCEIROS - API: GET /api/admin/financeiro/fluxo-caixa
     async function carregarFinanceiro(mes = null) {
         try {
-            const url = mes ? `${API_BASE}/admin/financeiro?mes=${mes}` : `${API_BASE}/admin/financeiro`;
-            const response = await fetch(url);
+            //  Endpoint corrigido: financeiro → financeiro/fluxo-caixa
+            let url = `${API_BASE}/admin/financeiro/fluxo-caixa`;
+            if (mes) url += `?mes=${mes}`;
             
+            const response = await fetchAuth(url);
+            if (!response) return; // 401 já tratou o redirecionamento
             if (!response.ok) throw new Error(`Erro ${response.status}`);
             
             const dados = await response.json();
@@ -269,7 +293,6 @@
     function renderizarGraficoBarras(dados) {
         const ctx = document.getElementById('barChart').getContext('2d');
         
-        // Destroi gráfico anterior se existir
         if (barChart) barChart.destroy();
         
         barChart = new Chart(ctx, {
@@ -311,7 +334,6 @@
     function renderizarGraficoPizza(dados) {
         const ctx = document.getElementById('pieChart').getContext('2d');
         
-        // Destroi gráfico anterior se existir
         if (pieChart) pieChart.destroy();
         
         pieChart = new Chart(ctx, {
@@ -382,12 +404,13 @@
         }
         
         try {
-            const response = await fetch(`${API_BASE}/admin/financeiro/despesas`, {
+            //  fetchAuth + endpoint correto
+            const response = await fetchAuth(`${API_BASE}/admin/financeiro/despesas`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
                 body: JSON.stringify(payload)
             });
             
+            if (!response) return;
             if (!response.ok) throw new Error('Erro');
             
             bootstrap.Modal.getInstance(document.getElementById('modalDespesa')).hide();

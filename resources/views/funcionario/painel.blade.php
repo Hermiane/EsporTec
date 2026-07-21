@@ -14,21 +14,74 @@
         
         /* Layout */
         .layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; background: var(--primary); color: white; padding: 1.5rem; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar { 
+            width: 260px; 
+            background: var(--primary); 
+            color: white; 
+            padding: 1.5rem; 
+            display: flex; 
+            flex-direction: column; 
+            position: fixed; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 100; 
+            left: 0;
+            top: 0;
+            transition: transform 0.3s ease;
+        }
         .sidebar-brand { font-size: 1.3rem; font-weight: 700; color: white; text-decoration: none; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem; border-radius: 8px; background: rgba(255,255,255,0.1); }
         .sidebar-brand i { font-size: 1.8rem; }
         .sidebar-brand span { font-size: 0.75rem; opacity: 0.85; display: block; font-weight: 400; margin-top: -0.2rem; }
         .nav-link { color: #94A3B8; font-weight: 500; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; transition: all 0.2s; text-decoration: none; }
         .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
-        .main { flex: 1; padding: 2rem; overflow-y: auto; margin-left: 260px; }
+        
+        /*  Botão Menu Mobile */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 101;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* Overlay para mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+        }
+        
+        .main { 
+            flex: 1; 
+            padding: 2rem; 
+            overflow-y: auto; 
+            margin-left: 260px; 
+            min-height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
         
         /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; flex-shrink: 0; }
         .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0; }
         .badge-role { background: var(--secondary); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; }
 
         /* Stats */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; flex-shrink: 0; }
         .stat-card { background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin: 0.5rem 0; }
         .stat-label { font-size: 0.85rem; color: #64748B; font-weight: 500; }
@@ -50,7 +103,7 @@
         .badge-paid { background: rgba(16,185,129,0.15); color: var(--accent); }
         .badge-pending { background: rgba(245,158,11,0.15); color: #F59E0B; }
 
-        /*  BOTÕES  */
+        /* BOTÕES */
         .actions-cell { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
         .btn-action { 
             padding: 0.5rem 0.8rem; 
@@ -73,19 +126,47 @@
         .btn-pay:hover { background: var(--secondary); color: white; }
         .btn-wait { background: #F1F5F9; color: #64748B; cursor: not-allowed; }
 
-        /* Responsividade */
+        /*  RESPONSIVIDADE COM MENU MOBILE */
         @media (max-width: 992px) { 
-            .sidebar { display: none; } 
-            .main { margin-left: 0; } 
+            .mobile-menu-btn { display: block; }
+            .sidebar { 
+                transform: translateX(-100%);
+                display: flex;
+            }
+            .sidebar.active { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .main { margin-left: 0; min-height: auto; max-height: none; display: block; padding: 5rem 1rem 1rem; }
             .actions-cell { flex-direction: column; width: 100%; }
             .btn-action { width: 100%; justify-content: center; margin-bottom: 0.2rem; }
+            .header h1 { font-size: 1.3rem; }
+        }
+        
+        /*  GARANTIR QUE TABELAS NÃO QUEBREM */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .table-custom {
+            min-width: 600px;
+        }
+        .table-custom th,
+        .table-custom td {
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
 
+<!--  Botão Menu Mobile -->
+<button class="mobile-menu-btn" onclick="toggleMenu()">
+    <i class="bi bi-list"></i>
+</button>
+
+<!--  Overlay para fechar ao clicar fora -->
+<div class="sidebar-overlay" onclick="toggleMenu()"></div>
+
 <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebarMenu">
         <a href="/painel-funcionario" class="sidebar-brand">
             <i class="bi bi-trophy"></i>
             <div>
@@ -98,7 +179,7 @@
             <a href="/funcionario/perfil" class="nav-link"><i class="bi bi-person"></i> Meu Perfil</a>
             <a href="/funcionario/agenda" class="nav-link"><i class="bi bi-calendar-check"></i> Agenda</a>
             <a href="#feedbacksClientes" class="nav-link"><i class="bi bi-people"></i> Clientes</a>
-            <a href="#modalManutencao" class="nav-link" data-bs-toggle="modal" data-bs-target="#modalManutencao"><i class="bi bi-tools"></i> Manutenção</a>
+            <a href="#modalManutencao" class="nav-link" data-bs-toggle="modal" data-bs-target="#modalManutencao" onclick="toggleMenu()"><i class="bi bi-tools"></i> Manutenção</a>
         </nav>
         <div style="margin-top: auto;">
             <a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a>
@@ -292,6 +373,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
 <script>
+    //  Função para toggle do menu mobile
+    function toggleMenu() {
+        document.getElementById('sidebarMenu').classList.toggle('active');
+        document.querySelector('.sidebar-overlay').classList.toggle('active');
+    }
    
     //  INTEGRAÇÃO COM API - MÓDULO FUNCIONÁRIO
     
@@ -413,7 +499,7 @@
 
     //  STATS 
     function atualizarStats(reservas) {
-        const reservasHoje = reservas; //
+        const reservasHoje = reservas;
 
         document.getElementById('countReservas').textContent = reservasHoje.length;
         const confirmadas = reservasHoje.filter(r => r.status === 'confirmada').length;

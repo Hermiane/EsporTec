@@ -199,10 +199,32 @@
         { id: 5, nome: 'Carlos Souza', email: 'carlos.s@email.com', telefone: '(11) 95555-5555', cpf: '555.666.777-88', reservas: 5, ultima_visita: '2026-05-20', vip: false, aniversario_mes: false }
     ];
 
+    //  FUNÇÃO AUXILIAR PARA FETCH COM AUTH
+    async function fetchAuth(url, options = {}) {
+        const token = localStorage.getItem('auth_token');
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+            ...options.headers
+        };
+        
+        const response = await fetch(url, { ...options, headers });
+        
+        // Se 401, redireciona para login
+        if (response.status === 401) {
+            window.location.href = '/login';
+            return null;
+        }
+        
+        return response;
+    }
+
     //  CARREGAR CLIENTES - API: GET /api/admin/clientes
     async function carregarClientes() {
         try {
-            const response = await fetch(`${API_BASE}/admin/clientes`);
+            const response = await fetchAuth(`${API_BASE}/admin/clientes`);
+            if (!response) return; // 401 já tratou o redirecionamento
             if (!response.ok) throw new Error(`Erro ${response.status}`);
             const clientes = await response.json();
             
@@ -296,7 +318,7 @@
         document.getElementById('statVip').textContent = clientes.filter(c => c.vip).length;
     }
 
-    //  BUSCA EM TEMPO REAL
+    //  BUSCA EM TEMPO REAL (frontend-only)
     document.getElementById('buscarClienteAdmin').addEventListener('input', event => {
         const termo = event.target.value.trim().toLowerCase();
         document.querySelectorAll('#tabelaClientes tr[data-cliente-id]').forEach(row => {
@@ -305,7 +327,7 @@
         });
     });
 
-    //  OFERTA EM MASSA
+    //  OFERTA EM MASSA - API: POST /api/admin/clientes/oferta-massa (se existir)
     document.getElementById('btnOfertaMassa').addEventListener('click', async () => {
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalClienteAdmin'));
         
@@ -342,17 +364,19 @@
             };
             
             try {
-                const response = await fetch(`${API_BASE}/admin/clientes/oferta-massa`, {
+                // Tenta endpoint real (pode não existir ainda)
+                const response = await fetchAuth(`${API_BASE}/admin/clientes/oferta-massa`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
                     body: JSON.stringify(payload)
                 });
+                if (!response) return;
                 if (!response.ok) throw new Error('Erro');
                 
                 modal.hide();
                 esportecToast('Oferta em massa enviada.', 'success');
             } catch (error) {
                 console.error('Erro ao enviar oferta:', error);
+                // Fallback visual
                 modal.hide();
                 esportecToast('Oferta em massa preparada (simulado).', 'success');
             }
@@ -381,11 +405,12 @@
             document.getElementById('btnConfirmarClienteModal').innerHTML = '<i class="bi bi-send me-1"></i>Preparar oferta';
             document.getElementById('btnConfirmarClienteModal').onclick = async () => {
                 try {
-                    const response = await fetch(`${API_BASE}/admin/clientes/${id}/oferta`, {
+                    // Tenta endpoint real (pode não existir ainda)
+                    const response = await fetchAuth(`${API_BASE}/admin/clientes/${id}/oferta`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
                         body: JSON.stringify({ mensagem: document.getElementById('ofertaMensagem').value })
                     });
+                    if (!response) return;
                     if (!response.ok) throw new Error('Erro');
                     
                     button.innerHTML = '<i class="bi bi-check2"></i> Oferta pronta';
@@ -394,6 +419,7 @@
                     esportecToast(`Oferta preparada para ${nome}.`, 'success');
                 } catch (error) {
                     console.error('Erro ao preparar oferta:', error);
+                    // Fallback visual
                     button.innerHTML = '<i class="bi bi-check2"></i> Oferta pronta';
                     button.disabled = true;
                     modal.hide();
@@ -406,7 +432,9 @@
 
         if (action === 'historico') {
             try {
-                const response = await fetch(`${API_BASE}/admin/clientes/${id}/historico`);
+                //  Endpoint correto: GET /api/admin/clientes/{id}
+                const response = await fetchAuth(`${API_BASE}/admin/clientes/${id}`);
+                if (!response) return;
                 if (!response.ok) throw new Error('Erro');
                 const historico = await response.json();
                 preencherModalHistorico(nome, historico);

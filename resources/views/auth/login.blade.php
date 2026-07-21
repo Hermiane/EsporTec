@@ -15,7 +15,10 @@
         body.super-admin-mode { background: linear-gradient(135deg, #FEF3C7 0%, #FFFFFF 55%, #F8FAFC 100%); }
         .auth-card { background: rgba(255,255,255,0.96); border-radius: 18px; box-shadow: 0 18px 50px rgba(15,23,42,0.12); padding: 2.25rem; width: 100%; max-width: 560px; border: 1px solid rgba(45,129,93,0.14); }
         .brand-mark { width: 52px; height: 52px; margin: 0 auto 0.8rem; border-radius: 16px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 10px 24px rgba(45,129,93,0.22); }
-        .access-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+        
+        /* Grid de acesso - Desktop: 2 colunas */
+        .access-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+        
         .access-option input { display: none; }
         .access-card { height: 100%; border: 1px solid #E2E8F0; border-radius: 14px; padding: 0.9rem 0.75rem; cursor: pointer; background: #FFFFFF; display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-start; transition: all 0.2s ease; }
         .access-card i { width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: var(--light); color: var(--primary); font-size: 1.1rem; }
@@ -37,9 +40,24 @@
         .auth-link { color: var(--primary); text-decoration: none; font-weight: 500; }
         .auth-link:hover { text-decoration: underline; }
         .login-support { background: #F8FAFC; border-radius: 12px; padding: 0.75rem; font-size: 0.85rem; color: var(--muted); }
+        
+        
+        /* Mobile (< 576px): 1 coluna - todos empilhados */
         @media (max-width: 576px) {
             .auth-card { padding: 1.5rem; }
-            .access-card { flex-direction: row; align-items: center; }
+            .access-grid { grid-template-columns: 1fr; } /* 1 coluna */
+            .access-card { 
+                flex-direction: row; 
+                align-items: center; 
+                padding: 0.9rem;
+            }
+            .access-card i { margin-right: 0.75rem; margin-bottom: 0; }
+            .access-card strong, .access-card small { text-align: left; }
+        }
+        
+        /* Tablet (576px - 768px): 2 colunas (2x2) */
+        @media (min-width: 577px) and (max-width: 768px) {
+            .access-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
