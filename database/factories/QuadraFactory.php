@@ -16,7 +16,7 @@ class QuadraFactory extends Factory
 
             'arenas_id' => Arena::factory(),
 
-            'nome' => 'Quadra '.$this->faker->unique()->numberBetween(1, 99),
+            'nome' => 'Quadra '.$this->faker->numberBetween(1, 9999),
 
             'tipo' => $this->faker->randomElement([
                 'society',

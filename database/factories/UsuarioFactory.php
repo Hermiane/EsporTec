@@ -39,7 +39,7 @@ class UsuarioFactory extends Factory
 
             'senha_hash' => static::$password ??= Hash::make('password'),
 
-            'telefone' => fake()->numerify('###########'),
+            'telefone' => fake()->unique()->numerify('###########'),
 
             'data_nascimento' => fake()->dateTimeBetween(
                 '-70 years',
