@@ -338,8 +338,3 @@ Route::post('/perfil/atualizar', function (\Illuminate\Http\Request $request) {
     return redirect()->back()->with('success', 'Perfil atualizado com sucesso!');
 })->name('perfil.atualizar');
 
-Route::get('/test-login', function () {
-    $user = App\Models\Usuario::find(5); // Seu ID
-    Auth::login($user);
-    return redirect('/perfil');
-});
