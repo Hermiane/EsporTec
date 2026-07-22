@@ -24,6 +24,31 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 
+
+//  ADICIONE ISSO:
+Route::post('/login', function (\Illuminate\Http\Request $request) {
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    if (\Illuminate\Support\Facades\Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
+        return redirect()->intended('/painel');
+    }
+
+    return back()->withErrors([
+        'email' => 'Credenciais inválidas.',
+    ])->onlyInput('email');
+})->name('login.post');
+
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/');
+})->name('logout');
+
 Route::get('/criar-conta', function () {
     return view('auth.criar-conta');
 });
@@ -294,4 +319,27 @@ Route::get('/cadastrar-arena', function () {
 
 Route::get('/partida/{codigo?}', function () {
     return view('partida');
+});
+
+// Rota para atualizar o perfil
+Route::post('/perfil/atualizar', function (\Illuminate\Http\Request $request) {
+    $user = auth()->user();
+    if (!$user) return redirect('/login');
+
+    $validated = $request->validate([
+        'nome_completo' => 'required|string|max:100',
+        'nome_usuario' => 'nullable|string|max:50',
+        'telefone' => 'nullable|string|max:20',
+        'data_nascimento' => 'nullable|date|before:today',
+    ]);
+
+    $user->update($validated);
+    
+    return redirect()->back()->with('success', 'Perfil atualizado com sucesso!');
+})->name('perfil.atualizar');
+
+Route::get('/test-login', function () {
+    $user = App\Models\Usuario::find(5); // Seu ID
+    Auth::login($user);
+    return redirect('/perfil');
 });

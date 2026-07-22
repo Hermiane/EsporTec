@@ -13,31 +13,38 @@ use Illuminate\Support\Facades\Mail;
 class AuthController extends Controller
 {
     public function registrar(Request $request) { $d=$request->validate(['nome_completo'=>['required','string','max:100'],'nome_usuario'=>['required','string','max:50','unique:usuarios,nome_usuario'],'email'=>['required','email','max:191','unique:usuarios,email'],'senha'=>['required','string','min:8','confirmed'],'telefone'=>['required','digits:11'],'data_nascimento'=>['required','date','before:today']]); $u=Usuario::create(['nome_completo'=>$d['nome_completo'],'nome_usuario'=>$d['nome_usuario'],'email'=>$d['email'],'senha_hash'=>Hash::make($d['senha']),'telefone'=>$d['telefone'],'data_nascimento'=>$d['data_nascimento']]); return response()->json(['usuario'=>$u,'acessos'=>$this->acessosPermitidos($u),'acesso_atual'=>'cliente','token'=>$u->createToken('cliente')->plainTextToken],201); }
-    public function login(Request $request)
-    {
-        $dados = $request->validate([
-            'email' => ['required', 'email'],
-            'senha' => ['required', 'string'],
-            'tipo_acesso' => ['required', 'in:cliente,funcionario,admin,super_admin'],
-        ]);
+   public function login(Request $request)
+{
+    $dados = $request->validate([
+        'email' => ['required', 'email'],
+        'senha' => ['required', 'string'],
+        'tipo_acesso' => ['required', 'in:cliente,funcionario,admin,super_admin'],
+    ]);
 
-        $usuario = Usuario::where('email', $dados['email'])->where('ativo', true)->first();
-        if (!$usuario || !Hash::check($dados['senha'], $usuario->senha_hash)) {
-            return response()->json(['message' => 'Credenciais inválidas.'], 422);
-        }
-
-        $acessos = $this->acessosPermitidos($usuario);
-        if (!$acessos[$dados['tipo_acesso']]) {
-            return response()->json(['message' => 'Esta conta não possui permissão para a área selecionada.'], 403);
-        }
-
-        return response()->json([
-            'usuario' => $usuario,
-            'acessos' => $acessos,
-            'acesso_atual' => $dados['tipo_acesso'],
-            'token' => $usuario->createToken('sessao')->plainTextToken,
-        ]);
+    $usuario = Usuario::where('email', $dados['email'])->where('ativo', true)->first();
+    
+    if (!$usuario || !Hash::check($dados['senha'], $usuario->senha_hash)) {
+        return response()->json(['message' => 'Credenciais inválidas.'], 422);
     }
+
+    $acessos = $this->acessosPermitidos($usuario);
+    
+    if (!$acessos[$dados['tipo_acesso']]) {
+        return response()->json(['message' => 'Esta conta não possui permissão para a área selecionada.'], 403);
+    }
+
+    //  ESTAS 2 LINHAS CRIAM A SESSÃO WEB 
+    \Illuminate\Support\Facades\Auth::login($usuario);
+    $request->session()->regenerate();
+    //  FIM DAS LINHAS CRÍTICAS 
+
+    return response()->json([
+        'usuario' => $usuario,
+        'acessos' => $acessos,
+        'acesso_atual' => $dados['tipo_acesso'],
+        'token' => $usuario->createToken('sessao')->plainTextToken,
+    ]);
+}
 
     public function me(Request $request)
     {
