@@ -127,18 +127,7 @@
             </div>
             <div class="access-panel" id="funcionarioPanel">
                 <span class="access-badge"><i class="bi bi-calendar-check"></i>Área do funcionário</span>
-                <p class="access-description">Acesso para controlar agenda, confirmar check-in, registrar pagamentos presenciais e acompanhar reservas do dia.</p>
-                <div class="mb-3">
-                    <label class="form-label fw-medium">Matrícula do funcionário</label>
-                    <input type="text" class="form-control staff-required" placeholder="Ex: FUNC-2024-089">
-                </div>
-                <div class="mb-0">
-                    <label class="form-label fw-medium">Unidade de trabalho</label>
-                    <select class="form-control staff-required">
-                        <option>EsporTec - Unidade Principal</option>
-                        <option>EsporTec - Unidade Zona Norte</option>
-                    </select>
-                </div>
+                <p class="access-description">Entre com o e-mail e a senha cadastrados pelo dono da arena para controlar a operação diária.</p>
             </div>
             <div class="access-panel" id="adminPanel">
                 <span class="access-badge"><i class="bi bi-speedometer2"></i>Admin da arena</span>
@@ -219,11 +208,6 @@
                 super_admin: '/super-admin/dashboard'
             };
             const perfil = getSelectedPerfil();
-            const requiredSelector = perfil === 'funcionario' ? '.staff-required' : '';
-            if (requiredSelector && [...document.querySelectorAll(requiredSelector)].some(input => !input.value.trim())) {
-                esportecToast('Preencha os dados profissionais para continuar.', 'warning');
-                return;
-            }
             const email = document.querySelector('#loginForm input[type="email"]').value;
             const senha = document.querySelector('#loginForm input[type="password"]').value;
             esportecWithLoading(submitButton, 'Entrando...', async () => {

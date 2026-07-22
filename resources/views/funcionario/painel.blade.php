@@ -179,7 +179,6 @@
             <a href="/funcionario/perfil" class="nav-link"><i class="bi bi-person"></i> Meu Perfil</a>
             <a href="/funcionario/agenda" class="nav-link"><i class="bi bi-calendar-check"></i> Agenda</a>
             <a href="#feedbacksClientes" class="nav-link"><i class="bi bi-people"></i> Clientes</a>
-            <a href="#modalManutencao" class="nav-link" data-bs-toggle="modal" data-bs-target="#modalManutencao" onclick="toggleMenu()"><i class="bi bi-tools"></i> Manutenção</a>
         </nav>
         <div style="margin-top: auto;">
             <a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a>
@@ -192,7 +191,7 @@
                 <h1><i class="bi bi-calendar-check me-2"></i>Agenda do Dia</h1>
                 <p class="text-muted mb-0" id="dataAtual">Carregando data...</p>
             </div>
-            <span class="badge-role"><i class="bi bi-check-circle me-1"></i>Funcionário Ativo</span>
+            <div class="text-end"><strong id="nomeFuncionario">Carregando...</strong><br><span class="badge-role"><i class="bi bi-check-circle me-1"></i>Funcionário ativo</span><small class="d-block text-muted mt-1" id="nomeArena"></small></div>
         </div>
 
         <!-- Stats -->
@@ -223,9 +222,7 @@
         <div class="agenda-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold mb-0"><i class="bi bi-list-ul me-2"></i>Partidas de Hoje</h4>
-                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalReservaManual">
-                    <i class="bi bi-plus"></i> Reserva Manual
-                </button>
+                <span class="text-muted small">Dados atualizados da arena</span>
             </div>
 
             <div class="table-responsive">
@@ -265,19 +262,8 @@
                             <th>Ação</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Mock estático -->
-                        <tr>
-                            <td>João Silva</td>
-                            <td>Society Premium<br><small class="text-muted">14/06</small></td>
-                            <td><span class="text-warning"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></span></td>
-                            <td>"Gramado impecável e iluminação excelente. Voltaremos semana que vem!"</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalResponderFeedback" data-cliente="João Silva" data-comentario="Gramado impecável...">
-                                    <i class="bi bi-reply"></i> Responder
-                                </button>
-                            </td>
-                        </tr>
+                    <tbody id="feedbacksBody">
+                        <tr><td colspan="5" class="text-center text-muted py-4">Carregando feedbacks...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -298,9 +284,6 @@
                     <label class="form-label fw-medium">Quadra</label>
                     <select class="form-select" id="manutencaoQuadra">
                         <option value="">Selecione...</option>
-                        <option value="1">Futsal Arena</option>
-                        <option value="2">Society Premium</option>
-                        <option value="3">Society Descoberta</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -332,7 +315,7 @@
                 <div class="mb-3"><label class="form-label fw-medium">Cliente</label><input type="text" class="form-control" id="reservaCliente" placeholder="Nome do cliente"></div>
                 <div class="mb-3"><label class="form-label fw-medium">Telefone</label><input type="tel" class="form-control" id="reservaTelefone" placeholder="(00) 00000-0000"></div>
                 <div class="row g-3 mb-3">
-                    <div class="col-6"><label class="form-label fw-medium">Quadra</label><select class="form-select" id="reservaQuadra"><option value="">Selecione...</option><option value="1">Futsal Arena</option><option value="2">Society Premium</option><option value="3">Society Descoberta</option></select></div>
+                    <div class="col-6"><label class="form-label fw-medium">Quadra</label><select class="form-select" id="reservaQuadra"><option value="">Selecione...</option></select></div>
                     <div class="col-6"><label class="form-label fw-medium">Data</label><input type="date" class="form-control" id="reservaData"></div>
                 </div>
                 <div class="row g-3 mb-3">
@@ -372,6 +355,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
     //  Função para toggle do menu mobile
     function toggleMenu() {
@@ -383,31 +367,42 @@
     
     const API_BASE = '/api';
     
-    // GERA DATA DE HOJE PARA O MOCK (Para funcionar com Stats)
-    const HOJE = new Date().toISOString().split('T')[0];
-    
-    // Mock data para fallback
-    const MOCK_AGENDA = [
-        { id: 1, data: HOJE, hora_inicio: '09:00', hora_fim: '10:00', status: 'confirmada', quadra: { id: 1, nome: 'Futsal Arena' }, usuario: { nome: 'Pedro Santos' }, pagamento: { status: 'pago', metodo: 'pix', valor: 120.00 } },
-        { id: 2, data: HOJE, hora_inicio: '10:00', hora_fim: '11:30', status: 'pendente', quadra: { id: 3, nome: 'Society Descoberta' }, usuario: { nome: 'Ana Lima' }, pagamento: { status: 'pendente', metodo: 'dinheiro', valor: 100.00 } },
-        { id: 3, data: HOJE, hora_inicio: '14:00', hora_fim: '15:30', status: 'confirmada', quadra: { id: 2, nome: 'Society Premium' }, usuario: { nome: 'Grupo F.C. Unidos' }, pagamento: { status: 'pago', metodo: 'cartao_credito', valor: 150.00 } },
-        { id: 4, data: HOJE, hora_inicio: '19:00', hora_fim: '20:30', status: 'agendada', quadra: { id: 2, nome: 'Society Premium' }, usuario: { nome: 'João Silva' }, pagamento: { status: 'pendente', metodo: 'pix', valor: 150.00 } }
-    ];
-
     //  CARREGAR AGENDA DO DIA
     async function carregarAgendaDia() {
         try {
-            const response = await fetch(`${API_BASE}/funcionario/agenda/dia`);
-            if (!response.ok) throw new Error(`Erro ${response.status}`);
-            const agenda = await response.json();
-            renderizarAgenda(agenda);
-            atualizarStats(agenda);
-            console.log(' Agenda carregada da API');
+            const dados = await EsporTecApi.request(`${API_BASE}/funcionario/painel`);
+            document.getElementById('nomeFuncionario').textContent = dados.funcionario.nome;
+            document.getElementById('nomeArena').textContent = dados.arenas.map(arena => arena.nome).join(', ');
+            preencherQuadras(dados.quadras);
+            renderizarAgenda(dados.reservas);
+            renderizarFeedbacks(dados.feedbacks);
+            atualizarStats(dados.reservas, dados.quadras);
         } catch (error) {
-            console.log(' Usando dados de teste para agenda:', error.message);
-            renderizarAgenda(MOCK_AGENDA);
-            atualizarStats(MOCK_AGENDA);
+            renderizarAgenda([]);
+            renderizarFeedbacks([]);
+            atualizarStats([], []);
+            esportecToast(error.message, 'warning');
         }
+    }
+
+    function preencherQuadras(quadras) {
+        const opcoes = '<option value="">Selecione...</option>' + quadras.map(quadra => `<option value="${quadra.id}">${quadra.nome}</option>`).join('');
+        document.getElementById('manutencaoQuadra').innerHTML = opcoes;
+        document.getElementById('reservaQuadra').innerHTML = opcoes;
+    }
+
+    function renderizarFeedbacks(feedbacks) {
+        const tbody = document.getElementById('feedbacksBody');
+        if (!feedbacks.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Nenhum feedback recebido nos últimos 7 dias.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = feedbacks.map(feedback => {
+            const estrelas = '<i class="bi bi-star-fill"></i>'.repeat(feedback.nota);
+            const data = new Date(feedback.created_at).toLocaleDateString('pt-BR');
+            return `<tr><td>${feedback.usuario?.nome_completo || 'Cliente'}</td><td>${feedback.reserva?.quadra?.nome || '-'}<br><small class="text-muted">${data}</small></td><td><span class="text-warning">${estrelas}</span></td><td>${feedback.comentario || 'Sem comentário'}</td><td>${feedback.resposta ? '<span class="badge bg-success">Respondido</span>' : '<span class="text-muted">Sem resposta</span>'}</td></tr>`;
+        }).join('');
     }
 
     function renderizarAgenda(reservas) {
@@ -430,8 +425,7 @@
                 <td>${reserva.quadra?.nome || '-'}</td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(reserva.usuario?.nome || '?')}&background=random&size=32" class="rounded-circle">
-                        <span>${reserva.usuario?.nome || 'Cliente'}</span>
+                        <span>${reserva.usuario?.nome_completo || 'Cliente'}</span>
                     </div>
                 </td>
                 <td><span class="status-dot ${statusConfig.dot}"></span> ${statusConfig.label}</td>
@@ -474,32 +468,18 @@
     function getAcoesFuncionario(reserva) {
         let html = '';
         
-        if (reserva.status === 'agendada' || (reserva.status === 'pendente' && reserva.pagamento?.status === 'pendente')) {
-             html += `<button class="btn-action btn-pay" onclick="confirmarPagamento(${reserva.id}, this)">
+        if (reserva.status === 'pendente' && reserva.pagamento?.status === 'pendente') {
+             html += `<button class="btn-action btn-pay" onclick="confirmarPagamento(${reserva.pagamento.id}, this)">
                 <i class="bi bi-check-circle"></i> Confirmar
             </button>`;
         }
-
-        if (reserva.status === 'confirmada') {
-            html += `<button class="btn-action btn-checkin" onclick="fazerCheckin(${reserva.id}, this)">
-                <i class="bi bi-person-check"></i> Check-in
-            </button>`;
-        } else if (reserva.status === 'agendada') {
-            html += `<button type="button" class="btn-action btn-wait" disabled>
-                <i class="bi bi-hourglass"></i> Aguardando
-            </button>`;
-        }
-        
-        html += `<button class="btn-action btn-report" onclick="abrirManutencaoRapida(${reserva.quadra?.id})">
-            <i class="bi bi-tools"></i> Manutenção
-        </button>`;
         
         return html;
     }
 
     //  STATS 
-    function atualizarStats(reservas) {
-        const reservasHoje = reservas;
+    function atualizarStats(reservas, quadras) {
+        const reservasHoje = reservas; //
 
         document.getElementById('countReservas').textContent = reservasHoje.length;
         const confirmadas = reservasHoje.filter(r => r.status === 'confirmada').length;
@@ -507,18 +487,19 @@
             `<i class="bi bi-arrow-up"></i> ${confirmadas} confirmadas` : 'Nenhuma confirmada';
         
         const receita = reservasHoje.filter(r => r.pagamento?.status === 'pago')
-            .reduce((sum, r) => sum + (r.pagamento?.valor || 0), 0);
+            .reduce((sum, r) => sum + Number(r.pagamento?.valor || 0), 0);
         document.getElementById('countReceita').textContent = `R$ ${receita.toFixed(2).replace('.', ',')}`;
         
         // Quadras ativas (conta quantas IDs únicos de quadra)
-        const quadrasUnicas = new Set(reservasHoje.map(r => r.quadra?.id).filter(Boolean)).size;
-        document.getElementById('countQuadras').textContent = quadrasUnicas > 0 ? quadrasUnicas : '-';
-        document.getElementById('countManutencao').innerHTML = quadrasUnicas > 0 ? 
+        const quadrasAtivas = quadras.length;
+        document.getElementById('countQuadras').textContent = quadrasAtivas;
+        document.getElementById('countManutencao').innerHTML = quadrasAtivas > 0 ?
             `<i class="bi bi-check"></i> Todas operacionais` : 
             `<i class="bi bi-dash"></i> Sem reservas`;
         
         // Próxima reserva
-        const proxima = reservasHoje.filter(r => r.status !== 'cancelada')
+        const horarioAtual = new Date().toTimeString().slice(0, 8);
+        const proxima = reservasHoje.filter(r => r.status !== 'cancelada' && r.hora_inicio >= horarioAtual)
             .sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio))[0];
         if (proxima) {
             document.getElementById('proximaReserva').textContent = proxima.hora_inicio;
@@ -533,66 +514,11 @@
     async function confirmarPagamento(pagamentoId, btn) {
         if (!confirm('Confirmar recebimento?')) return;
         try {
-            const response = await fetch(`${API_BASE}/funcionario/pagamentos/${pagamentoId}/confirmar`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' } });
-            if (!response.ok) throw new Error('Erro');
-            
-            const btnContainer = btn.parentElement;
-            const badge = btn.closest('tr').querySelector('.badge-payment');
-            if(badge) { badge.className = 'badge-payment badge-paid'; badge.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Pago<br><small>(Confirmado)</small>'; }
-            btn.remove(); // Remove botão de confirmar
+            await EsporTecApi.request(`${API_BASE}/funcionario/pagamentos/${pagamentoId}/confirmar`, { method: 'PATCH' });
             esportecToast('Pagamento confirmado.', 'success');
-        } catch (e) {
-            // Fallback visual
-            const badge = btn.closest('tr').querySelector('.badge-payment');
-            if(badge) { badge.className = 'badge-payment badge-paid'; badge.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Pago<br><small>(Simulado)</small>'; }
-            btn.remove();
-            esportecToast('Pagamento confirmado (Simulado).', 'success');
-        }
-    }
-
-    async function fazerCheckin(reservaId, btn) {
-        if (!confirm('Confirmar check-in?')) return;
-        try {
-            const response = await fetch(`${API_BASE}/agendamentos/${reservaId}/confirmar`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' } });
-            if (!response.ok) throw new Error('Erro');
-            
-            // Atualiza UI
-            const row = btn.closest('tr');
-            row.cells[3].innerHTML = '<span class="status-dot dot-green"></span> Em Jogo';
-            btn.remove();
-            esportecToast('Check-in realizado.', 'success');
-        } catch (e) {
-            const row = btn.closest('tr');
-            row.cells[3].innerHTML = '<span class="status-dot dot-green"></span> Em Jogo (Simulado)';
-            btn.remove();
-            esportecToast('Check-in realizado (Simulado).', 'success');
-        }
-    }
-
-    async function criarReservaManual() {
-        const payload = {
-            usuario_id: 1, quadra_id: document.getElementById('reservaQuadra').value,
-            data: document.getElementById('reservaData').value,
-            hora_inicio: document.getElementById('reservaHoraInicio').value,
-            hora_fim: document.getElementById('reservaHoraFim').value,
-            valor_total: parseFloat(document.getElementById('reservaValor').value) || 0,
-            observacao: 'Reserva manual'
-        };
-        if (!payload.quadra_id || !payload.data) { esportecToast('Preencha os campos.', 'warning'); return; }
-
-        try {
-            const response = await fetch(`${API_BASE}/reservas`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error('Erro');
-            bootstrap.Modal.getInstance(document.getElementById('modalReservaManual')).hide();
-            esportecToast('Reserva criada.', 'success');
             carregarAgendaDia();
-        } catch (e) {
-            bootstrap.Modal.getInstance(document.getElementById('modalReservaManual')).hide();
-            esportecToast('Reserva criada (Simulado).', 'success');
-            // Adiciona ao mock visualmente só pra demo
-            MOCK_AGENDA.push({ ...payload, id: Date.now(), status: 'agendada', usuario: { nome: payload.usuario_id }, quadra: { nome: 'Manual' }, pagamento: { status: 'pendente', valor: payload.valor_total } });
-            renderizarAgenda(MOCK_AGENDA);
-            atualizarStats(MOCK_AGENDA);
+        } catch (error) {
+            esportecToast(error.message, 'warning');
         }
     }
 

@@ -137,7 +137,7 @@
         </p>
     </section>
 
-    <form id="formArena">
+    <form id="formArena" autocomplete="off">
 
         <div class="row g-4">
 
@@ -171,8 +171,33 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">E-mail</label>
-                            <input name="email" type="email" class="form-control" placeholder="arena@email.com" required>
+                            <label class="form-label fw-semibold">Data de nascimento</label>
+                            <input name="data_nascimento" type="date" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="emailAcesso">E-mail de acesso</label>
+                            <input name="email" id="emailAcesso" type="email" class="form-control" placeholder="Digite seu e-mail" autocomplete="off" value="" required>
+                            <small class="text-muted">Este será o e-mail usado para entrar como dono da arena após a aprovação.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="senhaAcesso">Senha de acesso</label>
+                            <div class="input-group">
+                                <input name="senha" id="senhaAcesso" type="password" class="form-control" minlength="8" autocomplete="new-password" placeholder="Digite sua senha" aria-describedby="avisoSenhaAcesso" value="" required>
+                                <button class="btn btn-outline-secondary" id="alternarSenha" type="button" aria-label="Mostrar senha">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div id="avisoSenhaAcesso" class="alert alert-warning py-2 px-3 mt-2 mb-0 d-none" role="status">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Esta senha só dará acesso ao painel administrativo da arena após a aprovação do cadastro.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="confirmarSenhaAcesso">Confirmar senha</label>
+                            <input name="senha_confirmation" id="confirmarSenhaAcesso" type="password" class="form-control" minlength="8" autocomplete="new-password" placeholder="Digite a senha novamente" required>
                         </div>
 
                         <div class="col-md-6">
@@ -346,7 +371,7 @@
                     </h5>
 
                     <p class="mb-2">
-                        1. Preencha os dados da arena.
+                        1. Preencha seus dados de acesso e os dados da arena.
                     </p>
 
                     <p class="mb-2">
@@ -358,7 +383,7 @@
                     </p>
 
                     <p class="mb-0">
-                        4. Depois de aprovado, sua arena aparece no sistema.
+                        4. Depois de aprovado, sua conta é ativada e você pode entrar como dono da arena.
                     </p>
                 </div>
 
@@ -393,7 +418,7 @@
                 </h3>
 
                 <p class="text-muted">
-                    Sua arena foi cadastrada para análise da equipe EsporTec.
+                    Sua conta e sua arena foram cadastradas para análise da equipe EsporTec. O acesso como dono será liberado após a aprovação.
                 </p>
 
                 <a href="/" class="btn btn-primary-custom px-4 py-2">
@@ -409,6 +434,20 @@
     const formArena = document.getElementById('formArena');
     const quantidadeQuadras = document.getElementById('quantidadeQuadras');
     const camposQuadras = document.getElementById('camposQuadras');
+    const senhaAcesso = document.getElementById('senhaAcesso');
+    const avisoSenhaAcesso = document.getElementById('avisoSenhaAcesso');
+    const alternarSenha = document.getElementById('alternarSenha');
+
+    senhaAcesso.addEventListener('input', () => {
+        avisoSenhaAcesso.classList.toggle('d-none', senhaAcesso.value.length === 0);
+    });
+
+    alternarSenha.addEventListener('click', () => {
+        const mostrar = senhaAcesso.type === 'password';
+        senhaAcesso.type = mostrar ? 'text' : 'password';
+        alternarSenha.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+        alternarSenha.querySelector('i').className = mostrar ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
 
     function renderizarCamposQuadras() {
         const quantidade = Math.min(Math.max(parseInt(quantidadeQuadras.value || '0', 10), 0), 20);
@@ -419,10 +458,6 @@
 
     formArena.addEventListener('submit', async function(event) {
         event.preventDefault();
-        if (!EsporTecApi.token()) {
-            window.location.href = '/login?redirect=' + encodeURIComponent('/cadastrar-arena');
-            return;
-        }
         const botao = event.submitter;
         const textoOriginal = botao.innerHTML;
         botao.disabled = true;

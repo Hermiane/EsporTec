@@ -20,9 +20,12 @@ use App\Http\Controllers\Auth\PasswordResetController;
 
 Route::post('/auth/registro', [AuthController::class, 'registrar']);
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/recuperar-senha', [AuthController::class, 'solicitarReset']);
-Route::post('/auth/redefinir-senha', [AuthController::class, 'redefinirSenha']);
-Route::post('/auth/verificar-codigo', [AuthController::class, 'verificarCodigoReset']);
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/auth/recuperar-senha', [AuthController::class, 'solicitarReset']);
+    Route::post('/auth/redefinir-senha', [AuthController::class, 'redefinirSenha']);
+    Route::post('/auth/verificar-codigo', [AuthController::class, 'verificarCodigoReset']);
+});
+Route::post('/arenas/solicitacoes', [ArenaCadastroController::class, 'solicitar']);
 Route::middleware('auth:sanctum')->post('/auth/logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->get('/auth/me', [AuthController::class, 'me']);
 Route::get('/publico/arenas', [PublicoController::class, 'arenas']);
@@ -31,7 +34,6 @@ Route::get('/publico/quadras/{id}', [PublicoController::class, 'quadra']);
 
 // ===== API AUTENTICADA (front) =====
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/arenas/solicitacoes', [ArenaCadastroController::class, 'solicitar']);
     // GET /api/quadras
     Route::get('/quadras', [ReservaController::class, 'quadrasDisponiveis']);
 
@@ -68,6 +70,8 @@ Route::middleware('auth:sanctum')->prefix('cliente')->group(function () {
 // ===== ROTAS DO FUNCIONÁRIO/ADMIN =====
 use App\Http\Controllers\PagamentoController as FuncPagamentoController;
 Route::middleware(['auth:sanctum', 'papel:funcionario'])->prefix('funcionario')->group(function () {
+    Route::get('/painel', [AgendaController::class, 'painel']);
+    Route::get('/perfil', [AgendaController::class, 'perfil']);
     Route::get('/agenda/dia', [AgendaController::class, 'dia']);
     Route::get('/agenda/semana', [AgendaController::class, 'semana']);
     Route::patch('/reservas/{id}/horario', [AgendaController::class, 'alterarHorario']);

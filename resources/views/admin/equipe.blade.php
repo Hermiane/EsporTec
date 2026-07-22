@@ -71,7 +71,7 @@
                 <div class="fw-bold mb-1"><i class="bi bi-shield-check me-2"></i>Quem é quem no sistema</div>
                 <div><strong>Super admin</strong> pertence à plataforma EsporTec. <strong>Admin da arena</strong> é o proprietário ou gestor da arena. <strong>Funcionário</strong> atende a operação diária.</div>
             </div>
-            <h5 class="fw-bold mb-3">Plataforma, admins da arena e funcionários</h5>
+            <h5 class="fw-bold mb-3">Dono e equipe da arena</h5>
 
             <!-- Lista de usuários (preenchida via JS) -->
             <div id="listaUsuarios">
@@ -90,7 +90,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="usuarioEditId">
                 <div class="mb-3">
                     <label class="form-label fw-medium">Nome Completo</label>
                     <input type="text" class="form-control" id="pessoaNome">
@@ -100,8 +99,8 @@
                     <input type="email" class="form-control" id="pessoaEmail">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-medium">CPF</label>
-                    <input type="text" class="form-control" id="pessoaCpf" placeholder="000.000.000-00">
+                    <label class="form-label fw-medium">Telefone</label>
+                    <input type="text" class="form-control" id="pessoaTelefone" placeholder="(91) 99999-9999">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium">Perfil</label>
@@ -113,7 +112,7 @@
                 <div class="row g-3 mb-3">
                     <div class="col-6">
                         <label class="form-label fw-medium">Senha</label>
-                        <input type="password" class="form-control" id="pessoaSenha" placeholder="Deixe em branco para manter">
+                        <input type="password" class="form-control" id="pessoaSenha" minlength="8" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
                     </div>
                     <div class="col-6">
                         <label class="form-label fw-medium">Confirmar Senha</label>
@@ -140,20 +139,10 @@
     
     const API_BASE = '/api';
     
-    // Mock data para fallback
-    const MOCK_USUARIOS = [
-        { id: 0, nome: 'Plataforma EsporTec', email: 'suporte@esportec.com.br', cpf: '000.000.000-00', perfil: 'super_admin', ativo: true, protegido: true },
-        { id: 1, nome: 'Maria Admin', email: 'maria@esportec.com.br', cpf: '123.456.789-10', perfil: 'admin', ativo: true, protegido: false },
-        { id: 2, nome: 'João Silva', email: 'joao.silva@esportec.com.br', cpf: '222.333.444-55', perfil: 'funcionario', ativo: true, protegido: false },
-        { id: 3, nome: 'Ana Lima', email: 'ana.lima@esportec.com.br', cpf: '555.666.777-88', perfil: 'funcionario', ativo: false, protegido: false }
-    ];
-
     //  CARREGAR USUÁRIOS - API: GET /api/admin/usuarios
     async function carregarUsuarios() {
         try {
-            const response = await fetch(`${API_BASE}/admin/usuarios`);
-            if (!response.ok) throw new Error(`Erro ${response.status}`);
-            const usuarios = await response.json();
+            const usuarios = await EsporTecApi.request(`${API_BASE}/admin/usuarios`);
             
             if (!usuarios || usuarios.length === 0) {
                 renderizarUsuarios([]);
@@ -185,17 +174,9 @@
                 `<span class="badge-active"><i class="bi bi-check-circle me-1"></i>Ativo</span>` : 
                 `<span class="badge-inactive"><i class="bi bi-x-circle me-1"></i>Inativo</span>`;
             
-            let botoes = '';
-            if (user.protegido) {
-                botoes = `<button class="btn-action btn-edit" disabled style="opacity:0.5"><i class="bi bi-lock"></i> Protegido</button>`;
-            } else {
-                botoes = `
-                    <button class="btn-action btn-edit" data-person-action="editar" data-id="${user.id}"><i class="bi bi-pencil"></i> Editar</button>
-                    <button class="btn-action ${user.ativo ? 'btn-inactive' : 'btn-edit'}" data-person-action="toggle" data-id="${user.id}">
-                        <i class="bi ${user.ativo ? 'bi-ban' : 'bi-check'}"></i> ${user.ativo ? 'Inativar' : 'Reativar'}
-                    </button>
-                `;
-            }
+            const botoes = user.dono
+                ? `<button class="btn-action btn-edit" disabled><i class="bi bi-shield-lock"></i> Proprietário</button>`
+                : `<button class="btn-action btn-inactive" data-person-action="remover" data-id="${user.id}" data-arena="${user.arenas_id}" data-perfil="${user.perfil}"><i class="bi bi-person-x"></i> Remover</button>`;
 
             container.innerHTML += `
                 <div class="user-card" data-usuario-id="${user.id}">
@@ -203,7 +184,7 @@
                     <div class="user-info">
                         <div class="user-name">${user.nome} <span class="user-role ${roleClass}">${roleLabel}</span></div>
                         <div class="user-email">${user.email}</div>
-                        ${user.perfil === 'admin' ? '<small class="text-muted">Proprietária/Gestora da arena</small>' : ''}
+                        ${user.dono ? '<small class="text-muted">Dono da arena</small>' : ''}
                     </div>
                     ${badge}
                     ${botoes}
@@ -237,51 +218,31 @@
 
     //  SALVAR USUÁRIO (criar ou editar) - API: POST/PUT /api/admin/usuarios
     document.getElementById('btnCriarUsuario').addEventListener('click', async () => {
-        const id = document.getElementById('usuarioEditId').value;
         const payload = {
             nome: document.getElementById('pessoaNome').value.trim(),
             email: document.getElementById('pessoaEmail').value.trim(),
-            cpf: document.getElementById('pessoaCpf').value.trim(),
+            telefone: document.getElementById('pessoaTelefone').value.trim(),
             perfil: document.getElementById('pessoaPerfil').value,
-            senha: document.getElementById('pessoaSenha').value || undefined,
-            senha_confirmacao: document.getElementById('pessoaSenhaConfirm').value || undefined
+            senha: document.getElementById('pessoaSenha').value,
+            senha_confirmation: document.getElementById('pessoaSenhaConfirm').value
         };
 
-        if (!payload.nome || !payload.email) {
-            esportecToast('Preencha nome e e-mail.', 'warning');
+        if (!payload.nome || !payload.email || !payload.telefone || !payload.senha) {
+            esportecToast('Preencha todos os dados do funcionário.', 'warning');
+            return;
+        }
+        if (payload.senha !== payload.senha_confirmation) {
+            esportecToast('A confirmação da senha não corresponde.', 'warning');
             return;
         }
 
         try {
-            const url = id ? `${API_BASE}/admin/usuarios/${id}` : `${API_BASE}/admin/usuarios`;
-            const method = id ? 'PUT' : 'POST';
-            
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
-                body: JSON.stringify(payload)
-            });
-            
-            if (!response.ok) throw new Error('Erro');
-            
+            await EsporTecApi.request(`${API_BASE}/admin/usuarios`, { method: 'POST', body: JSON.stringify(payload) });
             bootstrap.Modal.getInstance(document.getElementById('modalNovoUsuario')).hide();
-            esportecToast(id ? 'Usuário atualizado.' : 'Usuário criado.', 'success');
+            esportecToast('Funcionário cadastrado com sucesso.', 'success');
             carregarUsuarios();
         } catch (error) {
-            console.error('Erro ao salvar usuário:', error);
-            // Fallback visual
-            bootstrap.Modal.getInstance(document.getElementById('modalNovoUsuario')).hide();
-            esportecToast(id ? 'Usuário atualizado (simulado).' : 'Usuário criado (simulado).', 'success');
-            // Adiciona ao mock e re-renderiza
-            if (!id) {
-                MOCK_USUARIOS.push({
-                    id: Date.now(),
-                    ...payload,
-                    ativo: true,
-                    protegido: false
-                });
-                renderizarUsuarios(MOCK_USUARIOS);
-            }
+            esportecToast(error.message, 'warning');
         }
     });
 
@@ -293,63 +254,26 @@
         const action = button.dataset.personAction;
         const id = button.dataset.id;
 
-        if (action === 'editar') {
-            // Preenche modal com dados do usuário
-            const user = MOCK_USUARIOS.find(u => u.id == id);
-            if (user) {
-                document.getElementById('usuarioEditId').value = user.id;
-                document.getElementById('pessoaNome').value = user.nome;
-                document.getElementById('pessoaEmail').value = user.email;
-                document.getElementById('pessoaCpf').value = user.cpf;
-                document.getElementById('pessoaPerfil').value = user.perfil;
-                document.getElementById('pessoaSenha').value = '';
-                document.getElementById('pessoaSenhaConfirm').value = '';
-                
-                document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-person-gear me-2"></i>Editar Usuário';
-                document.getElementById('btnTextoAcao').textContent = 'Atualizar';
-            }
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNovoUsuario')).show();
-            return;
-        }
-
-        if (action === 'toggle') {
-            if (!confirm('Alterar status deste usuário?')) return;
-            
+        if (action === 'remover') {
+            if (!confirm('Remover este funcionário da equipe?')) return;
             try {
-                const user = MOCK_USUARIOS.find(u => u.id == id);
-                if (!user) return;
-                
-                const response = await fetch(`${API_BASE}/admin/usuarios/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
-                    body: JSON.stringify({ ativo: !user.ativo })
+                await EsporTecApi.request(`${API_BASE}/admin/usuarios/${id}`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ arenas_id: Number(button.dataset.arena), tipo: button.dataset.perfil === 'admin' ? 'administrador' : 'funcionario' })
                 });
-                if (!response.ok) throw new Error('Erro');
-                
-                esportecToast(user.ativo ? 'Usuário inativado.' : 'Usuário reativado.', 'success');
+                esportecToast('Funcionário removido da equipe.', 'success');
                 carregarUsuarios();
             } catch (error) {
-                // Fallback visual
-                const card = button.closest('.user-card');
-                const badge = card.querySelector('.badge-active, .badge-inactive');
-                const reativando = button.textContent.trim().includes('Reativar');
-                
-                badge.className = reativando ? 'badge-active' : 'badge-inactive';
-                badge.innerHTML = reativando ? '<i class="bi bi-check-circle me-1"></i>Ativo' : '<i class="bi bi-x-circle me-1"></i>Inativo';
-                button.className = `btn-action ${reativando ? 'btn-inactive' : 'btn-edit'}`;
-                button.innerHTML = reativando ? '<i class="bi bi-ban"></i> Inativar' : '<i class="bi bi-check"></i> Reativar';
-                
-                esportecToast(reativando ? 'Usuário inativado (simulado).' : 'Usuário reativado (simulado).', 'success');
+                esportecToast(error.message, 'warning');
             }
         }
     });
 
     // Reset modal ao fechar
     document.getElementById('modalNovoUsuario').addEventListener('hidden.bs.modal', () => {
-        document.getElementById('usuarioEditId').value = '';
         document.getElementById('pessoaNome').value = '';
         document.getElementById('pessoaEmail').value = '';
-        document.getElementById('pessoaCpf').value = '';
+        document.getElementById('pessoaTelefone').value = '';
         document.getElementById('pessoaSenha').value = '';
         document.getElementById('pessoaSenhaConfirm').value = '';
         document.getElementById('modalTitulo').innerHTML = '<i class="bi bi-person-plus me-2"></i>Novo Usuário';

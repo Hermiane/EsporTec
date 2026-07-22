@@ -12,11 +12,14 @@ use App\Models\Quadra;
 use App\Models\Reserva;
 use App\Models\SuperAdmin;
 use App\Models\Suporte;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ArenaCadastroController extends Controller
 {
@@ -27,7 +30,9 @@ class ArenaCadastroController extends Controller
             'cnpj' => ['required', 'string', 'max:18', 'unique:arenas,cnpj'],
             'responsavel' => ['required', 'string', 'max:100'],
             'telefone' => ['required', 'string', 'max:20'],
-            'email' => ['required', 'email', 'max:50', 'unique:arenas,email'],
+            'data_nascimento' => ['required', 'date', 'before:today'],
+            'email' => ['required', 'email', 'max:50', 'unique:arenas,email', 'unique:usuarios,email'],
+            'senha' => ['required', 'string', 'min:8', 'confirmed'],
             'logradouro' => ['required', 'string', 'max:60'],
             'numero' => ['nullable', 'string', 'max:10'],
             'bairro' => ['required', 'string', 'max:20'],
@@ -49,15 +54,40 @@ class ArenaCadastroController extends Controller
             'foto_capa' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
+        $telefone = preg_replace('/\D/', '', $dados['telefone']);
+        if (strlen($telefone) !== 11) {
+            return response()->json([
+                'message' => 'Informe um telefone com DDD e 11 números.',
+                'errors' => ['telefone' => ['Informe um telefone com DDD e 11 números.']],
+            ], 422);
+        }
+
         $fotoCapa = $request->hasFile('foto_capa') ? '/storage/'.$request->file('foto_capa')->store('arenas', 'public') : null;
-        $arena = DB::transaction(function () use ($dados, $request, $fotoCapa) {
+        $arena = DB::transaction(function () use ($dados, $telefone, $fotoCapa) {
+            $baseNomeUsuario = Str::limit(Str::before($dados['email'], '@'), 40, '');
+            $nomeUsuario = $baseNomeUsuario;
+            $sufixo = 1;
+            while (Usuario::where('nome_usuario', $nomeUsuario)->exists()) {
+                $nomeUsuario = Str::limit($baseNomeUsuario, 40, '').'-'.$sufixo++;
+            }
+
+            $proprietario = Usuario::create([
+                'nome_completo' => $dados['responsavel'],
+                'nome_usuario' => $nomeUsuario,
+                'email' => $dados['email'],
+                'senha_hash' => Hash::make($dados['senha']),
+                'telefone' => $telefone,
+                'data_nascimento' => $dados['data_nascimento'],
+                'ativo' => false,
+            ]);
+
             $arena = Arena::create([
-                'criado_por' => $request->user()->id,
+                'criado_por' => $proprietario->id,
                 'nome' => $dados['nome'], 'cnpj' => $dados['cnpj'],
                 'logradouro' => $dados['logradouro'], 'numero' => $dados['numero'] ?? null,
                 'bairro' => $dados['bairro'], 'cidade' => $dados['cidade'], 'estado' => strtoupper($dados['estado']),
                 'ponto_referencia' => $dados['ponto_referencia'] ?? null,
-                'telefone' => preg_replace('/\D/', '', $dados['telefone']), 'email' => $dados['email'],
+                'telefone' => $telefone, 'email' => $dados['email'],
                 'descricao' => $dados['descricao'], 'foto_capa' => $fotoCapa, 'pix_tipo' => $dados['pix_tipo'], 'pix_chave' => $dados['pix_chave'],
                 'ativo' => false, 'status_aprovacao' => 'pendente',
             ]);
@@ -111,6 +141,7 @@ class ArenaCadastroController extends Controller
         $this->autorizarSuperAdmin($request);
         abort_unless($arena->status_aprovacao === 'pendente', 422, 'Esta arena não está pendente de análise.');
         DB::transaction(function () use ($arena, $request) {
+            $arena->criadoPor()->update(['ativo' => true]);
             $arena->update(['ativo' => true, 'status_aprovacao' => 'aprovada', 'motivo_recusa' => null, 'analisada_em' => now(), 'analisada_por' => $request->user()->id]);
             Quadra::where('arenas_id', $arena->id)->update(['ativo' => true]);
             HorarioFuncionamento::whereIn('quadras_id', $arena->quadras()->pluck('id'))->update(['ativo' => true]);

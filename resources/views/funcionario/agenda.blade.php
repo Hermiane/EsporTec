@@ -63,24 +63,19 @@
         <section class="row g-3 mb-4">
             <div class="col-md-3"><div class="card-soft p-3"><span class="text-muted small">Reservas hoje</span><h3 class="fw-bold mb-0" id="countReservas">-</h3></div></div>
             <div class="col-md-3"><div class="card-soft p-3"><span class="text-muted small">Pagamentos pendentes</span><h3 class="fw-bold mb-0 text-warning" id="countPendentes">-</h3></div></div>
-            <div class="col-md-3"><div class="card-soft p-3"><span class="text-muted small">Aniversariantes</span><h3 class="fw-bold mb-0 text-success" id="countAniversariantes">2</h3></div></div>
+            <div class="col-md-3"><div class="card-soft p-3"><span class="text-muted small">Quadras ativas</span><h3 class="fw-bold mb-0 text-success" id="countQuadras">-</h3></div></div>
             <div class="col-md-3"><div class="card-soft p-3"><span class="text-muted small">Próxima reserva</span><h3 class="fw-bold mb-0" id="proximaReserva">-</h3></div></div>
         </section>
 
         <section class="card-soft p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <h5 class="fw-bold mb-0" id="agendaTitulo">Grade por quadra - visão do dia</h5>
-                <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalReserva">Nova reserva manual</button>
+                <span class="text-muted small">Somente dados reais da arena</span>
             </div>
             <div class="table-responsive">
                 <div class="agenda-grid" id="agendaGrid">
                     <!-- Preenchido via JS -->
-                    <div class="cell head">Horário</div>
-                    <div class="cell head">Futsal Arena</div>
-                    <div class="cell head">Society Premium</div>
-                    <div class="cell head">Society Descoberta</div>
                     <div class="cell hour">Carregando...</div>
-                    <div class="cell busy" colspan="3">Aguarde</div>
                 </div>
             </div>
         </section>
@@ -105,7 +100,6 @@
         </div>
         <div class="modal-footer flex-wrap">
             <button class="btn btn-success" id="btnConfirmarPagamentoModal"><i class="bi bi-check-circle me-1"></i>Confirmar pagamento</button>
-            <button class="btn btn-outline-primary" id="btnAlterarHorarioModal"><i class="bi bi-clock me-1"></i>Alterar horário</button>
             <button class="btn btn-outline-danger" id="btnCancelarReservaModal"><i class="bi bi-x-circle me-1"></i>Cancelar</button>
         </div>
     </div></div>
@@ -125,7 +119,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
-<script>
+<script src="/js/esportec-api.js"></script>
+<script type="text/plain" id="legacyAgendaScript">
     
     //  INTEGRAÇÃO COM API - AGENDA FUNCIONÁRIO
    
@@ -460,5 +455,6 @@
         carregarAgenda();
     });
 </script>
+<script src="/js/funcionario-agenda.js"></script>
 </body>
 </html>

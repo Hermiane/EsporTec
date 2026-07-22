@@ -7,8 +7,11 @@ use App\Models\FuncionarioArena;
 use App\Models\ResetarSenha;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -54,9 +57,55 @@ class AuthController extends Controller
         ]);
     }
     public function logout(Request $request) { $request->user()->currentAccessToken()?->delete(); return response()->noContent(); }
-    public function solicitarReset(Request $request) { $d=$request->validate(['email'=>['required','email']]); $u=Usuario::where('email',$d['email'])->first(); if(!$u) return response()->json(['message'=>'Se o e-mail existir, o código será enviado.']); $codigo=(string)random_int(100000,999999); ResetarSenha::where('usuarios_id',$u->id)->where('usado',false)->update(['usado'=>true]); ResetarSenha::create(['usuarios_id'=>$u->id,'email'=>$u->email,'codigo'=>Hash::make($codigo),'expira_em'=>now()->addMinutes(15),'tipo'=>'resetar_senha','ip'=>$request->ip()]); Mail::raw("Seu código EsporTec é {$codigo}. Expira em 15 minutos.",fn($m)=>$m->to($u->email)->subject('Recuperação de senha')); return response()->json(['message'=>'Código de recuperação enviado.']); }
-    public function redefinirSenha(Request $request) { $d=$request->validate(['email'=>['required','email'],'codigo'=>['required','digits:6'],'senha'=>['required','string','min:8','confirmed']]); $r=ResetarSenha::where('email',$d['email'])->where('usado',false)->where('expira_em','>',now())->latest()->first(); if(!$r||$r->tentativa>=5||!Hash::check($d['codigo'],$r->codigo)){ if($r)$r->increment('tentativa'); return response()->json(['message'=>'Código inválido ou expirado'],422); } $r->update(['usado'=>true]); $r->usuario->update(['senha_hash'=>Hash::make($d['senha'])]); return response()->json(['message'=>'Senha redefinida com sucesso.']); }
-    public function verificarCodigoReset(Request $request) { $d=$request->validate(['email'=>['required','email'],'codigo'=>['required','digits:6']]); $r=ResetarSenha::where('email',$d['email'])->where('usado',false)->where('expira_em','>',now())->latest()->first(); if(!$r||$r->tentativa>=5||!Hash::check($d['codigo'],$r->codigo)){ if($r)$r->increment('tentativa'); return response()->json(['message'=>'Código inválido ou expirado'],422); } return response()->json(['message'=>'Código validado.']); }
+    public function solicitarReset(Request $request)
+    {
+        $dados = $request->validate(['email' => ['required', 'email']]);
+        $usuario = Usuario::where('email', Str::lower($dados['email']))->first();
+        if (! $usuario) return response()->json(['message' => 'Se o e-mail existir, o código será enviado.']);
+
+        $codigo = (string) random_int(100000, 999999);
+        ResetarSenha::where('usuarios_id', $usuario->id)->where('usado', false)->update(['usado' => true]);
+        $reset = ResetarSenha::create(['usuarios_id' => $usuario->id, 'email' => $usuario->email, 'codigo' => Hash::make($codigo), 'expira_em' => now()->addMinutes(15), 'tipo' => 'resetar_senha', 'ip' => $request->ip()]);
+
+        try {
+            Mail::raw("Seu código de recuperação EsporTec é {$codigo}. Ele expira em 15 minutos.", fn ($mensagem) => $mensagem->to($usuario->email)->subject('Recuperação de senha — EsporTec'));
+        } catch (\Throwable $erro) {
+            $reset->update(['usado' => true]);
+            Log::warning('Falha ao enviar código de recuperação de senha.', ['usuario_id' => $usuario->id, 'erro' => $erro->getMessage()]);
+            return response()->json(['message' => 'Não foi possível enviar o código agora. Tente novamente em alguns minutos.'], 503);
+        }
+        return response()->json(['message' => 'Código de recuperação enviado.']);
+    }
+
+    public function redefinirSenha(Request $request)
+    {
+        $dados = $request->validate(['email' => ['required', 'email'], 'codigo' => ['required', 'digits:6'], 'senha' => ['required', 'string', 'min:8', 'confirmed']]);
+        $reset = $this->resetValido(Str::lower($dados['email']), $dados['codigo']);
+        if (! $reset) return response()->json(['message' => 'Código inválido ou expirado.'], 422);
+
+        DB::transaction(function () use ($reset, $dados) {
+            $reset->update(['usado' => true]);
+            $reset->usuario->update(['senha_hash' => Hash::make($dados['senha'])]);
+            $reset->usuario->tokens()->delete();
+        });
+        return response()->json(['message' => 'Senha redefinida com sucesso.']);
+    }
+
+    public function verificarCodigoReset(Request $request)
+    {
+        $dados = $request->validate(['email' => ['required', 'email'], 'codigo' => ['required', 'digits:6']]);
+        if (! $this->resetValido(Str::lower($dados['email']), $dados['codigo'])) return response()->json(['message' => 'Código inválido ou expirado.'], 422);
+        return response()->json(['message' => 'Código validado.']);
+    }
+
+    private function resetValido(string $email, string $codigo): ?ResetarSenha
+    {
+        $reset = ResetarSenha::where('email', $email)->where('usado', false)->where('expira_em', '>', now())->latest()->first();
+        if (! $reset || $reset->tentativa >= 5) return null;
+        if (Hash::check($codigo, $reset->codigo)) return $reset;
+        $reset->increment('tentativa');
+        return null;
+    }
 
     private function acessosPermitidos(Usuario $usuario): array
     {

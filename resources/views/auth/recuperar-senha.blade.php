@@ -66,7 +66,7 @@
                         <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
                         <input type="text" class="otp-input" maxlength="1" pattern="[0-9]">
                     </div>
-                    <small class="text-muted">Código expira em <strong id="timer">02:00</strong></small>
+                    <small class="text-muted">Código expira em <strong id="timer">15:00</strong></small>
                 </div>
                 <button type="button" class="btn btn-primary-custom text-white" onclick="nextStep(3)">Verificar Código</button>
                 <div class="text-center mt-3">
@@ -80,11 +80,11 @@
             <form id="form-step-3">
                 <div class="mb-3">
                     <label class="form-label fw-medium">Nova Senha</label>
-                    <input type="password" class="form-control" placeholder="••••••••" required minlength="6">
+                    <input type="password" class="form-control" placeholder="••••••••" required minlength="8" autocomplete="new-password">
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-medium">Confirmar Senha</label>
-                    <input type="password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" class="form-control" placeholder="••••••••" required minlength="8" autocomplete="new-password">
                 </div>
                 <button type="submit" class="btn btn-primary-custom text-white">Salvar Nova Senha</button>
             </form>
@@ -98,7 +98,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/esportec-ui.js"></script>
     <script src="/js/esportec-api.js"></script>
-    <script>
+    <script type="text/plain" id="legacyRecuperacaoVisual">
         function nextStep(step) {
             // Esconde todos os passos
             document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
@@ -153,7 +153,7 @@
             setTimeout(() => window.location.href = '/login', 1500);
         });
     </script>
-    <script>
+    <script type="text/plain" id="legacyRecuperacaoApi">
         let emailReset = '';
         const mudarPasso = step => {
             document.querySelectorAll('.step-content,.step-dot').forEach(el => el.classList.remove('active'));
@@ -169,5 +169,6 @@
         };
         document.getElementById('form-step-3').addEventListener('submit', async event => { event.preventDefault(); event.stopImmediatePropagation(); const senhas=[...document.querySelectorAll('#form-step-3 input')]; const codigo=[...document.querySelectorAll('.otp-input')].map(i=>i.value).join(''); try { await EsporTecApi.request('/api/auth/redefinir-senha',{method:'POST',body:JSON.stringify({email:emailReset,codigo,senha:senhas[0].value,senha_confirmation:senhas[1].value})}); window.location.href='/login'; } catch(error) { esportecToast(error.message,'warning'); } }, true);
     </script>
+    <script src="/js/recuperar-senha.js"></script>
 </body>
 </html>

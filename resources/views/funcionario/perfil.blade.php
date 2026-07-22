@@ -49,91 +49,74 @@
     <main class="main">
         <div class="profile-card">
             <div class="profile-header">
-                <div class="avatar">MS</div>
-                <h2 class="fw-bold mb-2">Maria Silva</h2>
+                <div class="avatar" id="perfilAvatar">--</div>
+                <h2 class="fw-bold mb-2" id="perfilNome">Carregando...</h2>
                 <span class="badge-role"><i class="bi bi-person-badge"></i> Funcionário</span>
-                <p class="text-muted mt-2 mb-0">Matrícula: FUNC-2024-089</p>
+                <p class="text-muted mt-2 mb-0" id="perfilCargo">Conta profissional</p>
             </div>
 
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-envelope"></i> E-mail</span>
-                <span class="info-value">maria.silva@esportec.com.br</span>
+                <span class="info-value" id="perfilEmail">-</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-phone"></i> Telefone</span>
-                <span class="info-value">(11) 98765-4321</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label"><i class="bi bi-calendar-heart"></i> Data de Nascimento</span>
-                <span class="info-value">15/03/1995</span>
+                <span class="info-value" id="perfilTelefone">-</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-building"></i> Arena</span>
-                <span class="info-value">EsporTec - Unidade Principal</span>
+                <span class="info-value" id="perfilArena">-</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-clock"></i> Turno</span>
-                <span class="info-value">Tarde (12:00 - 20:00)</span>
+                <span class="info-value" id="perfilTurno">-</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-calendar-check"></i> Data de Admissão</span>
-                <span class="info-value">10/01/2024</span>
+                <span class="info-value" id="perfilAdmissao">-</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-check-circle"></i> Status</span>
-                <span class="info-value" style="color: #10B981;">Ativo</span>
+                <span class="info-value" id="perfilStatus">-</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="bi bi-lock"></i> Permissões</span>
-                <span class="info-value">Agendar, Confirmar, Cancelar</span>
+                <span class="info-value" id="perfilPermissoes">-</span>
             </div>
-
-            <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
-                <i class="bi bi-pencil"></i>Editar Perfil
-            </button>
         </div>
     </main>
 </div>
 
-<div class="modal fade" id="modalEditarPerfil" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold"><i class="bi bi-person-gear me-2"></i>Editar perfil profissional</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <label class="form-label"><i class="bi bi-phone me-1"></i>Telefone</label>
-                <input class="form-control mb-3" id="funcTelefone" value="(11) 98765-4321">
-                <label class="form-label"><i class="bi bi-clock me-1"></i>Turno</label>
-                <select class="form-select mb-3" id="funcTurno">
-                    <option>Tarde (12:00 - 20:00)</option>
-                    <option>Manhã (07:00 - 15:00)</option>
-                    <option>Noite (15:00 - 23:00)</option>
-                </select>
-                <label class="form-label"><i class="bi bi-shield-check me-1"></i>Permissões</label>
-                <input class="form-control" id="funcPermissoes" value="Agendar, Confirmar, Cancelar">
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-primary" id="btnSalvarPerfilFuncionario">
-                    <i class="bi bi-check-lg me-1"></i>Salvar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
-    document.getElementById('btnSalvarPerfilFuncionario').addEventListener('click', () => {
-        document.querySelectorAll('.info-row')[1].querySelector('.info-value').textContent = document.getElementById('funcTelefone').value;
-        document.querySelectorAll('.info-row')[4].querySelector('.info-value').textContent = document.getElementById('funcTurno').value;
-        document.querySelectorAll('.info-row')[7].querySelector('.info-value').textContent = document.getElementById('funcPermissoes').value;
-        bootstrap.Modal.getInstance(document.getElementById('modalEditarPerfil')).hide();
-        esportecToast('Perfil profissional atualizado.', 'success');
-    });
+    const formatarTelefone = telefone => telefone?.length === 11 ? telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3') : (telefone || '-');
+    const formatarData = data => data ? new Date(`${data}T00:00:00`).toLocaleDateString('pt-BR') : '-';
+    const rotuloTurno = { manha: 'Manhã', tarde: 'Tarde', noite: 'Noite', integral: 'Integral' };
+
+    async function carregarPerfil() {
+        try {
+            const dados = await EsporTecApi.request('/api/funcionario/perfil');
+            const vinculos = dados.vinculos;
+            const permissoes = [...new Set(vinculos.flatMap(vinculo => vinculo.permissoes))];
+            document.getElementById('perfilNome').textContent = dados.usuario.nome;
+            document.getElementById('perfilAvatar').textContent = dados.usuario.nome.split(' ').map(parte => parte[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('perfilCargo').textContent = [...new Set(vinculos.map(v => v.cargo))].join(', ') || 'Funcionário';
+            document.getElementById('perfilEmail').textContent = dados.usuario.email;
+            document.getElementById('perfilTelefone').textContent = formatarTelefone(dados.usuario.telefone);
+            document.getElementById('perfilArena').textContent = vinculos.map(v => v.arena?.nome).filter(Boolean).join(', ') || '-';
+            document.getElementById('perfilTurno').textContent = [...new Set(vinculos.map(v => rotuloTurno[v.turno] || v.turno))].join(', ') || '-';
+            document.getElementById('perfilAdmissao').textContent = vinculos.map(v => formatarData(v.data_entrada)).join(', ') || '-';
+            document.getElementById('perfilStatus').textContent = dados.usuario.ativo && vinculos.some(v => v.ativo) ? 'Ativo' : 'Inativo';
+            document.getElementById('perfilStatus').style.color = dados.usuario.ativo ? '#10B981' : '#DC2626';
+            document.getElementById('perfilPermissoes').textContent = permissoes.join(', ') || 'Permissões padrão de funcionário';
+        } catch (error) {
+            esportecToast(error.message, 'warning');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarPerfil);
 </script>
 </body>
 </html>
