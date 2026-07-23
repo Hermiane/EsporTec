@@ -195,5 +195,6 @@ document.getElementById('buscarLog').addEventListener('keydown', event => {
     }
 });
 </script>
+<script src="/js/esportec-ui.js"></script>
 </body>
 </html>

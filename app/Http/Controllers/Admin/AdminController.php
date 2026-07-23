@@ -86,7 +86,7 @@ class AdminController extends Controller
     public function updateQuadra(Request $request, $id)
     {
         $quadra = Quadra::findOrFail($id); $this->autorizarArena($request, (int) $quadra->arenas_id);
-        $d = $request->validate(['nome' => ['sometimes', 'string', 'max:255'], 'preco_hora' => ['sometimes', 'numeric', 'min:0'], 'ativo' => ['sometimes', 'boolean'], 'coberta' => ['sometimes', 'boolean'], 'capacidade_jogador' => ['sometimes', 'integer', 'min:1']]);
+        $d = $request->validate(['nome' => ['sometimes', 'string', 'max:255'], 'tipo' => ['sometimes', 'in:society,futsal,futebol,misto'], 'descricao' => ['sometimes', 'nullable', 'string'], 'preco_hora' => ['sometimes', 'numeric', 'min:0'], 'ativo' => ['sometimes', 'boolean'], 'coberta' => ['sometimes', 'boolean'], 'capacidade_jogador' => ['sometimes', 'integer', 'min:1']]);
         $quadra->update($d); return response()->json(['message' => 'Quadra atualizada.', 'data' => $quadra->fresh()]);
     }
 

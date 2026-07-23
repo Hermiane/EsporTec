@@ -24,39 +24,39 @@
             <h2 class="fw-bold" style="color: var(--primary);">Criar Conta</h2>
             <p class="text-muted">Preencha seus dados para começar</p>
         </div>
-        <form id="createAccountForm">
+        <form id="createAccountForm" autocomplete="off">
             @csrf
             <div class="mb-3">
                 <label class="form-label fw-medium">Nome Completo</label>
-                <input type="text" class="form-control" placeholder="Seu nome" required>
+                <input type="text" class="form-control" id="nomeCompleto" placeholder="Seu nome" autocomplete="off" required>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-medium">Nome de usuário</label>
-                <input type="text" class="form-control" placeholder="Ex: joao.silva" required>
+                <input type="text" class="form-control" id="nomeUsuario" placeholder="Ex: joao.silva" autocomplete="off" required>
                 <small class="text-muted">Campo obrigatório no banco para identificar sua conta.</small>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-medium">E-mail</label>
-                <input type="email" class="form-control" placeholder="seu@email.com" required>
+                <input type="email" class="form-control" id="emailCadastro" placeholder="seu@email.com" autocomplete="off" value="" required>
             </div>
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Telefone</label>
-                    <input type="tel" class="form-control" placeholder="(00) 00000-0000" required>
+                    <input type="tel" class="form-control" id="telefoneCadastro" placeholder="(00) 00000-0000" autocomplete="off" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Data de Nascimento</label>
-                    <input type="date" class="form-control" required>
+                    <input type="date" class="form-control" id="dataNascimentoCadastro" autocomplete="off" required>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Senha</label>
-                    <input type="password" class="form-control" id="senha" placeholder="••••••••" required minlength="6">
+                    <input type="password" class="form-control" id="senha" placeholder="••••••••" autocomplete="new-password" required minlength="8">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Confirmar Senha</label>
-                    <input type="password" class="form-control" id="confirmarSenha" placeholder="••••••••" required minlength="6">
+                    <input type="password" class="form-control" id="confirmarSenha" placeholder="••••••••" autocomplete="new-password" required minlength="8">
                 </div>
             </div>
             <div class="form-check mb-4">
@@ -91,6 +91,12 @@
     <script src="/js/esportec-ui.js"></script>
     <script src="/js/esportec-api.js"></script>
     <script>
+        function limparEmailCadastro() {
+            document.getElementById('emailCadastro').value = '';
+        }
+        limparEmailCadastro();
+        window.addEventListener('pageshow', limparEmailCadastro);
+
         document.getElementById('createAccountForm').addEventListener('submit', event => {
             event.preventDefault();
             const submitButton = event.submitter;
@@ -98,8 +104,15 @@
                 esportecToast('As senhas precisam ser iguais.', 'warning');
                 return;
             }
-            const inputs = document.querySelectorAll('#createAccountForm input');
-            const payload = { nome_completo: inputs[1].value, nome_usuario: inputs[2].value, email: inputs[3].value, telefone: inputs[4].value.replace(/\D/g, ''), data_nascimento: inputs[5].value, senha: document.getElementById('senha').value, senha_confirmation: document.getElementById('confirmarSenha').value };
+            const payload = {
+                nome_completo: document.getElementById('nomeCompleto').value,
+                nome_usuario: document.getElementById('nomeUsuario').value,
+                email: document.getElementById('emailCadastro').value,
+                telefone: document.getElementById('telefoneCadastro').value.replace(/\D/g, ''),
+                data_nascimento: document.getElementById('dataNascimentoCadastro').value,
+                senha: document.getElementById('senha').value,
+                senha_confirmation: document.getElementById('confirmarSenha').value
+            };
             esportecWithLoading(submitButton, 'Cadastrando...', async () => { const data = await EsporTecApi.request('/api/auth/registro', { method: 'POST', body: JSON.stringify(payload) }); EsporTecApi.saveSession(data); }).then(() => { sessionStorage.setItem('esportecRole', 'cliente'); window.location.replace('/painel'); }).catch(error => esportecToast(error.message, 'warning'));
         });
 </script>

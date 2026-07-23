@@ -98,7 +98,7 @@
                 <h1 class="fw-bold mb-1">Quadras</h1>
                 <p class="text-muted mb-0">Cadastre, edite horários e controle bloqueios.</p>
             </div>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalQuadra"><i class="bi bi-plus-lg me-2"></i>Nova Quadra</button>
+            <button class="btn btn-success" id="btnNovaQuadra" data-bs-toggle="modal" data-bs-target="#modalQuadra"><i class="bi bi-plus-lg me-2"></i>Nova Quadra</button>
         </div>
 
         <div class="row g-4 mb-4" id="listaQuadras">
@@ -191,6 +191,18 @@
     const API_BASE = '/api';
     
     let quadrasAtuais = [];
+    let quadraEmEdicao = null;
+
+    document.getElementById('btnNovaQuadra').addEventListener('click', () => {
+        quadraEmEdicao = null;
+        document.querySelector('#modalQuadra .modal-title').textContent = 'Nova quadra';
+        ['quadraNomeAdmin', 'quadraValorAdmin', 'quadraCapacidadeAdmin', 'quadraDescricaoAdmin'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('quadraTipoAdmin').selectedIndex = 0;
+        document.getElementById('quadraCoberturaAdmin').selectedIndex = 0;
+        document.getElementById('quadraFotoAdmin').value = '';
+    });
     
     const MOCK_BLOQUEIOS = [
         { id: 1, data: '2026-06-22', quadra_id: 3, quadra_nome: 'Society Descoberta', motivo: 'Manutenção do gramado', status: 'bloqueada' },
@@ -314,17 +326,41 @@
 
     //  SALVAR NOVA QUADRA
     document.getElementById('btnSalvarQuadra').addEventListener('click', async () => {
+        const dadosQuadra = {
+            nome: document.getElementById('quadraNomeAdmin').value.trim(),
+            tipo: document.getElementById('quadraTipoAdmin').value.toLowerCase(),
+            preco_hora: parseFloat(document.getElementById('quadraValorAdmin').value) || 0,
+            capacidade_jogador: parseInt(document.getElementById('quadraCapacidadeAdmin').value) || 10,
+            coberta: document.getElementById('quadraCoberturaAdmin').value === 'Coberta',
+            descricao: document.getElementById('quadraDescricaoAdmin').value.trim(),
+        };
+        if (!dadosQuadra.nome) { esportecToast('Informe o nome da quadra.', 'warning'); return; }
+
+        if (quadraEmEdicao) {
+            try {
+                await EsporTecApi.request(`${API_BASE}/admin/quadras/${quadraEmEdicao}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(dadosQuadra)
+                });
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQuadra')).hide();
+                esportecToast('Quadra atualizada.', 'success');
+                quadraEmEdicao = null;
+                await carregarQuadras();
+            } catch (error) {
+                esportecToast(error.message || 'Não foi possível atualizar a quadra.', 'danger');
+            }
+            return;
+        }
+
         const payload = new FormData();
-        payload.append('nome', document.getElementById('quadraNomeAdmin').value.trim());
-        payload.append('tipo', document.getElementById('quadraTipoAdmin').value.toLowerCase());
-        payload.append('preco_hora', parseFloat(document.getElementById('quadraValorAdmin').value) || 0);
-        payload.append('capacidade_jogador', parseInt(document.getElementById('quadraCapacidadeAdmin').value) || 10);
-        payload.append('coberta', document.getElementById('quadraCoberturaAdmin').value === 'Coberta' ? '1' : '0');
-        payload.append('descricao', document.getElementById('quadraDescricaoAdmin').value.trim());
+        payload.append('nome', dadosQuadra.nome);
+        payload.append('tipo', dadosQuadra.tipo);
+        payload.append('preco_hora', dadosQuadra.preco_hora);
+        payload.append('capacidade_jogador', dadosQuadra.capacidade_jogador);
+        payload.append('coberta', dadosQuadra.coberta ? '1' : '0');
+        payload.append('descricao', dadosQuadra.descricao);
         payload.append('ativo', '1');
         const foto = document.getElementById('quadraFotoAdmin').files[0]; if (foto) payload.append('foto', foto);
-
-        if (!payload.get('nome')) { esportecToast('Informe o nome da quadra.', 'warning'); return; }
 
         try {
             await EsporTecApi.request(`${API_BASE}/admin/quadras`, {
@@ -352,11 +388,14 @@
         if (action === 'editar') {
             const quadra = quadrasAtuais.find(q => q.id == id);
             if (quadra) {
+                quadraEmEdicao = quadra.id;
+                document.querySelector('#modalQuadra .modal-title').textContent = 'Editar quadra';
                 document.getElementById('quadraNomeAdmin').value = quadra.nome;
                 document.getElementById('quadraTipoAdmin').value = quadra.tipo;
                 document.getElementById('quadraValorAdmin').value = quadra.preco_hora;
-                document.getElementById('quadraCapacidadeAdmin').value = quadra.capacidade;
+                document.getElementById('quadraCapacidadeAdmin').value = quadra.capacidade_jogador;
                 document.getElementById('quadraCoberturaAdmin').value = quadra.coberta ? 'Coberta' : 'Descoberta';
+                document.getElementById('quadraDescricaoAdmin').value = quadra.descricao || '';
             }
             bootstrap.Modal.getOrCreateInstance(document.getElementById('modalQuadra')).show();
             return;

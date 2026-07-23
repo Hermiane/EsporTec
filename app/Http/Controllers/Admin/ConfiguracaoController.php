@@ -55,15 +55,14 @@ class ConfiguracaoController extends Controller
                 'lembrete_automatico' => filter_var($config->get('lembrete_automatico', true), FILTER_VALIDATE_BOOLEAN),
                 'solicitar_feedback' => filter_var($config->get('solicitar_feedback', true), FILTER_VALIDATE_BOOLEAN),
             ],
-            'seguranca' => $config->only(['expiracao_codigo', 'max_tentativas_login', 'tempo_bloqueio', 'duracao_sessao'])->all(),
         ]);
     }
 
     public function update(Request $request)
     {
-        $arena = $this->arenaAtual($request); $d = $request->validate(['arena' => ['required', 'array'], 'horarios' => ['nullable', 'array'], 'regras' => ['nullable', 'array'], 'pagamentos' => ['nullable', 'array'], 'notificacoes' => ['nullable', 'array'], 'seguranca' => ['nullable', 'array']]);
+        $arena = $this->arenaAtual($request); $d = $request->validate(['arena' => ['required', 'array'], 'horarios' => ['nullable', 'array'], 'regras' => ['nullable', 'array'], 'pagamentos' => ['nullable', 'array'], 'notificacoes' => ['nullable', 'array']]);
         $arena->update(['nome' => $d['arena']['nome'], 'cnpj' => $d['arena']['cnpj'], 'logradouro' => $d['arena']['logradouro'], 'numero' => $d['arena']['numero'] ?? null, 'bairro' => $d['arena']['bairro'], 'cidade' => $d['arena']['cidade'], 'estado' => $d['arena']['uf'], 'ponto_referencia' => $d['arena']['referencia'] ?? null, 'telefone' => preg_replace('/\D/', '', $d['arena']['telefone']), 'email' => $d['arena']['email'], 'pix_tipo' => $d['pagamentos']['pix_tipo'], 'pix_chave' => $d['pagamentos']['pix_chave']]);
-        foreach (['regras', 'pagamentos', 'notificacoes', 'seguranca'] as $grupo) foreach (($d[$grupo] ?? []) as $chave => $valor) Configuracao::updateOrCreate(['arenas_id' => $arena->id, 'chave' => $chave], ['valor' => is_bool($valor) ? ($valor ? '1' : '0') : (string) $valor, 'descricao' => 'Configuração da arena']);
+        foreach (['regras', 'pagamentos', 'notificacoes'] as $grupo) foreach (($d[$grupo] ?? []) as $chave => $valor) Configuracao::updateOrCreate(['arenas_id' => $arena->id, 'chave' => $chave], ['valor' => is_bool($valor) ? ($valor ? '1' : '0') : (string) $valor, 'descricao' => 'Configuração da arena']);
         if (!empty($d['horarios']['abertura']) && !empty($d['horarios']['fechamento'])) {
             $horarios = HorarioFuncionamento::whereHas('quadra', fn ($q) => $q->where('arenas_id', $arena->id));
             $horarios->update(['hora_inicio' => $d['horarios']['abertura'], 'hora_fim' => $d['horarios']['fechamento']]);

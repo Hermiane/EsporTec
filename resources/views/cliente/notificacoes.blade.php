@@ -53,70 +53,10 @@
         <h2 class="fw-bold mb-0">Notificações</h2>
     </div>
 
-    <!-- Notificação: Aniversário -->
-    <div class="notification-card unread">
-        <span class="badge-new"></span>
-        <div class="notification-icon icon-aniversario">
-            <i class="bi bi-balloon-heart"></i>
-        </div>
-        <div class="notification-content">
-            <div class="notification-title"><i class="bi bi-balloon-heart text-danger"></i> Feliz aniversário!</div>
-            <div class="notification-text">Hoje é seu dia! Que tal comemorar com uma partida? Ganhe 10% de desconto na sua próxima reserva.</div>
-            <div class="notification-time">Hoje, 08:00</div>
-        </div>
-        <div class="notification-actions">
-            <button class="btn-mark-read" onclick="marcarComoLida(this)">Marcar como lida</button>
-        </div>
-    </div>
-
-    <!-- Notificação: Oferta -->
-    <div class="notification-card unread">
-        <span class="badge-new"></span>
-        <div class="notification-icon icon-oferta">
-            <i class="bi bi-gift"></i>
-        </div>
-        <div class="notification-content">
-            <div class="notification-title"><i class="bi bi-gift text-warning"></i> Oferta especial!</div>
-            <div class="notification-text">Reserve a Quadra Society Premium às terças e quintas e ganhe 15% de desconto. Válido até 30/06.</div>
-            <div class="notification-time">Ontem, 14:30</div>
-        </div>
-        <div class="notification-actions">
-            <button class="btn-mark-read" onclick="marcarComoLida(this)">Marcar como lida</button>
-        </div>
-    </div>
-
-    <!-- Notificação: Aviso -->
-    <div class="notification-card">
-        <div class="notification-icon icon-aviso">
-            <i class="bi bi-exclamation-triangle"></i>
-        </div>
-        <div class="notification-content">
-            <div class="notification-title"><i class="bi bi-exclamation-triangle text-danger"></i> Aviso de manutenção</div>
-            <div class="notification-text">A Quadra Futsal Arena passará por manutenção preventiva no dia 20/06 das 08:00 às 12:00. Agende em outro horário.</div>
-            <div class="notification-time">12/06, 10:15</div>
-        </div>
-        <div class="notification-actions">
-            <button class="btn-mark-read" onclick="marcarComoLida(this)" disabled style="opacity: 0.5;">Lida</button>
-        </div>
-    </div>
-
-    <!-- Notificação: Confirmação -->
-    <div class="notification-card">
-        <div class="notification-icon icon-confirmacao">
-            <i class="bi bi-check-circle"></i>
-        </div>
-        <div class="notification-content">
-            <div class="notification-title"><i class="bi bi-check-circle text-success"></i> Reserva confirmada</div>
-            <div class="notification-text">Sua reserva na Quadra Society Premium para 14/06 às 19:00 foi confirmada. Chegue com 10 minutos de antecedência.</div>
-            <div class="notification-time">10/06, 16:45</div>
-        </div>
-        <div class="notification-actions">
-            <button class="btn-mark-read" onclick="marcarComoLida(this)" disabled style="opacity: 0.5;">Lida</button>
-        </div>
-    </div>
+    <div id="lista-notificacoes"></div>
 
     <!-- Estado vazio (oculto por padrão) -->
-    <div class="empty-state" id="empty-state" style="display: none;">
+    <div class="empty-state" id="empty-state">
         <i class="bi bi-bell-slash"></i>
         <p class="fw-medium">Nenhuma notificação nova</p>
         <small class="text-muted">Quando houver novidades, elas aparecerão aqui.</small>
@@ -125,24 +65,59 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
-    function marcarComoLida(btn) {
-        const card = btn.closest('.notification-card');
-        card.classList.remove('unread');
-        btn.textContent = 'Lida';
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
+    const configuracoesTipo = {
+        aniversario: ['icon-aniversario', 'bi-balloon-heart'],
+        oferta: ['icon-oferta', 'bi-gift'],
+        aviso: ['icon-aviso', 'bi-exclamation-triangle'],
+        confirmacao: ['icon-confirmacao', 'bi-check-circle']
+    };
 
-        // Remove o badge "novo"
-        const badge = card.querySelector('.badge-new');
-        if (badge) badge.remove();
+    function escapar(texto) {
+        const elemento = document.createElement('div');
+        elemento.textContent = texto ?? '';
+        return elemento.innerHTML;
+    }
 
-        // Verifica se todas foram lidas
-        const unread = document.querySelectorAll('.notification-card.unread');
-        if (unread.length === 0) {
-            // Opcional: mostrar estado vazio se quiser
+    async function carregarNotificacoes() {
+        try {
+            const notificacoes = await EsporTecApi.request('/api/cliente/notificacoes');
+            const lista = document.getElementById('lista-notificacoes');
+            document.getElementById('empty-state').style.display = notificacoes.length ? 'none' : 'block';
+            lista.innerHTML = notificacoes.map(notificacao => {
+                const [classe, icone] = configuracoesTipo[notificacao.tipo] || ['icon-aviso', 'bi-bell'];
+                const data = notificacao.enviada_em
+                    ? new Date(notificacao.enviada_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+                    : '';
+                return `<div class="notification-card ${notificacao.lida ? '' : 'unread'}">
+                    ${notificacao.lida ? '' : '<span class="badge-new"></span>'}
+                    <div class="notification-icon ${classe}"><i class="bi ${icone}"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">${escapar(notificacao.titulo)}</div>
+                        <div class="notification-text">${escapar(notificacao.mensagem)}</div>
+                        <div class="notification-time">${data}</div>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="btn-mark-read" data-id="${notificacao.id}" ${notificacao.lida ? 'disabled style="opacity: .5"' : ''}>
+                            ${notificacao.lida ? 'Lida' : 'Marcar como lida'}
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        } catch (erro) {
+            esportecToast('Não foi possível carregar as notificações.', 'warning');
         }
     }
+
+    document.addEventListener('click', async event => {
+        const botao = event.target.closest('.btn-mark-read:not(:disabled)');
+        if (!botao) return;
+        await EsporTecApi.request(`/api/cliente/notificacoes/${botao.dataset.id}/ler`, { method: 'PATCH' });
+        carregarNotificacoes();
+    });
+
+    carregarNotificacoes();
 </script>
 </body>
 </html>

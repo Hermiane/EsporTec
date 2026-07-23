@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AdminArena;
 use App\Models\Arena;
 use App\Models\Auditoria;
+use App\Models\Configuracao;
 use App\Models\Despesa;
 use App\Models\HorarioFuncionamento;
 use App\Models\Pagamento;
@@ -44,15 +45,32 @@ class ArenaCadastroController extends Controller
             'quadras' => ['required', 'array', 'min:1'],
             'quadras.*.nome' => ['required', 'string', 'max:50'],
             'quadras.*.foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-            'preco_hora' => ['required', 'numeric', 'min:0'],
-            'capacidade_jogador' => ['required', 'integer', 'min:1'],
+            'quadras.*.preco_hora' => ['required', 'numeric', 'min:0'],
+            'quadras.*.capacidade_jogador' => ['required', 'integer', 'min:1'],
+            'quadras.*.descricao' => ['required', 'string', 'max:2000'],
+            'quadras.*.coberta' => ['required', 'boolean'],
             'hora_inicio' => ['required', 'date_format:H:i'],
             'hora_fim' => ['required', 'date_format:H:i', 'after:hora_inicio'],
-            'descricao' => ['required', 'string'],
             'pix_tipo' => ['required', 'in:cpf,cnpj,email,telefone,aleatoria'],
             'pix_chave' => ['required', 'string', 'max:255'],
+            'aceitar_pix' => ['nullable', 'boolean'],
+            'aceitar_dinheiro' => ['nullable', 'boolean'],
+            'aceitar_cartao_credito' => ['nullable', 'boolean'],
+            'aceitar_cartao_debito' => ['nullable', 'boolean'],
             'foto_capa' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
+        $formasPagamento = [
+            'aceitar_pix' => $request->boolean('aceitar_pix'),
+            'aceitar_dinheiro' => $request->boolean('aceitar_dinheiro'),
+            'aceitar_cartao_credito' => $request->boolean('aceitar_cartao_credito'),
+            'aceitar_cartao_debito' => $request->boolean('aceitar_cartao_debito'),
+        ];
+        if (!in_array(true, $formasPagamento, true)) {
+            return response()->json([
+                'message' => 'Selecione pelo menos uma forma de pagamento.',
+                'errors' => ['formas_pagamento' => ['Selecione pelo menos uma forma de pagamento.']],
+            ], 422);
+        }
 
         $telefone = preg_replace('/\D/', '', $dados['telefone']);
         if (strlen($telefone) !== 11) {
@@ -63,7 +81,7 @@ class ArenaCadastroController extends Controller
         }
 
         $fotoCapa = $request->hasFile('foto_capa') ? '/storage/'.$request->file('foto_capa')->store('arenas', 'public') : null;
-        $arena = DB::transaction(function () use ($dados, $telefone, $fotoCapa) {
+        $arena = DB::transaction(function () use ($dados, $telefone, $fotoCapa, $formasPagamento) {
             $baseNomeUsuario = Str::limit(Str::before($dados['email'], '@'), 40, '');
             $nomeUsuario = $baseNomeUsuario;
             $sufixo = 1;
@@ -88,17 +106,26 @@ class ArenaCadastroController extends Controller
                 'bairro' => $dados['bairro'], 'cidade' => $dados['cidade'], 'estado' => strtoupper($dados['estado']),
                 'ponto_referencia' => $dados['ponto_referencia'] ?? null,
                 'telefone' => $telefone, 'email' => $dados['email'],
-                'descricao' => $dados['descricao'], 'foto_capa' => $fotoCapa, 'pix_tipo' => $dados['pix_tipo'], 'pix_chave' => $dados['pix_chave'],
+                'descricao' => '', 'foto_capa' => $fotoCapa, 'pix_tipo' => $dados['pix_tipo'], 'pix_chave' => $dados['pix_chave'],
                 'ativo' => false, 'status_aprovacao' => 'pendente',
             ]);
+            foreach ($formasPagamento as $chave => $aceita) {
+                Configuracao::create([
+                    'arenas_id' => $arena->id,
+                    'chave' => $chave,
+                    'valor' => $aceita ? '1' : '0',
+                    'descricao' => 'Forma de pagamento aceita pela arena',
+                ]);
+            }
 
             abort_unless(count($dados['quadras']) === (int) $dados['quantidade_quadras'], 422, 'Informe o nome de todas as quadras.');
             foreach ($dados['quadras'] as $dadosQuadra) {
                 $fotoQuadra = isset($dadosQuadra['foto']) ? '/storage/'.$dadosQuadra['foto']->store('quadras', 'public') : ($fotoCapa ?: 'https://via.placeholder.com/800x500?text=Quadra');
                 $quadra = Quadra::create([
                     'arenas_id' => $arena->id, 'nome' => $dadosQuadra['nome'], 'tipo' => $dados['tipo_quadra'],
-                    'descricao' => $dados['descricao'], 'foto' => $fotoQuadra,
-                    'capacidade_jogador' => $dados['capacidade_jogador'], 'preco_hora' => $dados['preco_hora'],
+                    'descricao' => $dadosQuadra['descricao'], 'foto' => $fotoQuadra,
+                    'capacidade_jogador' => $dadosQuadra['capacidade_jogador'], 'preco_hora' => $dadosQuadra['preco_hora'],
+                    'coberta' => $dadosQuadra['coberta'],
                     'ativo' => false,
                 ]);
                 foreach (['segunda-feira', 'terca-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sabado', 'domingo'] as $dia) {
@@ -114,7 +141,23 @@ class ArenaCadastroController extends Controller
     public function index(Request $request)
     {
         $this->autorizarSuperAdmin($request);
-        return response()->json(Arena::with('criadoPor:id,nome_completo,email')->withCount('quadras')->latest()->get());
+        $resumo = $this->resumoPorArena()->keyBy('arena_id');
+        $arenas = Arena::with('criadoPor:id,nome_completo,email,telefone')
+            ->withCount([
+                'quadras',
+                'quadras as quadras_ativas_count' => fn ($query) => $query->where('ativo', true),
+            ])
+            ->latest()
+            ->get()
+            ->map(function (Arena $arena) use ($resumo) {
+                $dados = $resumo->get($arena->id);
+                $arena->setAttribute('reservas_count', $dados['reservas_count'] ?? 0);
+                $arena->setAttribute('faturamento_confirmado', $dados['faturamento_confirmado'] ?? 0);
+
+                return $arena;
+            });
+
+        return response()->json($arenas);
     }
 
     public function dashboard(Request $request)
@@ -131,8 +174,40 @@ class ArenaCadastroController extends Controller
             ],
             'admins' => AdminArena::with(['usuario:id,nome_completo,email', 'arena:id,nome'])
                 ->where('ativo', true)->latest()->limit(12)->get(),
+            'faturamento_por_arena' => $this->resumoPorArena()->values(),
             'logs' => Auditoria::with(['usuario:id,nome_completo', 'arena:id,nome'])
                 ->latest()->limit(10)->get(),
+        ]);
+    }
+
+    private function resumoPorArena()
+    {
+        $faturamentos = Pagamento::query()
+            ->join('reservas', 'reservas.id', '=', 'pagamentos.reservas_id')
+            ->join('quadras', 'quadras.id', '=', 'reservas.quadras_id')
+            ->where('pagamentos.status', 'pago')
+            ->groupBy('quadras.arenas_id')
+            ->selectRaw('quadras.arenas_id, SUM(pagamentos.valor) as total')
+            ->pluck('total', 'quadras.arenas_id');
+
+        $reservas = Reserva::query()
+            ->join('quadras', 'quadras.id', '=', 'reservas.quadras_id')
+            ->groupBy('quadras.arenas_id')
+            ->selectRaw('quadras.arenas_id, COUNT(reservas.id) as total')
+            ->pluck('total', 'quadras.arenas_id');
+
+        return Arena::withCount([
+            'quadras',
+            'quadras as quadras_ativas_count' => fn ($query) => $query->where('ativo', true),
+        ])->orderBy('nome')->get()->map(fn (Arena $arena) => [
+            'arena_id' => $arena->id,
+            'arena_nome' => $arena->nome,
+            'status_aprovacao' => $arena->status_aprovacao,
+            'ativa' => $arena->ativo,
+            'quadras_count' => $arena->quadras_count,
+            'quadras_ativas_count' => $arena->quadras_ativas_count,
+            'reservas_count' => (int) ($reservas[$arena->id] ?? 0),
+            'faturamento_confirmado' => (float) ($faturamentos[$arena->id] ?? 0),
         ]);
     }
 

@@ -292,35 +292,6 @@
                 </div>
             </div>
 
-            <!-- Segurança -->
-            <div class="settings-card">
-                <div class="settings-title"><i class="bi bi-shield-lock"></i> Segurança e Acesso</div>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Tempo de Expiração do Código (minutos)</label>
-                        <input type="number" class="form-control" id="configExpiracaoCodigo" value="15" min="5" max="60">
-                        <div class="help-text">Tempo válido para redefinição de senha</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Máximo de Tentativas de Login</label>
-                        <input type="number" class="form-control" id="configMaxTentativas" value="5" min="1" max="10">
-                        <div class="help-text">Bloqueia a conta após X tentativas falhas</div>
-                    </div>
-                </div>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Tempo de Bloqueio (minutos)</label>
-                        <input type="number" class="form-control" id="configTempoBloqueio" value="15" min="5">
-                        <div class="help-text">Duração do bloqueio após muitas tentativas</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Duração da Sessão (dias)</label>
-                        <input type="number" class="form-control" id="configDuracaoSessao" value="30" min="1">
-                        <div class="help-text">Tempo até exigir novo login</div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Botão Salvar -->
             <div class="text-end mt-4">
                 <button class="btn-save" id="btnSalvarConfiguracoes">
@@ -379,12 +350,6 @@
             email_confirmacao: true,
             lembrete_automatico: true,
             solicitar_feedback: true
-        },
-        seguranca: {
-            expiracao_codigo: 15,
-            max_tentativas_login: 5,
-            tempo_bloqueio: 15,
-            duracao_sessao: 30
         }
     };
 
@@ -462,13 +427,6 @@
             document.getElementById('configFeedback').checked = config.notificacoes.solicitar_feedback ?? true;
         }
         
-        // Segurança
-        if (config.seguranca) {
-            document.getElementById('configExpiracaoCodigo').value = config.seguranca.expiracao_codigo ?? 15;
-            document.getElementById('configMaxTentativas').value = config.seguranca.max_tentativas_login ?? 5;
-            document.getElementById('configTempoBloqueio').value = config.seguranca.tempo_bloqueio ?? 15;
-            document.getElementById('configDuracaoSessao').value = config.seguranca.duracao_sessao ?? 30;
-        }
     }
 
     //  SALVAR CONFIGURAÇÕES - API: PUT /api/admin/configuracoes
@@ -516,12 +474,6 @@
                 email_confirmacao: document.getElementById('configEmailConfirmacao').checked,
                 lembrete_automatico: document.getElementById('configLembrete').checked,
                 solicitar_feedback: document.getElementById('configFeedback').checked
-            },
-            seguranca: {
-                expiracao_codigo: parseInt(document.getElementById('configExpiracaoCodigo').value) || 15,
-                max_tentativas_login: parseInt(document.getElementById('configMaxTentativas').value) || 5,
-                tempo_bloqueio: parseInt(document.getElementById('configTempoBloqueio').value) || 15,
-                duracao_sessao: parseInt(document.getElementById('configDuracaoSessao').value) || 30
             }
         };
         

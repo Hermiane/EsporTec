@@ -154,7 +154,7 @@
     <!-- Passo 3 -->
     <div class="step-content" id="step-3">
         <div class="card-step">
-            <h4 class="fw-bold mb-3">Dados dos Jogadores</h4>
+            <h4 class="fw-bold mb-3">Dados do Jogador</h4>
             <div class="mb-3">
                 <label class="form-label fw-medium">Nome do Responsável</label>
                 <input type="text" class="form-control" id="nome-responsavel" placeholder="Seu nome completo">
@@ -166,10 +166,9 @@
             <div class="mb-3">
                 <label class="form-label fw-medium">Quantidade de Jogadores</label>
                 <select class="form-select" id="qtd-jogadores">
-                    <option>10 jogadores</option>
-                    <option>12 jogadores</option>
-                    <option>14 jogadores</option>
+                    <option value="">Selecione uma quadra primeiro</option>
                 </select>
+                <small class="text-muted" id="limite-jogadores">A quantidade máxima depende da capacidade da quadra.</small>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-medium">Observações (opcional)</label>
@@ -277,6 +276,8 @@
     const avisoData = document.getElementById('aviso-data');
     const horariosLabel = horariosContainer.previousElementSibling;
     const paymentMethods = document.querySelectorAll('input[name="forma-pagamento"]');
+    const quantidadeJogadores = document.getElementById('qtd-jogadores');
+    const limiteJogadores = document.getElementById('limite-jogadores');
     const pagamentoInfo = document.getElementById('pagamento-info');
     const pixSection = document.getElementById('pix-section');
     const dinheiroSection = document.getElementById('dinheiro-section');
@@ -308,6 +309,7 @@
             option.dataset.arena = String(quadra.arenas_id || quadra.arena?.id || '');
             option.dataset.price = quadra.preco_hora;
             option.dataset.nome = quadra.nome;
+            option.dataset.capacity = quadra.capacidade_jogador;
             quadraSelect.appendChild(option);
         });
 
@@ -332,7 +334,11 @@
             return Array.isArray(dados) ? { horarios_disponiveis: dados, bloqueios: [] } : dados;
         } catch (error) {
             console.error(' Erro ao carregar horários:', error.message);
-            return { horarios_disponiveis: [], bloqueios: [] };
+            return {
+                horarios_disponiveis: [],
+                bloqueios: [],
+                erro: error.message || 'Não foi possível consultar os horários. Verifique sua conexão e tente novamente.'
+            };
         }
     }
 
@@ -363,7 +369,22 @@
             document.getElementById('preco-hora').textContent = `R$ ${pricePerHour.toFixed(2).replace('.', ',')}`;
             selectedQuadraId = selected.value;
         }
+        atualizarQuantidadeJogadores(selected);
         updateTotal();
+    }
+
+    function atualizarQuantidadeJogadores(selected) {
+        const capacidade = Number(selected?.dataset?.capacity || 0);
+        quantidadeJogadores.innerHTML = capacidade > 0
+            ? Array.from({ length: capacidade }, (_, indice) => {
+                const quantidade = indice + 1;
+                return `<option value="${quantidade}">${quantidade} ${quantidade === 1 ? 'jogador' : 'jogadores'}</option>`;
+            }).join('')
+            : '<option value="">Selecione uma quadra primeiro</option>';
+        quantidadeJogadores.disabled = capacidade === 0;
+        limiteJogadores.textContent = capacidade > 0
+            ? `Capacidade máxima desta quadra: ${capacidade} jogadores.`
+            : 'A quantidade máxima depende da capacidade da quadra.';
     }
 
     //  Carrega quadras ao iniciar
@@ -393,6 +414,15 @@
         const dadosHorarios = await carregarHorarios(quadraId, dataReserva.value);
         const horarios = dadosHorarios.horarios_disponiveis || [];
         const bloqueios = dadosHorarios.bloqueios || [];
+
+        if (dadosHorarios.erro) {
+            const mensagem = document.createElement('div');
+            mensagem.className = 'alert alert-danger mb-0';
+            mensagem.style.gridColumn = '1 / -1';
+            mensagem.textContent = dadosHorarios.erro;
+            grid.appendChild(mensagem);
+            return;
+        }
 
         if (bloqueios.length) {
             const aviso = document.createElement('div');
@@ -546,6 +576,7 @@
             hora_inicio: horariosSelecionados[0],
             hora_fim: horarioApos(horariosSelecionados[horariosSelecionados.length - 1], 60),
             valor_total: pricePerHour * horariosSelecionados.length,
+            quantidade_jogadores: Number(quantidadeJogadores.value),
             observacao: document.getElementById('observacoes').value || null,
             metodo_pagamento: selectedPayment.value
         };

@@ -51,6 +51,8 @@ class Reserva extends Model
 
         'valor_total',
 
+        'quantidade_jogadores',
+
         'status',
 
         'observacao',
@@ -68,6 +70,8 @@ class Reserva extends Model
         return [
 
             'data' => 'date',
+
+            'quantidade_jogadores' => 'integer',
 
             'cancelada_em' => 'datetime',
 

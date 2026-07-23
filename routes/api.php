@@ -5,6 +5,8 @@ use App\Http\Controllers\PublicoController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ArenaCadastroController;
+use App\Http\Controllers\PartidaController;
+use App\Http\Controllers\Cliente\NotificacaoController as ClienteNotificacaoController;
 
 use App\Http\Controllers\PagamentoController;
 use App\Http\Controllers\Admin\AdminController;
@@ -63,12 +65,14 @@ Route::middleware('auth:sanctum')->prefix('cliente')->group(function () {
  Route::get('/quadras', [ReservaController::class, 'quadrasDisponiveis']);
  Route::get('/quadras/{id}/horarios', [ReservaController::class, 'horariosDisponiveis']);
  Route::get('/reservas', [ReservaController::class, 'minhasReservas']);
+ Route::post('/reservas/{reserva}/avaliacao', [ReservaController::class, 'avaliar']);
  Route::post('/pagamentos', [PagamentoController::class, 'store']);
  Route::get('/pagamentos/reservas/{reserva_id}', [PagamentoController::class, 'porReserva']);
- 
- //  ROTAS ADICIONADAS: Cancelar e Remarcar reserva
- Route::patch('/reservas/{id}/cancelar', [ReservaController::class, 'cancelar']);
  Route::patch('/reservas/{id}/remarcar', [ReservaController::class, 'remarcar']);
+ Route::post('/reservas/{reserva}/partida', [PartidaController::class, 'criarLink']);
+ Route::delete('/partidas/{partida}/jogadores/{jogador}', [PartidaController::class, 'removerJogador']);
+ Route::get('/notificacoes', [ClienteNotificacaoController::class, 'index']);
+ Route::patch('/notificacoes/{notificacao}/ler', [ClienteNotificacaoController::class, 'ler']);
 });
 
 // ===== ROTAS DO FUNCIONÁRIO/ADMIN =====

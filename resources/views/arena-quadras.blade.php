@@ -380,7 +380,9 @@
                 <i class="bi bi-arrow-left me-1"></i>Voltar para arenas
             </a>
             <h1>{{ $arena['nome'] }}</h1>
-            <p class="lead mb-0" style="max-width: 740px;">{{ $arena['descricao'] }}</p>
+            @if(!empty($arena['descricao']))
+                <p class="lead mb-0" style="max-width: 740px;">{{ $arena['descricao'] }}</p>
+            @endif
             <div class="arena-meta">
                 <span><i class="bi bi-geo-alt"></i>{{ $arena['endereco'] }}</span>
                 <span><i class="bi bi-clock"></i>{{ $arena['funcionamento'] }}</span>

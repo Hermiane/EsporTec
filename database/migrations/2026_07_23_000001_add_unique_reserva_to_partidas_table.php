@@ -1,0 +1,22 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('partidas', function (Blueprint $table) {
+            $table->unique('reservas_id', 'partidas_reservas_id_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('partidas', function (Blueprint $table) {
+            $table->dropUnique('partidas_reservas_id_unique');
+        });
+    }
+};

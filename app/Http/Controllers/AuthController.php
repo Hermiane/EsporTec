@@ -36,11 +36,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Esta conta não possui permissão para a área selecionada.'], 403);
     }
 
-    //  ESTAS 2 LINHAS CRIAM A SESSÃO WEB 
-    \Illuminate\Support\Facades\Auth::login($usuario);
-    $request->session()->regenerate();
-    //  FIM DAS LINHAS CRÍTICAS 
-
     return response()->json([
         'usuario' => $usuario,
         'acessos' => $acessos,

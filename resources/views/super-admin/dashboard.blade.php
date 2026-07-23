@@ -48,6 +48,7 @@
         <nav>
             <button type="button" class="nav-button active" data-scroll-target="visao-geral"><i class="bi bi-speedometer2"></i> Visão geral</button>
             <button type="button" class="nav-button" data-scroll-target="arenas"><i class="bi bi-buildings"></i> Arenas</button>
+            <button type="button" class="nav-button" data-scroll-target="faturamento-arenas"><i class="bi bi-cash-stack"></i> Faturamento por arena</button>
             <button type="button" class="nav-button" data-scroll-target="admins"><i class="bi bi-person-gear"></i> Admins das arenas</button>
             <button type="button" class="nav-button" data-scroll-target="logs"><i class="bi bi-journal-text"></i> Logs globais</button>
         </nav>
@@ -93,6 +94,21 @@
             </article>
         </div>
 
+        <section class="section-card" id="faturamento-arenas">
+            <div class="mb-3">
+                <h5 class="fw-bold mb-1">Faturamento confirmado por arena</h5>
+                <p class="text-muted mb-0">Soma dos pagamentos confirmados, separada por arena cadastrada.</p>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th>Arena</th><th>Quadras ativas</th><th>Reservas</th><th>Faturamento confirmado</th><th>Situação</th></tr></thead>
+                    <tbody id="faturamentoArenasBody">
+                        <tr><td colspan="5" class="text-center text-muted">Carregando faturamento...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <section class="section-card" id="arenas">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <div>
@@ -103,8 +119,8 @@
             </div>
             <div class="table-responsive">
                 <table class="table align-middle">
-                    <thead><tr><th>Arena</th><th>Proprietário/Admin</th><th>Plano</th><th>Status</th><th>Ações</th></tr></thead>
-                    <tbody id="arenasBody"><tr><td colspan="5" class="text-center text-muted">Carregando arenas...</td></tr></tbody>
+                    <thead><tr><th>Arena</th><th>Proprietário/Admin</th><th>Localização</th><th>Operação</th><th>Faturamento</th><th>Status</th><th>Ações</th></tr></thead>
+                    <tbody id="arenasBody"><tr><td colspan="7" class="text-center text-muted">Carregando arenas...</td></tr></tbody>
                 </table>
             </div>
         </section>
@@ -119,6 +135,24 @@
             <div class="list-group list-group-flush" id="logsBody"><div class="list-group-item px-0 text-muted">Carregando atividades...</div></div>
         </section>
     </main>
+</div>
+
+<div class="modal fade" id="modalDetalhesArena" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-building me-2"></i>Detalhes da arena</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3" id="detalhesArenaBody"></div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-outline-success" id="linkArenaPublica" href="#" target="_blank" rel="noopener">Abrir página pública</a>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -138,8 +172,10 @@
     document.getElementById('btnExportarArenas').addEventListener('click', () => window.print());
 
     const statusArena = { pendente: ['dot-yellow', 'Em análise'], aprovada: ['dot-green', 'Ativa'], recusada: ['dot-red', 'Recusada'] };
+    let arenasAtuais = [];
     function escapar(valor = '') { const elemento = document.createElement('span'); elemento.textContent = valor; return elemento.innerHTML; }
     function renderizarArenas(arenas) {
+        arenasAtuais = arenas;
         document.getElementById('totalArenas').textContent = arenas.length;
         const pendentes = arenas.filter(arena => arena.status_aprovacao === 'pendente').length;
         const ativas = arenas.filter(arena => arena.status_aprovacao === 'aprovada' && arena.ativo).length;
@@ -149,16 +185,37 @@
             const dono = arena.criado_por?.nome_completo || 'Não informado';
             const excluir = `<button class="btn btn-sm btn-outline-danger ms-1" data-action="excluir" data-id="${arena.id}">Excluir</button>`;
             const acoes = arena.status_aprovacao === 'pendente' ? `<button class="btn btn-sm btn-success me-1" data-action="aprovar" data-id="${arena.id}">Aprovar</button><button class="btn btn-sm btn-outline-danger" data-action="recusar" data-id="${arena.id}">Recusar</button>${excluir}` : arena.status_aprovacao === 'aprovada' ? `<button class="btn btn-sm ${arena.ativo ? 'btn-outline-danger' : 'btn-success'}" data-action="ativacao" data-id="${arena.id}" data-ativo="${arena.ativo ? '1' : '0'}">${arena.ativo ? 'Inativar' : 'Ativar'}</button>${excluir}` : excluir;
-            return `<tr><td class="fw-semibold">${escapar(arena.nome)}<small class="d-block text-muted">${arena.quadras_count} quadra(s)</small></td><td>${escapar(dono)}<small class="d-block text-muted">${escapar(arena.email)}</small></td><td>-</td><td><span class="status-dot ${status[0]}"></span>${status[1]}</td><td>${acoes}</td></tr>`;
-        }).join('') : '<tr><td colspan="5" class="text-center text-muted">Nenhuma arena cadastrada.</td></tr>';
+            const localizacao = [arena.bairro, arena.cidade, arena.estado].filter(Boolean).join(' - ') || 'Não informada';
+            return `<tr>
+                <td class="fw-semibold">${escapar(arena.nome)}<small class="d-block text-muted">${arena.quadras_ativas_count || 0} de ${arena.quadras_count || 0} quadra(s) ativa(s)</small></td>
+                <td>${escapar(dono)}<small class="d-block text-muted">${escapar(arena.email)}</small></td>
+                <td>${escapar(localizacao)}</td>
+                <td>${arena.reservas_count || 0} reserva(s)</td>
+                <td class="fw-semibold text-success">${moeda(arena.faturamento_confirmado)}</td>
+                <td><span class="status-dot ${status[0]}"></span>${status[1]}</td>
+                <td><button class="btn btn-sm btn-outline-success me-1" data-detalhes-arena="${arena.id}">Detalhes</button>${acoes}</td>
+            </tr>`;
+        }).join('') : '<tr><td colspan="7" class="text-center text-muted">Nenhuma arena cadastrada.</td></tr>';
     }
     function moeda(valor) { return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     function formatarData(data) { return data ? new Date(data).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : ''; }
     function renderizarResumo(dados) {
-        const { metricas, admins, logs } = dados;
+        const { metricas, admins, logs, faturamento_por_arena } = dados;
         document.getElementById('totalAdmins').textContent = metricas.admins_ativos;
         document.getElementById('faturamentoConfirmado').textContent = moeda(metricas.faturamento_confirmado);
         document.getElementById('chamadosAbertos').textContent = metricas.chamados_abertos;
+        document.getElementById('faturamentoArenasBody').innerHTML = faturamento_por_arena.length
+            ? faturamento_por_arena.map(arena => {
+                const situacao = arena.status_aprovacao === 'pendente' ? 'Em análise' : arena.status_aprovacao === 'recusada' ? 'Recusada' : arena.ativa ? 'Ativa' : 'Inativa';
+                return `<tr>
+                    <td class="fw-semibold">${escapar(arena.arena_nome)}</td>
+                    <td>${arena.quadras_ativas_count} de ${arena.quadras_count}</td>
+                    <td>${arena.reservas_count}</td>
+                    <td class="fw-bold text-success">${moeda(arena.faturamento_confirmado)}</td>
+                    <td>${situacao}</td>
+                </tr>`;
+            }).join('')
+            : '<tr><td colspan="5" class="text-center text-muted">Nenhuma arena cadastrada.</td></tr>';
         document.getElementById('adminsBody').innerHTML = admins.length ? admins.map(admin => `<div class="col-md-4"><div class="p-3 rounded border"><div class="fw-bold">${escapar(admin.usuario?.nome_completo || 'Usuário')}</div><small class="text-muted d-block">${escapar(admin.cargo)} - ${escapar(admin.arena?.nome || 'Arena')}</small><span class="badge bg-success mt-2">Ativo</span></div></div>`).join('') : '<p class="text-muted mb-0">Nenhum administrador de arena ativo.</p>';
         document.getElementById('logsBody').innerHTML = logs.length ? logs.map(log => `<div class="list-group-item px-0 d-flex justify-content-between flex-wrap gap-2"><span>${escapar(log.descricao)}</span><small class="text-muted">${formatarData(log.created_at)}</small></div>`).join('') : '<div class="list-group-item px-0 text-muted">Nenhuma atividade registrada.</div>';
     }
@@ -167,10 +224,40 @@
             const [dados, arenas] = await Promise.all([EsporTecApi.request('/api/super-admin/dashboard'), EsporTecApi.request('/api/super-admin/arenas')]);
             renderizarResumo(dados); renderizarArenas(arenas);
         } catch (erro) {
-            document.getElementById('arenasBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger">${escapar(erro.message)}</td></tr>`;
+            document.getElementById('arenasBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">${escapar(erro.message)}</td></tr>`;
             setTimeout(() => window.location.replace('/painel'), 600);
         }
     }
+    document.addEventListener('click', event => {
+        const botao = event.target.closest('[data-detalhes-arena]');
+        if (!botao) return;
+        const arena = arenasAtuais.find(item => item.id == botao.dataset.detalhesArena);
+        if (!arena) return;
+        const endereco = [arena.logradouro, arena.numero, arena.bairro, arena.cidade, arena.estado].filter(Boolean).join(', ');
+        const situacao = arena.status_aprovacao === 'pendente' ? 'Em análise' : arena.status_aprovacao === 'recusada' ? 'Recusada' : arena.ativo ? 'Ativa' : 'Inativa';
+        const itens = [
+            ['Arena', arena.nome],
+            ['Proprietário', arena.criado_por?.nome_completo || 'Não informado'],
+            ['E-mail', arena.email || 'Não informado'],
+            ['Telefone', arena.telefone || 'Não informado'],
+            ['Endereço', endereco || 'Não informado'],
+            ['CNPJ', arena.cnpj || 'Não informado'],
+            ['Quadras', `${arena.quadras_ativas_count || 0} ativas de ${arena.quadras_count || 0}`],
+            ['Reservas', arena.reservas_count || 0],
+            ['Faturamento confirmado', moeda(arena.faturamento_confirmado)],
+            ['Situação', situacao],
+        ];
+        document.getElementById('detalhesArenaBody').innerHTML = itens.map(([rotulo, valor]) => `
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded-3 h-100">
+                    <small class="text-muted d-block">${rotulo}</small>
+                    <strong>${escapar(String(valor))}</strong>
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('linkArenaPublica').href = `/arenas/${arena.id}/quadras`;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalhesArena')).show();
+    });
     document.addEventListener('click', async event => {
         const botao = event.target.closest('[data-action]'); if (!botao) return;
         const { action, id } = botao.dataset; let body;

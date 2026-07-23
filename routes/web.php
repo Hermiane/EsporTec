@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Arena;
+use App\Http\Controllers\PartidaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -58,7 +59,15 @@ Route::get('/recuperar-senha', function () {
 });
 
 Route::get('/painel', function () {
-    return view('cliente.painel');
+    $arenas = Arena::query()
+        ->where('ativo', true)
+        ->where('status_aprovacao', 'aprovada')
+        ->whereHas('quadras', fn ($query) => $query->where('ativo', true))
+        ->withCount(['quadras as quadras_ativas_count' => fn ($query) => $query->where('ativo', true)])
+        ->orderBy('nome')
+        ->get();
+
+    return view('cliente.painel', compact('arenas'));
 });
 
 Route::get('/nova-reserva', function () {
@@ -96,9 +105,16 @@ Route::get('/arenas/{arena}/quadras', function ($arena) {
 
     if ($arenaModel) {
         $horarios = $arenaModel->quadras->flatMap->horariosFuncionamento;
+        $configuracoes = \App\Models\Configuracao::where('arenas_id', $arenaModel->id)->pluck('valor', 'chave');
         $inicio = $horarios->min('hora_inicio');
         $fim = $horarios->max('hora_fim');
         $funcionamento = $inicio && $fim ? substr($inicio, 0, 5).' - '.substr($fim, 0, 5) : 'Horários a consultar';
+        $formasPagamento = array_values(array_filter([
+            filter_var($configuracoes->get('aceitar_pix', true), FILTER_VALIDATE_BOOLEAN) ? 'PIX' : null,
+            filter_var($configuracoes->get('aceitar_dinheiro', true), FILTER_VALIDATE_BOOLEAN) ? 'Dinheiro' : null,
+            filter_var($configuracoes->get('aceitar_cartao_credito', true), FILTER_VALIDATE_BOOLEAN) ? 'Cartão de crédito' : null,
+            filter_var($configuracoes->get('aceitar_cartao_debito', true), FILTER_VALIDATE_BOOLEAN) ? 'Cartão de débito' : null,
+        ]));
 
         $dadosArena = [
             'nome' => $arenaModel->nome,
@@ -108,7 +124,7 @@ Route::get('/arenas/{arena}/quadras', function ($arena) {
             'email' => $arenaModel->email,
             'dias_funcionamento' => $horarios->isEmpty() ? 'A consultar' : 'Conforme disponibilidade da quadra',
             'funcionamento' => $funcionamento,
-            'formas_pagamento' => array_filter(['PIX', 'Dinheiro']),
+            'formas_pagamento' => $formasPagamento,
             'descricao' => $arenaModel->descricao,
             'imagem' => $arenaModel->foto_capa ?: ($arenaModel->quadras->first()?->foto ?: ''),
             'quadras' => $arenaModel->quadras->map(fn ($quadra) => [
@@ -317,9 +333,8 @@ Route::get('/cadastrar-arena', function () {
     return view('cadastrar-arena');
 });
 
-Route::get('/partida/{codigo?}', function () {
-    return view('partida');
-});
+Route::get('/partida/{codigo}', [PartidaController::class, 'show'])->name('partida.show');
+Route::post('/partida/{codigo}/entrar', [PartidaController::class, 'entrar'])->middleware('throttle:10,1')->name('partida.entrar');
 
 // Rota para atualizar o perfil
 Route::post('/perfil/atualizar', function (\Illuminate\Http\Request $request) {
@@ -337,4 +352,3 @@ Route::post('/perfil/atualizar', function (\Illuminate\Http\Request $request) {
     
     return redirect()->back()->with('success', 'Perfil atualizado com sucesso!');
 })->name('perfil.atualizar');
-

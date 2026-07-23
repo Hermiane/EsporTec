@@ -64,6 +64,94 @@
             });
     };
 
+    function configurarBotaoVoltar() {
+        const path = window.location.pathname;
+        const paginasIniciais = ['/', '/painel', '/admin/dashboard', '/painel-funcionario', '/super-admin/dashboard'];
+        const paginaInterna =
+            path.startsWith('/admin/') ||
+            path.startsWith('/funcionario/') ||
+            ['/nova-reserva', '/minhas-reservas', '/notificacoes', '/perfil'].includes(path) ||
+            path.startsWith('/partida/');
+
+        if (!paginaInterna || paginasIniciais.includes(path)) {
+            return;
+        }
+
+        const role = sessionStorage.getItem('esportecRole');
+        const destinoPadrao = path.startsWith('/partida/') && role === 'cliente'
+            ? '/minhas-reservas'
+            : path.startsWith('/admin/')
+                ? '/admin/dashboard'
+                : path.startsWith('/funcionario/')
+                    ? '/painel-funcionario'
+                    : '/painel';
+
+        const voltar = event => {
+            event.preventDefault();
+            const origem = document.referrer;
+            let origemDoSistema = false;
+            try {
+                origemDoSistema = Boolean(origem) && new URL(origem).origin === window.location.origin;
+            } catch (_) {
+                origemDoSistema = false;
+            }
+
+            if (origemDoSistema && window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+            window.location.href = destinoPadrao;
+        };
+
+        const existente = document.querySelector('.btn-back, [data-esportec-voltar]');
+        if (existente) {
+            existente.setAttribute('aria-label', 'Voltar para a página anterior');
+            existente.addEventListener('click', voltar);
+            return;
+        }
+
+        const estilo = document.createElement('style');
+        estilo.textContent = `
+            .esportec-btn-voltar {
+                position: fixed;
+                right: 20px;
+                bottom: 20px;
+                z-index: 1080;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 11px 17px;
+                border: 0;
+                border-radius: 999px;
+                background: #1f5c42;
+                color: #fff;
+                font: 600 14px/1.2 Poppins, sans-serif;
+                box-shadow: 0 6px 20px rgba(15, 23, 42, .24);
+                cursor: pointer;
+            }
+            .esportec-btn-voltar:hover { background: #174733; }
+            .esportec-btn-voltar:focus-visible { outline: 3px solid rgba(45, 129, 93, .35); outline-offset: 3px; }
+            @media (max-width: 576px) {
+                .esportec-btn-voltar { right: 14px; bottom: 14px; }
+            }
+        `;
+        document.head.appendChild(estilo);
+
+        const botao = document.createElement('button');
+        botao.type = 'button';
+        botao.className = 'esportec-btn-voltar';
+        botao.setAttribute('aria-label', 'Voltar para a página anterior');
+        botao.innerHTML = '<span aria-hidden="true">←</span> Voltar';
+        botao.addEventListener('click', voltar);
+        document.body.appendChild(botao);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', configurarBotaoVoltar);
+    } else {
+        configurarBotaoVoltar();
+    }
+
     document.addEventListener('click', event => {
         const logoutLink = event.target.closest('a');
         if (logoutLink && logoutLink.textContent.trim().toLowerCase().includes('sair')) {

@@ -37,6 +37,8 @@
         .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 0.25rem rgba(45, 129, 93, 0.15); }
         .btn-primary-custom { background: var(--primary); border: none; padding: 0.9rem; border-radius: 10px; font-weight: 600; width: 100%; }
         .btn-primary-custom:hover { background: var(--dark); }
+        .btn-home { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 1.25rem; }
+        .btn-home:hover { color: var(--dark); text-decoration: underline; }
         .auth-link { color: var(--primary); text-decoration: none; font-weight: 500; }
         .auth-link:hover { text-decoration: underline; }
         .login-support { background: #F8FAFC; border-radius: 12px; padding: 0.75rem; font-size: 0.85rem; color: var(--muted); }
@@ -63,6 +65,9 @@
 </head>
 <body>
     <div class="auth-card">
+        <a href="/" class="btn-home" aria-label="Voltar para a página inicial">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar para o início
+        </a>
         <div class="text-center mb-4">
             <div class="brand-mark">
                 <i class="bi bi-dribbble"></i>
@@ -71,16 +76,16 @@
             <p class="text-muted">Entre na sua conta para continuar</p>
         </div>
 
-        <form id="loginForm">
+        <form id="loginForm" autocomplete="off">
             @csrf
 
             <div class="mb-3">
                 <label class="form-label fw-medium">E-mail</label>
-                <input type="email" class="form-control" placeholder="seu@email.com" required>
+                <input type="email" class="form-control" id="emailLogin" placeholder="seu@email.com" autocomplete="off" value="" required>
             </div>
             <div class="mb-4">
                 <label class="form-label fw-medium">Senha</label>
-                <input type="password" class="form-control" placeholder="Digite sua senha" required>
+                <input type="password" class="form-control" id="senhaLogin" placeholder="Digite sua senha" autocomplete="new-password" value="" required>
             </div>
 
             <div class="mb-3">
@@ -172,6 +177,13 @@
     <script src="/js/esportec-ui.js"></script>
     <script src="/js/esportec-api.js"></script>
     <script>
+        function limparCredenciaisLogin() {
+            document.getElementById('emailLogin').value = '';
+            document.getElementById('senhaLogin').value = '';
+        }
+        limparCredenciaisLogin();
+        window.addEventListener('pageshow', limparCredenciaisLogin);
+
         const accessInputs = document.querySelectorAll('input[name="tipo-acesso"]');
         const panels = {
             cliente: document.getElementById('clientePanel'),

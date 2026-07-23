@@ -157,7 +157,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">CNPJ</label>
-                            <input name="cnpj" type="text" class="form-control" placeholder="00.000.000/0001-00" required>
+                            <input name="cnpj" id="cnpjArena" type="text" class="form-control" inputmode="numeric" maxlength="18" placeholder="00.000.000/0001-00" required>
                         </div>
 
                         <div class="col-md-6">
@@ -262,17 +262,7 @@
                         </div>
 
                         <div class="col-12" id="camposQuadras">
-                            <div class="alert alert-light border mb-0">Informe a quantidade de quadras para adicionar o nome e a foto de cada uma.</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Valor por Hora</label>
-                            <input name="preco_hora" type="number" min="0" step="0.01" class="form-control" placeholder="Ex: 120,00" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Capacidade</label>
-                            <input name="capacidade_jogador" type="number" min="1" class="form-control" placeholder="Ex: 10" required>
+                            <div class="alert alert-light border mb-0">Informe a quantidade de quadras para preencher os dados de cada uma.</div>
                         </div>
 
                         <div class="col-md-6">
@@ -285,10 +275,6 @@
                             <input name="hora_fim" type="time" class="form-control" required>
                         </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Descrição do Espaço</label>
-                            <textarea name="descricao" class="form-control" rows="4" placeholder="Descreva a estrutura, cobertura, iluminação, vestiários..." required></textarea>
-                        </div>
                     </div>
                 </div>
 
@@ -301,7 +287,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Tipo da chave PIX</label>
-                            <select name="pix_tipo" class="form-select" required>
+                            <select name="pix_tipo" id="pixTipo" class="form-select" required>
                                 <option value="">Selecione</option>
                                 <option value="cpf">CPF</option>
                                 <option value="cnpj">CNPJ</option>
@@ -313,33 +299,33 @@
 
                         <div class="col-md-8">
                             <label class="form-label fw-semibold">Chave PIX</label>
-                            <input name="pix_chave" type="text" class="form-control" placeholder="Chave usada para receber pagamentos" required>
+                            <input name="pix_chave" id="pixChave" type="text" class="form-control" placeholder="Chave usada para receber pagamentos" required>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked>
+                                <input class="form-check-input" name="aceitar_pix" type="checkbox" value="1" checked>
                                 <label class="form-check-label">PIX</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox">
+                                <input class="form-check-input" name="aceitar_dinheiro" type="checkbox" value="1">
                                 <label class="form-check-label">Dinheiro</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox">
+                                <input class="form-check-input" name="aceitar_cartao_credito" type="checkbox" value="1">
                                 <label class="form-check-label">Cartão crédito</label>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox">
+                                <input class="form-check-input" name="aceitar_cartao_debito" type="checkbox" value="1">
                                 <label class="form-check-label">Cartão débito</label>
                             </div>
                         </div>
@@ -437,6 +423,59 @@
     const senhaAcesso = document.getElementById('senhaAcesso');
     const avisoSenhaAcesso = document.getElementById('avisoSenhaAcesso');
     const alternarSenha = document.getElementById('alternarSenha');
+    const cnpjArena = document.getElementById('cnpjArena');
+    const pixTipo = document.getElementById('pixTipo');
+    const pixChave = document.getElementById('pixChave');
+
+    function mascaraCpf(valor) {
+        return valor.replace(/\D/g, '').slice(0, 11)
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+
+    function mascaraCnpj(valor) {
+        return valor.replace(/\D/g, '').slice(0, 14)
+            .replace(/(\d{2})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1.$2')
+            .replace(/(\d{3})(\d)/, '$1/$2')
+            .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+    }
+
+    function mascaraTelefone(valor) {
+        const digitos = valor.replace(/\D/g, '').slice(0, 11);
+        return digitos.length > 10
+            ? digitos.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3')
+            : digitos.replace(/(\d{2})(\d{4})(\d{1,4})/, '($1) $2-$3');
+    }
+
+    cnpjArena.addEventListener('input', () => {
+        cnpjArena.value = mascaraCnpj(cnpjArena.value);
+    });
+
+    function atualizarMascaraPix() {
+        const tipo = pixTipo.value;
+        pixChave.value = '';
+        pixChave.removeAttribute('maxlength');
+        pixChave.inputMode = tipo === 'cpf' || tipo === 'cnpj' || tipo === 'telefone' ? 'numeric' : 'text';
+        const configuracoes = {
+            cpf: ['000.000.000-00', 14],
+            cnpj: ['00.000.000/0000-00', 18],
+            telefone: ['(00) 00000-0000', 15],
+            email: ['nome@exemplo.com', null],
+            aleatoria: ['Digite a chave aleatória', null],
+        };
+        const [placeholder, limite] = configuracoes[tipo] || ['Chave usada para receber pagamentos', null];
+        pixChave.placeholder = placeholder;
+        if (limite) pixChave.maxLength = limite;
+    }
+
+    pixTipo.addEventListener('change', atualizarMascaraPix);
+    pixChave.addEventListener('input', () => {
+        if (pixTipo.value === 'cpf') pixChave.value = mascaraCpf(pixChave.value);
+        if (pixTipo.value === 'cnpj') pixChave.value = mascaraCnpj(pixChave.value);
+        if (pixTipo.value === 'telefone') pixChave.value = mascaraTelefone(pixChave.value);
+    });
 
     senhaAcesso.addEventListener('input', () => {
         avisoSenhaAcesso.classList.toggle('d-none', senhaAcesso.value.length === 0);
@@ -451,8 +490,59 @@
 
     function renderizarCamposQuadras() {
         const quantidade = Math.min(Math.max(parseInt(quantidadeQuadras.value || '0', 10), 0), 20);
-        if (!quantidade) { camposQuadras.innerHTML = '<div class="alert alert-light border mb-0">Informe a quantidade de quadras para adicionar o nome e a foto de cada uma.</div>'; return; }
-        camposQuadras.innerHTML = `<label class="form-label fw-semibold d-block mb-3">Dados de cada quadra</label>${Array.from({ length: quantidade }, (_, indice) => `<div class="border rounded-3 p-3 mb-3"><strong class="d-block mb-3">Quadra ${indice + 1}</strong><div class="row g-3"><div class="col-md-6"><label class="form-label">Nome da quadra</label><input name="quadras[${indice}][nome]" class="form-control" placeholder="Ex: Society Premium" required></div><div class="col-md-6"><label class="form-label">Foto da quadra</label><input name="quadras[${indice}][foto]" type="file" class="form-control" accept="image/jpeg,image/png,image/webp"><small class="text-muted">JPG, PNG ou WebP, até 5 MB.</small></div></div></div>`).join('')}`;
+        if (!quantidade) {
+            camposQuadras.innerHTML = '<div class="alert alert-light border mb-0">Informe a quantidade de quadras para preencher os dados de cada uma.</div>';
+            return;
+        }
+        camposQuadras.innerHTML = `
+            <label class="form-label fw-semibold d-block mb-3">Dados de cada quadra</label>
+            ${Array.from({ length: quantidade }, (_, indice) => `
+                <div class="border rounded-3 p-3 mb-3">
+                    <strong class="d-block mb-3">Quadra ${indice + 1}</strong>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome da quadra</label>
+                            <input name="quadras[${indice}][nome]" class="form-control" placeholder="Ex: Society Premium" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Foto da quadra</label>
+                            <input name="quadras[${indice}][foto]" type="file" class="form-control" accept="image/jpeg,image/png,image/webp">
+                            <small class="text-muted">JPG, PNG ou WebP, até 5 MB.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Valor por hora</label>
+                            <input type="text" class="form-control preco-hora-formatado" data-indice="${indice}" inputmode="numeric" placeholder="R$ 0,00" required>
+                            <input name="quadras[${indice}][preco_hora]" type="hidden" class="preco-hora-valor" data-indice="${indice}">
+                            <small class="text-muted">Digite apenas os números. Ex.: 12000 será exibido como R$ 120,00.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Capacidade de jogadores</label>
+                            <input name="quadras[${indice}][capacidade_jogador]" type="number" min="1" class="form-control" placeholder="Ex: 10" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">A quadra é coberta?</label>
+                            <select name="quadras[${indice}][coberta]" class="form-select" required>
+                                <option value="">Selecione</option>
+                                <option value="1">Sim, é coberta</option>
+                                <option value="0">Não, é descoberta</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descrição do espaço</label>
+                            <textarea name="quadras[${indice}][descricao]" class="form-control" rows="3" maxlength="2000" placeholder="Descreva a estrutura, cobertura, iluminação, vestiários..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        `;
+        camposQuadras.querySelectorAll('.preco-hora-formatado').forEach(input => {
+            input.addEventListener('input', () => {
+                const digitos = input.value.replace(/\D/g, '').slice(0, 11);
+                const valor = digitos ? Number(digitos) / 100 : 0;
+                input.value = digitos ? valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '';
+                camposQuadras.querySelector(`.preco-hora-valor[data-indice="${input.dataset.indice}"]`).value = digitos ? valor.toFixed(2) : '';
+            });
+        });
     }
     quantidadeQuadras.addEventListener('input', renderizarCamposQuadras);
 
