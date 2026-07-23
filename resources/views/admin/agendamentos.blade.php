@@ -9,60 +9,182 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --admin-dark: #0F172A; --primary: #3B82F6; --success: #10B981; --danger: #EF4444; --warning: #F59E0B; --bg: #F8FAFC; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; margin: 0; }
+        :root { --primary:#2D815D; --dark:#1F5C42; --light:#E8F5EE; --bg:#F8FAFC; --text:#334155; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
         .layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: var(--admin-dark); color: white; padding: 1.5rem; }
-        .sidebar-brand { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; }
-        .sidebar-brand i { font-size: 1.8rem; }
-        .sidebar-brand span { font-size: 0.7rem; opacity: 0.6; display: block; margin-top: -0.2rem; }
-        .nav-link { color: #94A3B8; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
-        .main { flex: 1; padding: 2rem; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-        .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--admin-dark); margin: 0; display: flex; align-items: center; gap: 0.5rem; }
-        .card-custom { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-box { padding: 1.2rem; border-radius: 12px; color: white; display: flex; align-items: center; gap: 1rem; }
-        .stat-box.total { background: linear-gradient(135deg, var(--primary), #60A5FA); }
-        .stat-box.pending { background: linear-gradient(135deg, var(--warning), #FCD34D); color: #1F2937; }
-        .stat-box.confirmed { background: linear-gradient(135deg, var(--success), #34D399); }
-        .stat-box.cancelled { background: linear-gradient(135deg, var(--danger), #F87171); }
-        .stat-value { font-size: 2rem; font-weight: 700; }
-        .stat-label { font-size: 0.9rem; opacity: 0.95; }
-        .table-custom { width: 100%; border-collapse: collapse; }
-        .table-custom th { text-align: left; padding: 1rem; background: #F1F5F9; color: #64748B; font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #E2E8F0; }
-        .table-custom td { padding: 1rem; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
-        .badge-status { padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem; }
-        .badge-pendente { background: #FEF3C7; color: #B45309; }
-        .badge-confirmada { background: #D1FAE5; color: #065F46; }
-        .badge-cancelada { background: #FEE2E2; color: #991B1B; }
-        .badge-concluida { background: #DBEAFE; color: #1E40AF; }
-        .badge-pago { background: #DBEAFE; color: #1E40AF; }
         
-        .btn-action { 
-            padding: 0.4rem 0.6rem; 
-            border-radius: 6px; 
-            font-size: 0.75rem; 
-            border: none; 
-            cursor: pointer; 
-            margin: 0.15rem; 
-            font-weight: 600; 
-            display: inline-flex; 
-            align-items: center; 
+        
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--dark) 0%, #154030 100%);
+            color: white;
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .sidebar-brand {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand i { font-size: 2rem; color: #4ADE80; }
+        .sidebar-brand small { display: block; font-size: 0.75rem; opacity: 0.7; margin-top: -0.2rem; font-weight: 400; }
+        .nav-link {
+            color: rgba(255,255,255,0.7);
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .main { flex: 1; margin-left: 250px; padding: 2rem; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--dark); margin: 0; }
+        
+        .card-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(15,23,42,0.06);
+            margin-bottom: 1.5rem;
+        }
+        
+        
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-box {
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: #334155;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(15,23,42,0.04);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-box i { font-size: 2.5rem; opacity: 0.85; }
+        
+        .stat-box.total { border-left-color: #10B981; }
+        .stat-box.total i { color: #10B981; }
+        
+        .stat-box.pending { border-left-color: #F59E0B; }
+        .stat-box.pending i { color: #F59E0B; }
+        
+        .stat-box.confirmed { border-left-color: #3B82F6; }
+        .stat-box.confirmed i { color: #3B82F6; }
+        
+        .stat-box.cancelled { border-left-color: #EF4444; }
+        .stat-box.cancelled i { color: #EF4444; }
+        
+        .stat-value { font-size: 2rem; font-weight: 700; margin: 0.5rem 0; line-height: 1; }
+        .stat-label { font-size: 0.9rem; color: #64748B; font-weight: 500; }
+        
+        /* Table */
+        .table-custom { width: 100%; border-collapse: collapse; }
+        .table-custom th {
+            text-align: left;
+            padding: 1rem;
+            background: #F8FAFC;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #E2E8F0;
+        }
+        .table-custom td {
+            padding: 1rem;
+            border-bottom: 1px solid #F1F5F9;
+            vertical-align: middle;
+        }
+        .table-custom tr:hover { background: #F8FAFC; }
+        
+        /* Badges Profissionais */
+        .badge-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid;
+        }
+        .badge-pendente { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+        .badge-confirmada { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
+        .badge-cancelada { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+        .badge-concluida { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+        .badge-pago { background: #DBEAFE; color: #1E40AF; border-color: #BFDBFE; }
+        .badge-pagto-pendente { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+        
+        /* Botões de Ação */
+        .btn-action {
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            border: 1px solid;
+            cursor: pointer;
+            margin: 0.15rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
             gap: 0.25rem;
             white-space: nowrap;
+            background: white;
+            transition: all 0.2s;
         }
-        .btn-confirm { background: rgba(16,185,129,0.1); color: var(--success); }
-        .btn-confirm:hover { background: var(--success); color: white; }
-        .btn-cancel { background: rgba(239,68,68,0.1); color: var(--danger); }
-        .btn-cancel:hover { background: var(--danger); color: white; }
-        .btn-edit { background: rgba(59,130,246,0.1); color: var(--primary); }
-        .btn-edit:hover { background: var(--primary); color: white; }
+        .btn-action:hover { transform: translateY(-1px); }
+        .btn-confirm { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
+        .btn-confirm:hover { background: #DCFCE7; }
+        .btn-cancel { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+        .btn-cancel:hover { background: #FEE2E2; }
+        .btn-edit { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+        .btn-edit:hover { background: #DBEAFE; }
+        .btn-pay { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
+        .btn-pay:hover { background: #DCFCE7; }
         
         .filter-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-        .filter-bar input, .filter-bar select { padding: 0.6rem; border: 1px solid #E2E8F0; border-radius: 8px; }
-        .btn-primary-admin { background: var(--primary); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .filter-bar input, .filter-bar select {
+            padding: 0.6rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            background: white;
+        }
+        .btn-primary-admin {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn-primary-admin:hover { background: var(--dark); }
         
         .actions-cell { display: flex; flex-wrap: wrap; gap: 0.2rem; align-items: center; }
         
@@ -77,8 +199,8 @@
         }
         @media (max-width: 992px) {
             .layout { display: block; }
-            .sidebar { width: 100%; }
-            .main { padding: 1rem; }
+            .sidebar { width: 100%; position: relative; height: auto; }
+            .main { margin-left: 0; padding: 1rem; }
             .card-custom { overflow-x: auto; }
             .table-custom { min-width: 1100px; }
             .filter-bar input, .filter-bar select { width: 100% !important; }
@@ -99,7 +221,7 @@
             <i class="bi bi-trophy"></i>
             <div>
                 EsporTec
-                <span>Admin da arena</span>
+                <small>Admin da arena</small>
             </div>
         </a>
         <nav>
@@ -114,39 +236,40 @@
         </nav>
         <div style="margin-top: auto;"><a href="/" class="nav-link"><i class="bi bi-box-arrow-left"></i> Sair</a></div>
     </aside>
+    
     <main class="main">
         <div class="header">
-            <h1><i class="bi bi-calendar-check"></i>Gestão de Agendamentos</h1>
+            <h1><i class="bi bi-calendar-check"></i> Gestão de Agendamentos</h1>
             <button class="btn-primary-admin" data-bs-toggle="modal" data-bs-target="#modalReserva">
-                <i class="bi bi-plus-lg"></i>Nova Reserva
+                <i class="bi bi-plus-lg"></i> Nova Reserva
             </button>
         </div>
 
         <!-- Stats -->
         <div class="stats-row">
             <div class="stat-box total">
-                <i class="bi bi-calendar-event fs-1"></i>
+                <i class="bi bi-calendar-event"></i>
                 <div>
                     <div class="stat-value" id="countTotal">-</div>
                     <div class="stat-label">Total do Mês</div>
                 </div>
             </div>
             <div class="stat-box pending">
-                <i class="bi bi-clock-history fs-1"></i>
+                <i class="bi bi-clock-history"></i>
                 <div>
                     <div class="stat-value" id="countPendentes">-</div>
                     <div class="stat-label">Pendentes</div>
                 </div>
             </div>
             <div class="stat-box confirmed">
-                <i class="bi bi-check-circle fs-1"></i>
+                <i class="bi bi-check-circle"></i>
                 <div>
                     <div class="stat-value" id="countConfirmadas">-</div>
                     <div class="stat-label">Confirmadas</div>
                 </div>
             </div>
             <div class="stat-box cancelled">
-                <i class="bi bi-x-circle fs-1"></i>
+                <i class="bi bi-x-circle"></i>
                 <div>
                     <div class="stat-value" id="countCanceladas">-</div>
                     <div class="stat-label">Canceladas</div>
@@ -175,7 +298,6 @@
             <table class="table-custom">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Data/Hora</th>
                         <th>Quadra</th>
                         <th>Cliente</th>
@@ -187,7 +309,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabelaAgendamentos">
-                    <tr><td colspan="9" class="text-center text-muted py-4"><i class="bi bi-hourglass-spin me-2"></i>Carregando agendamentos...</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4"><i class="bi bi-hourglass-spin me-2"></i>Carregando agendamentos...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -248,40 +370,26 @@
 <script src="/js/esportec-ui.js"></script>
 <script src="/js/esportec-api.js"></script>
 <script>
-    
-    //  INTEGRAÇÃO COM API - ADMIN AGENDAMENTOS
-    
     const API_BASE = '/api';
-    
-    // Mock data para fallback
     const MOCK_AGENDAMENTOS = [
         { id: 1234, data: '2026-06-14', hora_inicio: '14:00', hora_fim: '15:30', status: 'confirmada', quadra: { nome: 'Society Premium' }, usuario: { nome: 'João Silva', telefone: '(11) 99999-9999' }, pagamento: { status: 'pendente', metodo: 'dinheiro', valor: 225.00 } },
         { id: 1235, data: '2026-06-15', hora_inicio: '19:00', hora_fim: '20:00', status: 'pendente', quadra: { nome: 'Futsal Arena' }, usuario: { nome: 'Pedro Santos', telefone: '(11) 98888-8888' }, pagamento: { status: 'pendente', metodo: 'pix', valor: 120.00 } },
         { id: 1236, data: '2026-06-16', hora_inicio: '10:00', hora_fim: '11:00', status: 'concluida', quadra: { nome: 'Beach Tennis #1' }, usuario: { nome: 'Ana Lima', telefone: '(11) 97777-7777' }, pagamento: { status: 'pago', metodo: 'cartao_credito', valor: 100.00 } }
     ];
-    
     const MOCK_QUADRAS = [
         { id: 1, nome: 'Futsal Arena' },
         { id: 2, nome: 'Society Premium' },
         { id: 3, nome: 'Beach Tennis #1' }
     ];
 
-    //  CARREGAR AGENDAMENTOS - API: GET /api/admin/agendamentos
     async function carregarAgendamentos() {
         try {
             const response = await fetch(`${API_BASE}/admin/agendamentos`);
             if (!response.ok) throw new Error(`Erro ${response.status}`);
             const agendamentos = await response.json();
-            
-            if (!agendamentos || agendamentos.length === 0) {
-                renderizarTabela([]);
-                atualizarStats([]);
-                return;
-            }
-            
+            if (!agendamentos || agendamentos.length === 0) { renderizarTabela([]); atualizarStats([]); return; }
             renderizarTabela(agendamentos);
             atualizarStats(agendamentos);
-            console.log(' Agendamentos carregados:', agendamentos.length);
         } catch (error) {
             console.error('Erro ao carregar agendamentos:', error.message);
             renderizarTabela([]);
@@ -292,21 +400,17 @@
     function renderizarTabela(agendamentos) {
         const tbody = document.getElementById('tabelaAgendamentos');
         tbody.innerHTML = '';
-
         if (!agendamentos || agendamentos.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Nenhum agendamento encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Nenhum agendamento encontrado.</td></tr>';
             return;
         }
-
         agendamentos.forEach(agenda => {
             const statusBadge = getStatusBadge(agenda.status);
             const pagamentoBadge = getPagamentoBadge(agenda.pagamento);
             const acoes = getAcoesAgendamento(agenda);
-
             tbody.innerHTML += `
                 <tr data-agenda-id="${agenda.id}">
-                    <td>#${agenda.id}</td>
-                    <td>${formatarData(agenda.data)}<br><small>${formatarHora(agenda.hora_inicio)} - ${formatarHora(agenda.hora_fim)}</small></td>
+                    <td>${formatarData(agenda.data)}<br><small class="text-muted">${formatarHora(agenda.hora_inicio)} - ${formatarHora(agenda.hora_fim)}</small></td>
                     <td>${agenda.quadra?.nome || '-'}</td>
                     <td>${agenda.usuario?.nome_completo || '-'}</td>
                     <td>${agenda.usuario?.telefone || '-'}</td>
@@ -332,10 +436,10 @@
     function getPagamentoBadge(pagamento) {
         if (!pagamento) return '<span class="badge-status">-</span>';
         const pago = pagamento.status === 'pago';
-        const classe = pago ? 'badge-pago' : 'badge-pendente';
-        const icone = pago ? 'bi-check2-circle' : 'bi-clock';
+        const classe = pago ? 'badge-pago' : 'badge-pagto-pendente';
+        const icone = pago ? 'bi bi-check2' : 'bi bi-clock';
         const metodo = pagamento.metodo ? `(${formatarMetodo(pagamento.metodo)})` : '';
-        return `<span class="badge-status ${classe}"><i class="bi ${icone}"></i>${pago ? 'Pago' : 'Pendente'} ${metodo}</span>`;
+        return `<span class="badge-status ${classe}"><i class="${icone}"></i>${pago ? 'Pago' : 'Pendente'} ${metodo}</span>`;
     }
 
     function formatarMetodo(metodo) {
@@ -345,37 +449,23 @@
 
     function getAcoesAgendamento(agenda) {
         let html = '';
-        
-        // O dono confirma a reserva; o pagamento pode ser feito depois, no local.
         if (agenda.status === 'pendente') {
-            html += `<button class="btn-action btn-confirm" data-action="confirmar-reserva" data-id="${agenda.id}"><i class="bi bi-check-circle"></i> Confirmar</button>`;
+            html += `<button class="btn-action btn-confirm" data-action="confirmar-reserva" data-id="${agenda.id}"><i class="bi bi-check"></i> Confirmar</button>`;
         }
-
         const pagamentoNoLocal = ['dinheiro', 'cartao_credito', 'cartao_debito'].includes(agenda.pagamento?.metodo);
         if (agenda.pagamento?.status === 'pendente' && pagamentoNoLocal) {
-            html += `<button class="btn-action btn-confirm" data-action="confirmar-pagamento" data-id="${agenda.pagamento.id}"><i class="bi bi-cash-coin"></i> Confirmar pagamento</button>`;
+            html += `<button class="btn-action btn-pay" data-action="confirmar-pagamento" data-id="${agenda.pagamento.id}"><i class="bi bi-wallet2"></i> Conf. Pagto</button>`;
         }
-        
-        // Ver comprovante (se pago)
         if (agenda.pagamento?.comprovante) {
             html += `<button class="btn-action btn-edit" data-action="ver-comprovante" data-url="${agenda.pagamento.comprovante}"><i class="bi bi-file-earmark-image"></i> Comprovante</button>`;
         }
-        
-        // Editar (se não concluída/cancelada)
         if (!['concluida', 'cancelada'].includes(agenda.status)) {
             html += `<button class="btn-action btn-edit" data-action="editar-reserva" data-id="${agenda.id}"><i class="bi bi-pencil"></i> Editar</button>`;
+            html += `<button class="btn-action btn-cancel" data-action="cancelar-reserva" data-id="${agenda.id}"><i class="bi bi-x"></i> Cancelar</button>`;
         }
-        
-        // Cancelar (se não concluída/cancelada)
-        if (!['concluida', 'cancelada'].includes(agenda.status)) {
-            html += `<button class="btn-action btn-cancel" data-action="cancelar-reserva" data-id="${agenda.id}"><i class="bi bi-x-circle"></i> Cancelar</button>`;
-        }
-        
-        // Bloqueado se concluída
         if (agenda.status === 'concluida') {
             html += `<button class="btn-action btn-edit" disabled style="opacity:0.5"><i class="bi bi-lock"></i> Fechada</button>`;
         }
-        
         return html || '-';
     }
 
@@ -392,20 +482,15 @@
         return `${dia}/${mes}/${ano}`;
     }
 
-    function formatarHora(hora) {
-        return hora ? String(hora).slice(0, 5) : '-';
-    }
+    function formatarHora(hora) { return hora ? String(hora).slice(0, 5) : '-'; }
 
-    // AÇÕES DOS BOTÕES
     document.getElementById('tabelaAgendamentos').addEventListener('click', async event => {
         const button = event.target.closest('[data-action]');
         if (!button) return;
-
         const action = button.dataset.action;
         const id = button.dataset.id;
 
         if (action === 'editar-reserva') {
-            // Preenche modal com dados da reserva
             const agenda = MOCK_AGENDAMENTOS.find(a => a.id == id);
             if (agenda) {
                 document.getElementById('reservaCliente').value = agenda.usuario?.nome || '';
@@ -418,38 +503,30 @@
             bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReserva')).show();
             return;
         }
-
         if (action === 'confirmar-pagamento') {
             if (!confirm('Confirmar recebimento do pagamento?')) return;
             try {
                 await EsporTecApi.request(`${API_BASE}/admin/pagamentos/${id}/confirmar`, { method: 'PATCH' });
                 esportecToast('Pagamento confirmado.', 'success');
                 await carregarAgendamentos();
-            } catch (error) {
-                esportecToast(error.message || 'Não foi possível confirmar o pagamento.', 'danger');
-            }
+            } catch (error) { esportecToast(error.message || 'Não foi possível confirmar o pagamento.', 'danger'); }
             return;
         }
-
         if (action === 'confirmar-reserva') {
             if (!confirm('Confirmar esta reserva? O pagamento continuará pendente até ser feito.')) return;
             try {
                 await EsporTecApi.request(`${API_BASE}/admin/reservas/${id}/confirmar`, { method: 'PATCH' });
-                esportecToast('Reserva confirmada. O cliente já pode visualizar a confirmação.', 'success');
+                esportecToast('Reserva confirmada.', 'success');
                 await carregarAgendamentos();
-            } catch (error) {
-                esportecToast(error.message || 'Não foi possível confirmar a reserva.', 'danger');
-            }
+            } catch (error) { esportecToast(error.message || 'Não foi possível confirmar a reserva.', 'danger'); }
             return;
         }
-
         if (action === 'ver-comprovante') {
             const url = button.dataset.url;
             if (url) window.open(url, '_blank');
             else esportecToast('Comprovante não disponível.', 'warning');
             return;
         }
-
         if (action === 'cancelar-reserva') {
             if (!confirm('Cancelar esta reserva?\n\nEsta ação não pode ser desfeita.')) return;
             try {
@@ -461,9 +538,8 @@
                 esportecToast('Reserva cancelada.', 'success');
                 carregarAgendamentos();
             } catch (error) {
-                // Fallback visual
                 const row = button.closest('tr');
-                row.querySelector('td:nth-child(7)').innerHTML = '<span class="badge-status badge-cancelada"><i class="bi bi-x-circle"></i>Cancelada</span>';
+                row.querySelector('td:nth-child(6)').innerHTML = '<span class="badge-status badge-cancelada"><i class="bi bi-x-circle"></i>Cancelada</span>';
                 row.querySelectorAll('.btn-action').forEach(btn => { btn.disabled = true; btn.style.opacity = '0.5'; });
                 esportecToast('Reserva cancelada (simulado).', 'success');
             }
@@ -471,13 +547,11 @@
         }
     });
 
-    //  FILTROS
     function aplicarFiltros() {
         const data = document.getElementById('filtroData').value;
         const quadra = document.getElementById('filtroQuadra').value;
         const status = document.getElementById('filtroStatus').value;
         const cliente = document.getElementById('filtroCliente').value.trim().toLowerCase();
-
         document.querySelectorAll('#tabelaAgendamentos tr[data-agenda-id]').forEach(row => {
             const texto = row.textContent.toLowerCase();
             const mostrar = 
@@ -488,16 +562,14 @@
             row.classList.toggle('d-none', !mostrar);
         });
     }
-
     document.querySelectorAll('#filtroData, #filtroQuadra, #filtroStatus, #filtroCliente').forEach(input => {
         input.addEventListener('input', aplicarFiltros);
         input.addEventListener('change', aplicarFiltros);
     });
 
-    //  CRIAR RESERVA MANUAL - API: POST /api/reservas
     document.getElementById('btnSalvarReserva').addEventListener('click', async () => {
         const payload = {
-            usuario_id: 1, // Em produção: pegar do usuário logado
+            usuario_id: 1,
             quadra_id: document.getElementById('reservaQuadra').value,
             data: document.getElementById('reservaData').value,
             hora_inicio: document.getElementById('reservaHoraInicio').value,
@@ -505,12 +577,10 @@
             valor_total: parseFloat(document.getElementById('reservaValor').value) || 0,
             observacao: 'Reserva manual criada por admin'
         };
-
         if (!payload.quadra_id || !payload.data || !payload.hora_inicio) {
             esportecToast('Preencha todos os campos obrigatórios.', 'warning');
             return;
         }
-
         try {
             const response = await fetch(`${API_BASE}/reservas`, {
                 method: 'POST',
@@ -518,20 +588,17 @@
                 body: JSON.stringify(payload)
             });
             if (!response.ok) throw new Error('Erro');
-            
             bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide();
             esportecToast('Reserva criada.', 'success');
             carregarAgendamentos();
         } catch (error) {
             console.error('Erro ao criar reserva:', error);
-            // Fallback visual
             bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide();
             esportecToast('Reserva criada (simulado).', 'success');
             carregarAgendamentos();
         }
     });
 
-    //  CARREGAR QUADRAS NO SELECT
     async function carregarQuadrasSelect() {
         try {
             const response = await fetch(`${API_BASE}/admin/quadras`);
@@ -550,13 +617,10 @@
             if (!select) return;
             const first = select.querySelector('option[value=""]')?.outerHTML || '<option value="">Selecione...</option>';
             select.innerHTML = first;
-            quadras.forEach(q => {
-                select.innerHTML += `<option value="${q.id}">${q.nome}</option>`;
-            });
+            quadras.forEach(q => { select.innerHTML += `<option value="${q.id}">${q.nome}</option>`; });
         });
     }
 
-    // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
         carregarQuadrasSelect();
         carregarAgendamentos();

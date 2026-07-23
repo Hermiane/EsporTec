@@ -11,20 +11,107 @@
         :root { --primary:#2D815D; --dark:#1F5C42; --light:#E8F5EE; --bg:#F8FAFC; }
         body { margin:0; font-family:'Poppins',sans-serif; background:var(--bg); color:#334155; }
         .layout { display:flex; min-height:100vh; }
-        .sidebar { width:250px; background:var(--dark); color:white; padding:1.5rem; flex-shrink:0; }
-        .sidebar-brand { color:white; font-size:1.4rem; font-weight:700; text-decoration:none; display:block; margin-bottom:2rem; }
-        .nav-link { color:rgba(255,255,255,.76); border-radius:8px; padding:.75rem 1rem; margin-bottom:.4rem; display:flex; gap:.75rem; align-items:center; text-decoration:none; }
-        .nav-link:hover,.nav-link.active { background:rgba(255,255,255,.12); color:white; }
-        .main { flex:1; padding:2rem; }
-        .notice-card { background:white; border-radius:12px; padding:1rem; box-shadow:0 4px 16px rgba(15,23,42,.06); display:flex; gap:1rem; margin-bottom:1rem; align-items:flex-start; }
-        .notice-icon { width:42px; height:42px; border-radius:12px; background:var(--light); color:var(--primary); display:inline-flex; align-items:center; justify-content:center; font-size:1.25rem; flex:0 0 42px; }
-        @media (max-width: 992px) { .layout { display:block; } .sidebar { width:100%; } .main { padding:1rem; } }
+        
+        
+        .sidebar {
+            width:250px;
+            background:linear-gradient(180deg, var(--dark) 0%, #154030 100%);
+            color:white;
+            padding:1.5rem;
+            position:fixed;
+            height:100vh;
+            left:0;
+            top:0;
+            overflow-y:auto;
+            z-index:1000;
+        }
+        .sidebar-brand {
+            color:white;
+            font-size:1.6rem;
+            font-weight:700;
+            text-decoration:none;
+            display:flex;
+            align-items:center;
+            gap:0.75rem;
+            margin-bottom:3rem;
+            padding-bottom:1.5rem;
+            border-bottom:1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand i { font-size:2rem; color:#4ADE80; }
+        .sidebar-brand small { display:block; font-size:0.75rem; opacity:0.7; margin-top:-0.2rem; font-weight:400; }
+        .nav-link {
+            color:rgba(255,255,255,0.7);
+            padding:0.9rem 1rem;
+            border-radius:10px;
+            margin-bottom:0.5rem;
+            display:flex;
+            align-items:center;
+            gap:0.8rem;
+            text-decoration:none;
+            transition:all 0.3s;
+            font-weight:500;
+        }
+        .nav-link:hover,.nav-link.active {
+            background:rgba(255,255,255,0.15);
+            color:white;
+            transform:translateX(5px);
+        }
+        
+        .main { flex:1; margin-left:250px; padding:2rem; }
+        
+        
+        .page-header h1 {
+            font-size: 1.3rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 0.2rem !important;
+        }
+        .page-header p {
+            font-size: 0.9rem !important;
+            color: #64748B !important;
+            margin: 0 !important;
+        }
+        
+        .notice-card {
+            background:white;
+            border-radius:12px;
+            padding:1rem;
+            box-shadow:0 4px 16px rgba(15,23,42,.06);
+            display:flex;
+            gap:1rem;
+            margin-bottom:1rem;
+            align-items:flex-start;
+            transition:opacity 0.2s;
+        }
+        .notice-card.lida { opacity: 0.55; }
+        .notice-icon {
+            width:42px;
+            height:42px;
+            border-radius:12px;
+            background:var(--light);
+            color:var(--primary);
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.25rem;
+            flex:0 0 42px;
+        }
+        @media (max-width: 992px) {
+            .layout { display:block; }
+            .sidebar { width:100%; position:relative; height:auto; }
+            .main { margin-left:0; padding:1rem; }
+        }
     </style>
 </head>
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/painel-funcionario" class="sidebar-brand">EsporTec <small class="opacity-75">FUNCIONÁRIO</small></a>
+        <a href="/painel-funcionario" class="sidebar-brand">
+            <i class="bi bi-trophy"></i>
+            <div>
+                EsporTec
+                <small>Área do Funcionário</small>
+            </div>
+        </a>
         <nav>
             <a href="/painel-funcionario" class="nav-link"><i class="bi bi-grid"></i> Painel</a>
             <a href="/funcionario/agenda" class="nav-link"><i class="bi bi-calendar-week"></i> Agenda</a>
@@ -33,12 +120,12 @@
         </nav>
     </aside>
     <main class="main">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 page-header">
             <div>
-                <h1 class="fw-bold mb-1">Notificações operacionais</h1>
-                <p class="text-muted mb-0">Avisos úteis para atendimento, agenda, pagamentos e manutenção.</p>
+                <h1 class="fw-bold mb-1"><i class="bi bi-bell me-2"></i>Notificações</h1>
+                <p class="text-muted mb-0">Avisos de agenda, pagamentos e manutenção.</p>
             </div>
-            <button class="btn btn-success" id="btnMarcarTodas"><i class="bi bi-check2-all me-2"></i>Marcar como lidas</button>
+            <button class="btn btn-success btn-sm" id="btnMarcarTodas"><i class="bi bi-check2-all me-1"></i>Marcar como lidas</button>
         </div>
         <section id="staffNotices">
             <article class="notice-card">
@@ -60,8 +147,8 @@
 <script src="/js/esportec-ui.js"></script>
 <script>
     document.getElementById('btnMarcarTodas').addEventListener('click', () => {
-        document.querySelectorAll('.notice-card').forEach(card => card.style.opacity = '0.55');
-        esportecToast('Notificações operacionais marcadas como lidas.', 'success');
+        document.querySelectorAll('.notice-card').forEach(card => card.classList.add('lida'));
+        esportecToast('Notificações marcadas como lidas.', 'success');
     });
 </script>
 </body>

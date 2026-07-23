@@ -12,11 +12,52 @@
         :root { --primary:#2D815D; --dark:#1F5C42; --light:#E8F5EE; --bg:#F8FAFC; --text:#334155; }
         body { margin:0; font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); }
         .layout { display:flex; min-height:100vh; }
-        .sidebar { width:260px; background:var(--dark); color:white; padding:1.5rem; flex-shrink:0; }
-        .sidebar-brand { color:white; font-size:1.5rem; font-weight:700; text-decoration:none; display:block; margin-bottom:2rem; }
-        .nav-link { color:rgba(255,255,255,.75); border-radius:8px; padding:.75rem 1rem; margin-bottom:.35rem; display:flex; gap:.75rem; align-items:center; text-decoration:none; }
-        .nav-link:hover,.nav-link.active { background:rgba(255,255,255,.12); color:white; }
-        .main { flex:1; padding:2rem; overflow-x:hidden; }
+        
+        
+        .sidebar {
+            width:260px;
+            background:linear-gradient(180deg, var(--dark) 0%, #154030 100%);
+            color:white;
+            padding:1.5rem;
+            position:fixed;
+            height:100vh;
+            left:0;
+            top:0;
+            overflow-y:auto;
+            z-index:1000;
+        }
+        .sidebar-brand {
+            color:white;
+            font-size:1.5rem;
+            font-weight:700;
+            text-decoration:none;
+            display:flex;
+            align-items:center;
+            gap:0.5rem;
+            margin-bottom:2rem;
+            padding-bottom:1rem;
+            border-bottom:1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand i { font-size:1.8rem; color:#4ADE80; }
+        .sidebar-brand small { font-size:0.7rem; opacity:0.75; display:block; margin-top:-0.2rem; }
+        .nav-link {
+            color:rgba(255,255,255,.75);
+            border-radius:8px;
+            padding:.75rem 1rem;
+            margin-bottom:.35rem;
+            display:flex;
+            gap:.75rem;
+            align-items:center;
+            text-decoration:none;
+            transition:all 0.3s;
+        }
+        .nav-link:hover,.nav-link.active {
+            background:rgba(255,255,255,.15);
+            color:white;
+            transform:translateX(3px);
+        }
+        
+        .main { flex:1; margin-left:260px; padding:2rem; overflow-x:hidden; }
         .card-soft { background:white; border:0; border-radius:12px; box-shadow:0 4px 16px rgba(15,23,42,.06); }
         .court-img { height:170px; object-fit:cover; border-radius:12px 12px 0 0; }
         .badge-on { background:rgba(45,129,93,.15); color:var(--primary); }
@@ -26,13 +67,19 @@
         .day-box .form-check-input:checked { background-color:var(--primary); border-color:var(--primary); }
         .btn-success { background:var(--primary); border-color:var(--primary); }
         .btn-success:hover { background:var(--dark); border-color:var(--dark); }
-        @media (max-width: 992px) { .layout { display:block; } .sidebar { width:100%; } .main { padding:1rem; } }
+        @media (max-width: 992px) { .layout { display:block; } .sidebar { width:100%; position:relative; height:auto; } .main { margin-left:0; padding:1rem; } }
     </style>
 </head>
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <small class="opacity-75">Admin da arena</small></a>
+        <a href="/admin/dashboard" class="sidebar-brand">
+            <i class="bi bi-trophy"></i>
+            <div>
+                EsporTec
+                <small>Admin da arena</small>
+            </div>
+        </a>
         <nav>
             <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>

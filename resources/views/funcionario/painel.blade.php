@@ -176,8 +176,9 @@
         </a>
         <nav>
             <a href="/painel-funcionario" class="nav-link active"><i class="bi bi-grid"></i> Agenda do Dia</a>
+            <a href="/funcionario/agenda" class="nav-link"><i class="bi bi-calendar-week"></i> Agenda</a>
+            <a href="/funcionario/notificacoes" class="nav-link"><i class="bi bi-bell"></i> Notificações</a>
             <a href="/funcionario/perfil" class="nav-link"><i class="bi bi-person"></i> Meu Perfil</a>
-            <a href="/funcionario/agenda" class="nav-link"><i class="bi bi-calendar-check"></i> Agenda</a>
             <a href="#feedbacksClientes" class="nav-link"><i class="bi bi-people"></i> Clientes</a>
         </nav>
         <div style="margin-top: auto;">

@@ -89,11 +89,34 @@
         .empty-search i { width: 56px; height: 56px; border-radius: 50%; background: var(--light); color: var(--primary); display: inline-flex; align-items: center; justify-content: center; font-size: 1.7rem; margin-bottom: 1rem; }
         .empty-search strong { display: block; color: var(--text); font-size: 1.1rem; margin-bottom: 0.35rem; }
 
-        .badge-status { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-        .badge-confirmada { background: rgba(45,129,93,0.15); color: var(--primary); }
-        .badge-pago { background: rgba(21,101,192,0.15); color: #1565C0; }
-        .badge-pendente { background: rgba(249,168,37,0.15); color: #F9A825; }
-        .badge-cancelada { background: rgba(211,47,47,0.15); color: #D32F2F; }
+        
+        .badge-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid;
+            background: transparent; 
+        }
+        .badge-confirmada {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .badge-pago {
+            color: #3B82F6;
+            border-color: #3B82F6;
+        }
+        .badge-pendente {
+            color: #F59E0B;
+            border-color: #F59E0B;
+        }
+        .badge-cancelada {
+            color: #EF4444;
+            border-color: #EF4444;
+        }
 
         /* Loading state */
         .loading-placeholder {
@@ -149,7 +172,6 @@
                     <i class="bi bi-list"></i>
                 </button>
                 <div>
-                    <!-- DADO DINÂMICO: Nome do usuário logado -->
                     <h1 id="boasVindasCliente">Olá!</h1>
                     <p id="resumoReservasHoje">Bem-vindo de volta. Carregando suas reservas...</p>
                 </div>
@@ -158,7 +180,6 @@
                 <button type="button" class="btn btn-light" id="searchToggle" aria-label="Buscar"><i class="bi bi-search"></i></button>
                 <a href="/notificacoes" class="btn btn-light" aria-label="Notificações"><i class="bi bi-bell"></i></a>
                 <button type="button" class="account-button" id="profileToggle" aria-label="Abrir menu da conta" aria-expanded="false">
-                    <!--  DADO DINÂMICO: Avatar com iniciais -->
                     <span class="account-avatar">{{ substr(auth()->user()->nome_completo ?? 'C', 0, 2) }}</span>
                     <span class="account-name">{{ explode(' ', auth()->user()->nome_completo ?? 'Cliente')[0] }}</span>
                     <i class="bi bi-chevron-down"></i>
@@ -199,14 +220,12 @@
             </div>
         </div>
 
-        <!-- Próxima Reserva (Carregado via JS) -->
+        <!-- Próxima Reserva -->
         <div class="highlight-card" id="proximaReservaCard">
-            <!-- Placeholder enquanto carrega -->
             <div class="loading-placeholder" id="proximaReservaLoading">
                 <i class="bi bi-hourglass-split"></i>
                 <p class="mb-0 mt-2">Carregando sua próxima partida...</p>
             </div>
-            <!-- Conteúdo dinâmico (preenchido via JS) -->
             <div id="proximaReservaContent" class="d-none">
                 <h3 class="mb-2" id="proximaReservaQuadra">Quadra Society Premium</h3>
                 <p class="mb-3 opacity-75" id="proximaReservaInfo">Hoje, 19:00</p>
@@ -247,7 +266,7 @@
             </a>
         </div>
 
-        <!-- Arenas disponíveis (Carregado via Blade + JS) -->
+        <!-- Arenas disponíveis -->
         <section class="arena-selector">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                 <div>
@@ -257,7 +276,6 @@
                 <span class="badge bg-success" id="arenasCount">3 arenas</span>
             </div>
             <div class="arena-options" id="arenaOptions">
-                <!-- DADOS VIA BLADE: Loop das arenas que o Controller enviou -->
                 @if(isset($arenas) && $arenas->count() > 0)
                     <button type="button" class="arena-option active" data-arena-filter="todas">
                         <strong>Todas as arenas</strong>
@@ -270,7 +288,6 @@
                         </button>
                     @endforeach
                 @else
-                    <!-- Fallback se não houver arenas -->
                     <button type="button" class="arena-option active" data-arena-filter="todas">
                         <strong>Todas as arenas</strong>
                         <small>Mostrar todas as quadras disponíveis</small>
@@ -283,7 +300,7 @@
             </div>
         </section>
 
-        <!-- Quadras Disponíveis (Carregado via JS) -->
+        <!-- Quadras Disponíveis -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <div>
                 <h5 class="fw-bold mb-0">Quadras Disponíveis</h5>
@@ -291,15 +308,12 @@
             </div>
         </div>
         
-        <!-- Placeholder enquanto carrega quadras -->
         <div id="quadrasLoading" class="loading-placeholder">
             <i class="bi bi-hourglass-split"></i>
             <p class="mb-0 mt-2">Carregando quadras disponíveis...</p>
         </div>
         
-        <!-- Grid de quadras (preenchido via JS) -->
-        <div class="row g-4 quadras-grid" id="quadrasGrid">
-        </div>
+        <div class="row g-4 quadras-grid" id="quadrasGrid"></div>
         
         <div id="emptySearch" class="empty-search d-none">
             <i class="bi bi-search"></i>
@@ -307,19 +321,17 @@
             <p class="mb-0">Tente buscar por Futsal, Society ou pelo nome da quadra.</p>
         </div>
 
-        <!-- Reservas Recentes (Carregado via JS) -->
+        <!-- Reservas Recentes -->
         <div class="card-custom">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Reservas Recentes</h5>
                 <a href="/minhas-reservas" class="text-decoration-none small fw-semibold" style="color: var(--primary)">Ver todas</a>
             </div>
             <div class="table-responsive">
-                <!-- Placeholder enquanto carrega -->
                 <div id="reservasLoading" class="loading-placeholder py-3">
                     <i class="bi bi-hourglass-split"></i>
                     <small>Carregando histórico...</small>
                 </div>
-                <!-- Tabela dinâmica -->
                 <table class="table table-borderless align-middle mb-0" id="reservasTable">
                     <thead class="text-muted small">
                         <tr>
@@ -331,7 +343,7 @@
                         </tr>
                     </thead>
                     <tbody id="reservasBody">
-                        <!--  CONTEÚDO DINÂMICO: Será preenchido via JavaScript -->
+                        <!-- Preenchido via JS -->
                     </tbody>
                 </table>
             </div>
@@ -411,17 +423,16 @@
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/esportec-ui.js"></script>
-    <script src="/js/esportec-api.js"></script>
-    <script>
+<script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
+<script>
     const usuarioSessao = JSON.parse(localStorage.getItem('esportec_user') || 'null');
     if (usuarioSessao?.nome_completo) document.getElementById('boasVindasCliente').textContent = `Olá, ${usuarioSessao.nome_completo}!`;
-    //  VARIÁVEIS GLOBAIS PARA INTEGRAÇÃO
-    const API_BASE = '/api/cliente'; // CORRIGIDO: agora aponta para o prefixo correto
+    
+    const API_BASE = '/api/cliente';
     let currentArenaFilter = 'todas';
     let currentSearchTerm = '';
 
-    // Dados fictícios (fallback quando a API não existe)
     const MOCK_QUADRAS = [
         {
             id: 1, nome: 'Quadra Futsal Arena', tipo: 'Futsal', capacidade_jogadores: 10, coberta: true,
@@ -446,9 +457,6 @@
         }
     ];
 
-    //  FUNÇÕES DE CARREGAMENTO DE DADOS
-    
-    // Carregar próxima reserva do usuário
     async function carregarProximaReserva() {
         try {
             const reservas = await EsporTecApi.request(`${API_BASE}/reservas`);
@@ -484,13 +492,11 @@
         }
     }
 
-    // Carregar quadras disponíveis 
     async function carregarQuadras(arenaSlug = null, search = '') {
         try {
             document.getElementById('quadrasLoading').classList.remove('d-none');
             document.getElementById('quadrasGrid').innerHTML = '';
             
-            //  ROTA CORRIGIDA: /api/cliente/quadras (sem /disponiveis)
             let url = `${API_BASE}/quadras`;
             const params = new URLSearchParams();
             if (arenaSlug && arenaSlug !== 'todas') params.append('arena', arenaSlug);
@@ -504,7 +510,6 @@
             renderizarQuadras(quadras);
         } catch (error) {
             console.log('Usando dados fictícios para quadras:', error.message);
-            // Fallback com mock
             let quadrasFiltradas = MOCK_QUADRAS;
             if (arenaSlug && arenaSlug !== 'todas') {
                 quadrasFiltradas = MOCK_QUADRAS.filter(q => q.arena?.slug === arenaSlug);
@@ -521,7 +526,6 @@
         }
     }
 
-    // Função auxiliar para renderizar quadras
     function renderizarQuadras(quadras) {
         if (quadras.length > 0) {
             quadras.forEach(quadra => {
@@ -530,8 +534,8 @@
                 card.dataset.arena = quadra.arena?.slug || 'sem-arena';
                 card.innerHTML = `
                     <div class="quadra-card">
-                            <img src="${quadra.foto || quadra.imagem || 'https://via.placeholder.com/800x220?text=Sem+imagem'}"
-                             alt="${quadra.nome}" class="quadra-img">
+                        <img src="${quadra.foto || quadra.imagem || 'https://via.placeholder.com/800x220?text=Sem+imagem'}"
+                         alt="${quadra.nome}" class="quadra-img">
                         <div class="quadra-content">
                             <span class="arena-badge"><i class="bi bi-building"></i>${quadra.arena?.nome || 'Arena'}</span>
                             <h3 class="quadra-title">${quadra.nome}</h3>
@@ -558,13 +562,11 @@
         }
     }
 
-    // Carregar reservas recentes - 
     async function carregarReservasRecentes() {
         try {
             document.getElementById('reservasLoading').classList.remove('d-none');
             document.getElementById('reservasBody').innerHTML = '';
             
-            // ROTA CORRIGIDA: /api/cliente/reservas (sem /recentes)
             const reservas = await EsporTecApi.request(`${API_BASE}/reservas`);
             renderizarReservas(reservas);
             atualizarResumoReservasHoje(reservas);
@@ -585,7 +587,7 @@
             : `Bem-vindo de volta. Você tem ${total} reserva${total > 1 ? 's' : ''} confirmada${total > 1 ? 's' : ''} para hoje.`;
     }
 
-    // Função auxiliar para renderizar reservas
+
     function renderizarReservas(reservas) {
         if (reservas.length > 0) {
             reservas.forEach(reserva => {
@@ -604,14 +606,11 @@
         }
     }
 
-    // Carregar contador de notificações (mock por enquanto)
     function carregarNotificacoesCount() {
         document.getElementById('notifCount').textContent = 3;
         document.getElementById('profileNotifCount').textContent = 3;
     }
 
-    //  FUNÇÕES AUXILIARES
-  
     function formatarData(dataISO) {
         if (!dataISO) return '';
         const data = new Date(dataISO);
@@ -643,8 +642,6 @@
         return map[status] || '';
     }
 
-    //  EVENT LISTENERS
-    
     const sidebar = document.querySelector('.sidebar');
     const menuToggle = document.getElementById('menuToggle');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -677,17 +674,6 @@
     searchToggle.addEventListener('click', () => { toggleTopPanel(searchPanel); if (!searchPanel.classList.contains('d-none')) clientSearch.focus(); });
     profileToggle.addEventListener('click', () => toggleTopPanel(profilePanel));
 
-    document.querySelectorAll('[data-arena-filter]').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('[data-arena-filter]').forEach(item => item.classList.remove('active'));
-            button.classList.add('active');
-            currentArenaFilter = button.dataset.arenaFilter;
-            arenaAtualLabel.textContent = currentArenaFilter === 'todas' ? 'Mostrando quadras de todas as arenas' : `Mostrando quadras da ${button.querySelector('strong').textContent.trim()}`;
-            carregarQuadras(currentArenaFilter, currentSearchTerm);
-            document.querySelector('.quadras-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    });
-
     document.addEventListener('click', event => {
         const clickedTopAction = event.target.closest('#profileToggle, #searchToggle, #profilePanel, #searchPanel');
         if (!clickedTopAction) { topPanels.forEach(panel => panel.classList.add('d-none')); syncProfileButtonState(); }
@@ -700,7 +686,6 @@
     goSearch.addEventListener('click', goToSearchResult);
     document.addEventListener('keydown', event => { if (event.key === 'Escape') { topPanels.forEach(panel => panel.classList.add('d-none')); syncProfileButtonState(); closeSidebar(); } });
 
-    //  INICIALIZAÇÃO AO CARREGAR A PÁGINA
     document.addEventListener('DOMContentLoaded', () => {
         carregarProximaReserva();
         carregarQuadras(currentArenaFilter);

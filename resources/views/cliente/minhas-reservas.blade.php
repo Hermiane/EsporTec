@@ -32,7 +32,7 @@
         .badge-pendente { background: rgba(249,168,37,0.15); color: #F9A825; }
         .badge-confirmada { background: rgba(45,129,93,0.15); color: var(--primary); }
         .badge-pago { background: rgba(21,101,192,0.15); color: #1565C0; }
-        .badge-cancelada { background: rgba(211,47,47,0.15); color: #D32F2F; }
+        .badge-cancelada { background: rgba(239,68,68,0.15); color: #EF4444; }
         .badge-concluida { background: rgba(21,101,192,0.15); color: #1565C0; }
 
         .reserva-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
@@ -73,23 +73,18 @@
         <button class="tab-btn" onclick="switchTab('canceladas', this)">Canceladas</button>
     </div>
 
-    <!-- Conteúdo: Próximas -->
+    <!-- Conteúdo -->
     <div id="proximas" class="tab-content active"></div>
-
-    <!-- Conteúdo: Passadas -->
     <div id="passadas" class="tab-content"></div>
-
-    <!-- Conteúdo: Canceladas -->
     <div id="canceladas" class="tab-content"></div>
     
-    <!-- Estado vazio -->
     <div id="emptyState" class="empty-state d-none">
         <i class="bi bi-calendar-x"></i>
         <p class="mb-0">Nenhuma reserva encontrada nesta categoria.</p>
     </div>
 </div>
 
-<!-- Modal Detalhes da Reserva -->
+<!-- Modal Detalhes -->
 <div class="modal fade" id="modalDetalhes" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -102,56 +97,51 @@
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Quadra</small>
-                            <strong class="fs-5" id="detalhe-quadra">Society Premium</strong>
+                            <strong class="fs-5" id="detalhe-quadra">-</strong>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Data</small>
-                            <strong class="fs-5" id="detalhe-data">14/06/2026</strong>
+                            <strong class="fs-5" id="detalhe-data">-</strong>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">Responsável pela reserva</small>
-                            <strong class="fs-5" id="detalhe-responsavel">João Silva</strong>
+                            <small class="text-muted d-block">Responsável</small>
+                            <strong class="fs-5" id="detalhe-responsavel">-</strong>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Horário</small>
-                            <strong class="fs-5" id="detalhe-horario">19:00 - 20:30</strong>
+                            <strong class="fs-5" id="detalhe-horario">-</strong>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Valor Total</small>
-                            <strong class="fs-5 text-success" id="detalhe-valor">R$ 225,00</strong>
+                            <strong class="fs-5 text-success" id="detalhe-valor">-</strong>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Status</small>
-                            <span class="badge bg-success bg-opacity-10 text-success fs-6" id="detalhe-status">Confirmada</span>
+                            <span class="badge bg-success bg-opacity-10 text-success fs-6" id="detalhe-status">-</span>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">Forma de Pagamento</small>
-                            <strong><i class="bi bi-cash-coin me-2"></i><span id="detalhe-pagamento">Dinheiro - pagamento pendente</span></strong>
+                            <small class="text-muted d-block">Pagamento</small>
+                            <strong id="detalhe-pagamento">-</strong>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="p-3 bg-light rounded">
                             <small class="text-muted d-block">Observações</small>
-                            <p class="mb-0 mt-1" id="detalhe-observacoes">Reserva para campeonato interno. Precisamos de 2 bolas extras.</p>
+                            <p class="mb-0 mt-1" id="detalhe-observacoes">-</p>
                         </div>
                     </div>
-                </div>
-                <div class="mt-4 p-3 border rounded">
-                    <strong class="d-block mb-2"><i class="bi bi-geo-alt me-2"></i>Localização:</strong>
-                    <p class="mb-1">Rua dos Esportes, 123 - São Paulo, SP</p>
-                    <small class="text-muted">Chegar com 10 minutos de antecedência</small>
                 </div>
             </div>
             <div class="modal-footer border-0">
@@ -160,7 +150,7 @@
                     <i class="bi bi-calendar2-week me-2"></i>Remarcar
                 </button>
                 <button type="button" class="btn btn-danger" onclick="confirmarCancelamento(reservaEmDetalhe)">
-                    <i class="bi bi-x-circle me-2"></i>Cancelar Reserva
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
                 </button>
             </div>
         </div>
@@ -176,7 +166,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <p class="text-muted mb-3">Como foi sua experiência na <strong id="avaliar-quadra">Society Premium</strong>?</p>
+                <p class="text-muted mb-3">Como foi sua experiência na <strong id="avaliar-quadra">Quadra</strong>?</p>
                 <div class="mb-4">
                     <div class="d-flex justify-content-center gap-2 mb-3" id="stars">
                         <i class="bi bi-star fs-1 text-warning" style="cursor: pointer;" onclick="setRating(1)"></i>
@@ -189,24 +179,20 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-medium">Comentário (opcional)</label>
-                    <textarea class="form-control" rows="3" placeholder="Conte-nos como foi sua experiência..."></textarea>
-                </div>
-                <div class="form-check text-start mb-3">
-                    <input type="checkbox" class="form-check-input" id="recomendar">
-                    <label class="form-check-label" for="recomendar">Recomendaria para outros jogadores</label>
+                    <textarea class="form-control" rows="3" placeholder="Conte-nos como foi..."></textarea>
                 </div>
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" onclick="submitAvaliacao()">
-                    <i class="bi bi-check-lg me-2"></i>Enviar Avaliação
+                    <i class="bi bi-check-lg me-2"></i>Enviar
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Remarcação -->
+<!--  MODAL REMARCAÇÃO ATUALIZADO -->
 <div class="modal fade" id="modalRemarcacao" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -216,29 +202,39 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-success bg-success bg-opacity-10 text-success border-0">
-                    Escolha uma nova data e horário. A alteração fica registrada como remarcação no histórico.
+                    Escolha uma nova data e horário. A alteração fica registrada no histórico.
                 </div>
+                
                 <div class="mb-3">
-                    <label class="form-label fw-medium">Nova data</label>
-                    <input type="date" class="form-control" id="novaDataReserva">
+                    <label class="form-label fw-medium">Quadra</label>
+                    <input type="text" class="form-control" id="remarcarQuadraNome" readonly>
+                    <input type="hidden" id="remarcarQuadraId">
                 </div>
+                
                 <div class="mb-3">
-                    <label class="form-label fw-medium">Novo horário</label>
-                    <select class="form-select" id="novoHorarioReserva">
-                        <option value="">Selecione</option>
-                        <option>16:00 - 17:00</option>
-                        <option>18:00 - 19:00</option>
-                        <option>20:00 - 21:30</option>
+                    <label class="form-label fw-medium">Nova data <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="novaDataReserva" min="">
+                    <small class="text-muted">Horários disponíveis serão carregados automaticamente</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Novo horário <span class="text-danger">*</span></label>
+                    <select class="form-select" id="novoHorarioReserva" disabled>
+                        <option value="">Selecione uma data primeiro</option>
                     </select>
+                    <div id="loadingHorarios" class="text-muted small mt-1 d-none">
+                        <i class="bi bi-hourglass-split"></i> Carregando horários...
+                    </div>
                 </div>
+                
                 <div class="mb-0">
                     <label class="form-label fw-medium">Motivo da remarcação</label>
-                    <textarea class="form-control" id="motivoRemarcacao" rows="3" placeholder="Ex: precisei alterar o horário do grupo"></textarea>
+                    <textarea class="form-control" id="motivoRemarcacao" rows="3" placeholder="Ex: precisei alterar o horário"></textarea>
                 </div>
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="confirmarRemarcacao()">Confirmar remarcação</button>
+                <button type="button" class="btn btn-success" onclick="confirmarRemarcacao()" id="btnConfirmarRemarcacao" disabled>Confirmar remarcação</button>
             </div>
         </div>
     </div>
@@ -248,81 +244,29 @@
 <script src="/js/esportec-ui.js"></script>
 <script src="/js/esportec-api.js"></script>
 <script>
-  
-    // INTEGRAÇÃO COM API + FALLBACK
-   
     const API_BASE = '/api/cliente';
     let reservaEmRemarcacao = null;
     let reservaEmDetalhe = null;
 
-    // DADOS FICTÍCIOS (FALLBACK) - Datas no futuro para aparecer em "Próximas"
     const MOCK_RESERVAS = [
-        {
-            id: 101,
-            data: '2026-07-20',
-            hora_inicio: '19:00',
-            hora_fim: '20:30',
-            status: 'confirmada',
-            quadra: { nome: 'Quadra Society Premium' },
-            pagamento: { status: 'pendente', valor: 225.00, metodo: 'Dinheiro' },
-            responsavel: 'João Silva',
-            observacoes: 'Reserva para campeonato interno. Precisamos de 2 bolas extras.'
-        },
-        {
-            id: 102,
-            data: '2026-07-18',
-            hora_inicio: '16:00',
-            hora_fim: '17:00',
-            status: 'confirmada',
-            quadra: { nome: 'Quadra Futsal Arena' },
-            pagamento: { status: 'pago', valor: 120.00, metodo: 'Cartão de débito' },
-            responsavel: 'João Silva',
-            observacoes: 'Reserva individual sem observações adicionais.'
-        },
-        {
-            id: 103,
-            data: '2026-07-10',
-            hora_inicio: '10:00',
-            hora_fim: '11:00',
-            status: 'concluida',
-            quadra: { nome: 'Quadra Society Descoberta' },
-            pagamento: { status: 'pago', valor: 100.00, metodo: 'PIX' },
-            responsavel: 'João Silva',
-            observacoes: 'Partida concluída sem pendências.'
-        },
-        {
-            id: 104,
-            data: '2026-07-05',
-            hora_inicio: '20:00',
-            hora_fim: '21:30',
-            status: 'cancelada',
-            quadra: { nome: 'Quadra Society Premium' },
-            pagamento: { status: 'cancelado', valor: 0, metodo: 'Dinheiro' },
-            responsavel: 'João Silva',
-            observacoes: 'Reserva cancelada pelo cliente.'
-        }
+        { id: 101, data: '2026-07-20', hora_inicio: '19:00', hora_fim: '20:30', status: 'confirmada', quadra: { nome: 'Society Premium', id: 2 }, pagamento: { status: 'pendente', valor: 225.00, metodo: 'Dinheiro' }, responsavel: 'João Silva', observacoes: 'Campeonato interno' },
+        { id: 102, data: '2026-07-18', hora_inicio: '16:00', hora_fim: '17:00', status: 'confirmada', quadra: { nome: 'Futsal Arena', id: 1 }, pagamento: { status: 'pago', valor: 120.00, metodo: 'Cartão' }, responsavel: 'João Silva', observacoes: '' },
+        { id: 103, data: '2026-07-10', hora_inicio: '10:00', hora_fim: '11:00', status: 'concluida', quadra: { nome: 'Society Descoberta', id: 3 }, pagamento: { status: 'pago', valor: 100.00, metodo: 'PIX' }, responsavel: 'João Silva', observacoes: '' },
+        { id: 104, data: '2026-07-05', hora_inicio: '20:00', hora_fim: '21:30', status: 'cancelada', quadra: { nome: 'Society Premium', id: 2 }, pagamento: { status: 'cancelado', valor: 0, metodo: 'Dinheiro' }, responsavel: 'João Silva', observacoes: '' }
     ];
 
-    //  FUNÇÃO PRINCIPAL: Carrega reservas da API ou usa fallback
     async function carregarReservas() {
         try {
-            const reservas = await EsporTecApi.request(`${API_BASE}/reservas`);
+            const response = await fetch(`${API_BASE}/reservas`);
+            if (!response.ok) throw new Error('Erro');
+            const reservas = await response.json();
             renderizarTodasReservas(reservas);
-            return;
-            // quando as apis estiverem pronta desconta essas linhas e remover o throw
-            // const response = await fetch(`${API_BASE}/reservas`);
-            // if (!response.ok) throw new Error('Erro na API');
-            // const reservas = await response.json();
-            // renderizarTodasReservas(reservas);
-            
-            throw new Error('API ainda não implementada');
         } catch (error) {
-            console.log('Usando dados de teste para reservas.');
-            renderizarTodasReservas([]);
+            console.log('Usando dados de teste');
+            renderizarTodasReservas(MOCK_RESERVAS);
         }
     }
 
-    //  Renderiza todas as abas com os dados
     function renderizarTodasReservas(reservas) {
         renderizarAba('proximas', reservas.filter(r => {
             const hoje = new Date().toISOString().split('T')[0];
@@ -334,31 +278,41 @@
         }));
         renderizarAba('canceladas', reservas.filter(r => r.status === 'cancelada'));
         
-        // Mostra mensagem se todas as abas estiverem vazias
-        const todasVazias = ['proximas', 'passadas', 'canceladas'].every(id => 
-            document.getElementById(id).children.length === 0
-        );
+        const todasVazias = ['proximas', 'passadas', 'canceladas'].every(id => document.getElementById(id).children.length === 0);
         document.getElementById('emptyState').classList.toggle('d-none', !todasVazias);
     }
 
-    //  Renderiza uma aba específica
     function renderizarAba(abaId, reservas) {
         const container = document.getElementById(abaId);
         container.innerHTML = '';
-
         if (reservas.length === 0) return;
 
         reservas.forEach(reserva => {
             const card = document.createElement('div');
             card.className = 'reserva-card';
             card.dataset.reserva = JSON.stringify(reserva).replace(/"/g, '&quot;');
-            card.dataset.responsavel = reserva.responsavel || 'João Silva';
-            card.dataset.pagamento = `${reserva.pagamento?.metodo || 'Não informado'} - ${formatarStatusPagamento(reserva.pagamento?.status)}`;
-            card.dataset.observacoes = reserva.observacoes || 'Sem observações.';
-
-            const badges = getBadgesHTML(reserva);
-            const actions = getActionsHTML(reserva, abaId);
-
+            
+            let badges = '';
+            if (reserva.status === 'confirmada') badges += '<span class="badge-status badge-confirmada">Confirmada</span>';
+            else if (reserva.status === 'concluida') badges += '<span class="badge-status badge-concluida">Concluída</span>';
+            else if (reserva.status === 'cancelada') badges += '<span class="badge-status badge-cancelada">Cancelada</span>';
+            
+            if (reserva.pagamento?.status === 'pago') badges += '<span class="badge-status badge-pago ms-2">Pago</span>';
+            else if (reserva.pagamento?.status === 'pendente') badges += '<span class="badge-status badge-pendente ms-2">Pendente</span>';
+            
+            let actions = `<button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>`;
+            
+            if (abaId === 'passadas' && reserva.status === 'concluida') {
+                actions += `<button class="btn-action btn-outline" data-bs-toggle="modal" data-bs-target="#modalAvaliacao" onclick="prepararAvaliacao('${reserva.quadra?.nome}')"><i class="bi bi-star"></i> Avaliar</button>`;
+            }
+            if (abaId === 'proximas' && reserva.status !== 'cancelada') {
+                actions += `<button class="btn-action btn-outline" onclick="abrirRemarcacao(this)"><i class="bi bi-calendar2-week"></i> Remarcar</button>`;
+                actions += `<button class="btn-action btn-danger" onclick="confirmarCancelamento(this)"><i class="bi bi-x-circle"></i> Cancelar</button>`;
+            }
+            if (abaId === 'canceladas') {
+                actions += `<a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>`;
+            }
+            
             card.innerHTML = `
                 <div class="reserva-info">
                     <div class="reserva-title">${reserva.quadra?.nome || 'Quadra'}</div>
@@ -369,50 +323,12 @@
                     </div>
                     ${badges}
                 </div>
-                <div class="reserva-actions">
-                    ${actions}
-                </div>
+                <div class="reserva-actions">${actions}</div>
             `;
             container.appendChild(card);
         });
     }
 
-    //  Gera os badges de status
-    function getBadgesHTML(reserva) {
-        let html = '';
-        if (reserva.status === 'confirmada') {
-            html += `<span class="badge-status badge-confirmada">Reserva confirmada</span>`;
-        } else if (reserva.status === 'concluida') {
-            html += `<span class="badge-status badge-concluida">Concluída</span>`;
-        } else if (reserva.status === 'cancelada') {
-            html += `<span class="badge-status badge-cancelada">Cancelada</span>`;
-        }
-        if (reserva.pagamento?.status === 'pago') {
-            html += `<span class="badge-status badge-pago ms-2">Pagamento pago</span>`;
-        } else if (reserva.pagamento?.status === 'pendente') {
-            html += `<span class="badge-status badge-pendente ms-2">Pagamento pendente</span>`;
-        }
-        return html;
-    }
-
-    //  Gera os botões de ação
-    function getActionsHTML(reserva, abaId) {
-        let html = `<button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>`;
-        
-        if (abaId === 'passadas' && reserva.status === 'concluida') {
-            html += `<button class="btn-action btn-outline" data-bs-toggle="modal" data-bs-target="#modalAvaliacao" onclick="prepararAvaliacao('${reserva.quadra?.nome}')"><i class="bi bi-star"></i> Avaliar</button>`;
-        }
-        if (abaId === 'proximas' && reserva.status !== 'cancelada') {
-            html += `<button class="btn-action btn-outline" onclick="abrirRemarcacao(this)"><i class="bi bi-calendar2-week"></i> Remarcar</button>`;
-            html += `<button class="btn-action btn-danger" onclick="confirmarCancelamento(this)"><i class="bi bi-x-circle"></i> Cancelar</button>`;
-        }
-        if (abaId === 'canceladas') {
-            html += `<a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>`;
-        }
-        return html;
-    }
-
-    //  Funções de utilidade
     function formatarData(dataISO) {
         if (!dataISO) return '-';
         const [ano, mes, dia] = String(dataISO).slice(0, 10).split('-');
@@ -420,19 +336,7 @@
     }
     function formatarHora(hora) { return hora ? String(hora).slice(0, 5) : '-'; }
     function formatarValor(valor) { return Number(valor || 0).toFixed(2).replace('.', ','); }
-    function formatarStatus(status) {
-        const map = { 'pendente': 'Pendente', 'confirmada': 'Confirmada', 'concluida': 'Concluída', 'cancelada': 'Cancelada' };
-        return map[status] || status;
-    }
-    function formatarStatusPagamento(status) {
-        const map = { 'pago': 'pago', 'pendente': 'pagamento pendente', 'cancelado': 'cancelado' };
-        return map[status] || 'pendente';
-    }
 
-    
-    //  FUNÇÕES DE INTERAÇÃO (mantidas do original)
-
-    
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -450,63 +354,155 @@
         document.getElementById('detalhe-horario').textContent = `${formatarHora(reserva.hora_inicio)} - ${formatarHora(reserva.hora_fim)}`;
         document.getElementById('detalhe-valor').textContent = `R$ ${formatarValor(reserva.pagamento?.valor)}`;
         document.getElementById('detalhe-responsavel').textContent = reserva.responsavel || '-';
-        document.getElementById('detalhe-status').textContent = formatarStatus(reserva.status);
-        document.getElementById('detalhe-pagamento').textContent = `${reserva.pagamento?.metodo || '-'} - ${formatarStatusPagamento(reserva.pagamento?.status)}`;
+        document.getElementById('detalhe-status').textContent = reserva.status;
+        document.getElementById('detalhe-pagamento').textContent = `${reserva.pagamento?.metodo || '-'} - ${reserva.pagamento?.status || '-'}`;
         document.getElementById('detalhe-observacoes').textContent = reserva.observacoes || 'Sem observações.';
 
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalhes')).show();
     }
 
-    function confirmarCancelamento(trigger) {
-        if(confirm('Tem certeza que deseja cancelar esta reserva?')) {
-            const card = trigger.closest ? trigger.closest('.reserva-card') : trigger;
-            if (card) {
-                const reserva = JSON.parse(card.dataset.reserva.replace(/&quot;/g, '"'));
-                reserva.status = 'cancelada';
-                card.dataset.reserva = JSON.stringify(reserva).replace(/"/g, '&quot;');
-                
-                // Atualiza visualmente
-                card.querySelectorAll('.badge-status').forEach(b => b.remove());
-                card.querySelector('.reserva-info').insertAdjacentHTML('beforeend', '<span class="badge-status badge-cancelada">Cancelada</span>');
-                card.querySelector('.reserva-actions').innerHTML = '<a href="/nova-reserva" class="btn-action btn-outline"><i class="bi bi-arrow-repeat"></i> Nova reserva</a>';
-                
-                // Move para aba canceladas
-                document.getElementById('canceladas').prepend(card);
-                if (document.getElementById('proximas').children.length === 0) switchTab('canceladas', document.querySelector('[data-filter="canceladas"]'));
-            }
-            bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
-            if (typeof esportecToast === 'function') esportecToast('Reserva cancelada.', 'success');
+    async function confirmarCancelamento(trigger) {
+        if(!confirm('Tem certeza que deseja cancelar?')) return;
+        
+        const card = trigger.closest ? trigger.closest('.reserva-card') : trigger;
+        if (!card) return;
+        
+        const reserva = JSON.parse(card.dataset.reserva.replace(/&quot;/g, '"'));
+        
+        try {
+            await EsporTecApi.request(`${API_BASE}/reservas/${reserva.id}/cancelar`, { method: 'PATCH' });
+            if (typeof esportecToast === 'function') esportecToast('Reserva cancelada!', 'success');
+            await carregarReservas();
+        } catch (error) {
+            if (typeof esportecToast === 'function') esportecToast(error.message || 'Erro ao cancelar.', 'error');
         }
+        bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
     }
 
+    // ABRIR REMARCAÇÃO - Carrega dados
     function abrirRemarcacao(trigger) {
-        reservaEmRemarcacao = trigger.closest ? trigger.closest('.reserva-card') : trigger;
+        const card = trigger.closest('.reserva-card');
+        reservaEmRemarcacao = card;
+        
+        const reserva = JSON.parse(card.dataset.reserva.replace(/&quot;/g, '"'));
+        
+        document.getElementById('remarcarQuadraNome').value = reserva.quadra?.nome || 'Quadra';
+        document.getElementById('remarcarQuadraId').value = reserva.quadra?.id || '';
+        document.getElementById('motivoRemarcacao').value = '';
+        document.getElementById('novoHorarioReserva').innerHTML = '<option value="">Selecione uma data primeiro</option>';
+        document.getElementById('novoHorarioReserva').disabled = true;
+        document.getElementById('btnConfirmarRemarcacao').disabled = true;
+        
+        const hoje = new Date().toISOString().split('T')[0];
+        document.getElementById('novaDataReserva').min = hoje;
+        document.getElementById('novaDataReserva').value = '';
+        
         bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRemarcacao')).show();
     }
 
-    function confirmarRemarcacao() {
+    //  CARREGAR HORÁRIOS QUANDO MUDAR DATA
+    document.getElementById('novaDataReserva')?.addEventListener('change', async function() {
+        const data = this.value;
+        const quadraId = document.getElementById('remarcarQuadraId').value;
+        const selectHorarios = document.getElementById('novoHorarioReserva');
+        const loading = document.getElementById('loadingHorarios');
+        const btnConfirmar = document.getElementById('btnConfirmarRemarcacao');
+        
+        if (!data || !quadraId) {
+            selectHorarios.innerHTML = '<option value="">Data inválida</option>';
+            selectHorarios.disabled = true;
+            btnConfirmar.disabled = true;
+            return;
+        }
+        
+        loading.classList.remove('d-none');
+        selectHorarios.disabled = true;
+        selectHorarios.innerHTML = '<option value="">Carregando...</option>';
+        
+        try {
+            const response = await fetch(`/api/cliente/quadras/${quadraId}/horarios?data=${data}`);
+            if (!response.ok) throw new Error('Erro ao carregar');
+            
+            const responseData = await response.json();
+            
+            //  CORREÇÃO: Acessar o array correto dentro do objeto
+            const horarios = responseData.horarios_disponiveis || [];
+            
+            if (horarios.length === 0) {
+                selectHorarios.innerHTML = '<option value="">Nenhum horário disponível</option>';
+                selectHorarios.disabled = true;
+                btnConfirmar.disabled = true;
+            } else {
+                selectHorarios.innerHTML = '<option value="">Selecione um horário</option>';
+                
+                horarios.forEach(horaInicio => {
+                    // horaInicio é uma string "08:00", vamos calcular o fim (ex: +1 hora)
+                    // Ajuste a duração aqui se for diferente (ex: 1.5h)
+                    const [h, m] = horaInicio.split(':').map(Number);
+                    const horaFimH = h + 1; // Duração de 1 hora
+                    const horaFim = `${horaFimH.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    
+                    const valor = `${horaInicio} - ${horaFim}`;
+                    
+                    const option = document.createElement('option');
+                    option.value = valor;
+                    option.textContent = `${horaInicio} às ${horaFim}`;
+                    selectHorarios.appendChild(option);
+                });
+                
+                selectHorarios.disabled = false;
+                btnConfirmar.disabled = false;
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            selectHorarios.innerHTML = '<option value="">Erro ao carregar</option>';
+            selectHorarios.disabled = true;
+            btnConfirmar.disabled = true;
+        } finally {
+            loading.classList.add('d-none');
+        }
+    });
+    //  CONFIRMAR REMARCAÇÃO
+    async function confirmarRemarcacao() {
         const data = document.getElementById('novaDataReserva').value;
         const horario = document.getElementById('novoHorarioReserva').value;
+        const motivo = document.getElementById('motivoRemarcacao').value.trim();
+        
         if (!data || !horario) {
             if (typeof esportecToast === 'function') esportecToast('Escolha data e horário.', 'warning');
             return;
         }
-        if (reservaEmRemarcacao) {
-            const reserva = JSON.parse(reservaEmRemarcacao.dataset.reserva.replace(/&quot;/g, '"'));
-            reserva.data = data;
-            const [hInicio] = horario.split(' - ');
-            reserva.hora_inicio = hInicio;
-            reservaEmRemarcacao.dataset.reserva = JSON.stringify(reserva).replace(/"/g, '&quot;');
+        
+        if (!reservaEmRemarcacao) return;
+        const reserva = JSON.parse(reservaEmRemarcacao.dataset.reserva.replace(/&quot;/g, '"'));
+        const [hInicio, hFim] = horario.split(' - ');
+        
+        const btn = document.getElementById('btnConfirmarRemarcacao');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Remarcando...';
+        
+        try {
+            await EsporTecApi.request(`${API_BASE}/reservas/${reserva.id}/remarcar`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    data: data,
+                    hora_inicio: hInicio,
+                    hora_fim: hFim,
+                    motivo: motivo || 'Remarcação'
+                })
+            });
             
-            const metaItems = reservaEmRemarcacao.querySelectorAll('.reserva-meta span');
-            metaItems[0].innerHTML = `<i class="bi bi-calendar3"></i> ${formatarData(data)}`;
-            metaItems[1].innerHTML = `<i class="bi bi-clock"></i> ${horario}`;
-            reservaEmRemarcacao.querySelectorAll('.badge-status').forEach(b => b.remove());
-            reservaEmRemarcacao.querySelector('.reserva-info').insertAdjacentHTML('beforeend', '<span class="badge-status badge-confirmada">Remarcada</span>');
+            if (typeof esportecToast === 'function') esportecToast('Reserva remarcada!', 'success');
+            await carregarReservas();
+            bootstrap.Modal.getInstance(document.getElementById('modalRemarcacao')).hide();
+            
+        } catch (error) {
+            console.error('Erro:', error);
+            if (typeof esportecToast === 'function') esportecToast(error.message || 'Erro ao remarcar.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = 'Confirmar remarcação';
         }
-        bootstrap.Modal.getInstance(document.getElementById('modalRemarcacao')).hide();
-        if (typeof esportecToast === 'function') esportecToast('Reserva remarcada.', 'success');
     }
 
     function prepararAvaliacao(quadraNome) {
@@ -515,31 +511,21 @@
 
     function setRating(n) {
         document.getElementById('rating').value = n;
-        const stars = document.querySelectorAll('#stars i');
-        stars.forEach((star, index) => {
-            star.classList.toggle('bi-star-fill', index < n);
-            star.classList.toggle('bi-star', index >= n);
+        document.querySelectorAll('#stars i').forEach((star, i) => {
+            star.classList.toggle('bi-star-fill', i < n);
+            star.classList.toggle('bi-star', i >= n);
         });
     }
 
     function submitAvaliacao() {
-        const rating = document.getElementById('rating').value;
-        if (rating == 0) {
+        if (document.getElementById('rating').value == 0) {
             if (typeof esportecToast === 'function') esportecToast('Selecione uma nota.', 'warning');
             return;
         }
         if (typeof esportecToast === 'function') esportecToast('Avaliação enviada!', 'success');
-        const btn = document.querySelector(`[onclick*="prepararAvaliacao"]`);
-        if (btn) {
-            btn.innerHTML = '<i class="bi bi-check2"></i> Avaliada';
-            btn.disabled = true;
-        }
         bootstrap.Modal.getInstance(document.getElementById('modalAvaliacao')).hide();
     }
 
-   
-    // INICIALIZAÇÃO
-    
     document.addEventListener('DOMContentLoaded', () => {
         carregarReservas();
     });

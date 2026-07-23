@@ -65,6 +65,10 @@ Route::middleware('auth:sanctum')->prefix('cliente')->group(function () {
  Route::get('/reservas', [ReservaController::class, 'minhasReservas']);
  Route::post('/pagamentos', [PagamentoController::class, 'store']);
  Route::get('/pagamentos/reservas/{reserva_id}', [PagamentoController::class, 'porReserva']);
+ 
+ //  ROTAS ADICIONADAS: Cancelar e Remarcar reserva
+ Route::patch('/reservas/{id}/cancelar', [ReservaController::class, 'cancelar']);
+ Route::patch('/reservas/{id}/remarcar', [ReservaController::class, 'remarcar']);
 });
 
 // ===== ROTAS DO FUNCIONÁRIO/ADMIN =====

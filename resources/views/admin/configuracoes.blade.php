@@ -9,35 +9,85 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --admin-dark: #0F172A; --primary: #3B82F6; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; --bg: #F8FAFC; }
+        :root { --primary:#2D815D; --dark:#1F5C42; --success: #10B981; --warning: #F59E0B; --danger: #EF4444; --bg: #F8FAFC; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; margin: 0; }
         .layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: var(--admin-dark); color: white; padding: 1.5rem; }
-        .sidebar-brand { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; margin-bottom: 2rem; display: block; }
-        .nav-link { color: #94A3B8; padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
-        .main { flex: 1; padding: 2rem; }
+        
+        
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--dark) 0%, #154030 100%);
+            color: white;
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+        .sidebar-brand {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-brand i { font-size: 2rem; color: #4ADE80; }
+        .sidebar-brand span { font-size: 0.75rem; opacity: 0.7; margin-top: -0.2rem; font-weight: 400; }
+        .nav-link {
+            color: rgba(255,255,255,0.7);
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .main { flex: 1; margin-left: 250px; padding: 2rem; }
+        
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--admin-dark); margin: 0; }
+        .header h1 { font-size: 1.6rem; font-weight: 700; color: var(--dark); margin: 0; }
         .settings-container { max-width: 1000px; }
         .settings-card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
         .settings-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #F1F5F9; display: flex; align-items: center; gap: 0.5rem; }
         .form-label { font-weight: 500; margin-bottom: 0.5rem; }
         .form-control, .form-select { border-radius: 8px; padding: 0.7rem; border: 1px solid #E2E8F0; }
-        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45,129,93,0.15); }
         .help-text { font-size: 0.85rem; color: #64748B; margin-top: 0.3rem; }
         .btn-save { background: var(--primary); color: white; border: none; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
-        .btn-save:hover { background: #2563EB; }
+        .btn-save:hover { background: var(--dark); }
         .toggle-switch { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #F1F5F9; }
         .toggle-switch:last-child { border-bottom: none; }
         .form-check-input { width: 48px; height: 24px; cursor: pointer; }
         .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
+        
+        @media (max-width: 992px) { .sidebar { width: 100%; position: relative; height: auto; } .main { margin-left: 0; } }
     </style>
 </head>
 <body>
 <div class="layout">
     <aside class="sidebar">
-        <a href="/admin/dashboard" class="sidebar-brand">EsporTec <span style="font-size:0.7rem; opacity:0.75;">Admin da arena</span></a>
+        <a href="/admin/dashboard" class="sidebar-brand">
+            <i class="bi bi-trophy"></i>
+            <div>
+                EsporTec
+                <span>Admin da arena</span>
+            </div>
+        </a>
         <nav>
             <a href="/admin/dashboard" class="nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
             <a href="/admin/agendamentos" class="nav-link"><i class="bi bi-calendar-check"></i> Agendamentos</a>
