@@ -180,6 +180,84 @@ class ArenaCadastroController extends Controller
         ]);
     }
 
+    public function superAdministradores(Request $request)
+    {
+        $this->autorizarSuperAdmin($request);
+
+        return response()->json(
+            SuperAdmin::with(['usuario:id,nome_completo,email,ativo', 'criadoPor:id,nome_completo'])
+                ->latest()
+                ->get()
+                ->map(fn (SuperAdmin $superAdmin) => [
+                    'id' => $superAdmin->id,
+                    'usuario_id' => $superAdmin->usuarios_id,
+                    'nome' => $superAdmin->usuario?->nome_completo,
+                    'email' => $superAdmin->usuario?->email,
+                    'cargo' => $superAdmin->cargo,
+                    'ativo' => $superAdmin->ativo && (bool) $superAdmin->usuario?->ativo,
+                    'promovido_por' => $superAdmin->criadoPor?->nome_completo,
+                    'criado_em' => $superAdmin->created_at?->toIso8601String(),
+                ])
+        );
+    }
+
+    public function buscarUsuarioSuperAdmin(Request $request)
+    {
+        $this->autorizarSuperAdmin($request);
+        $dados = $request->validate(['email' => ['required', 'email', 'max:191']]);
+
+        $usuario = Usuario::with('superAdmin')
+            ->whereRaw('LOWER(email) = ?', [Str::lower($dados['email'])])
+            ->first();
+
+        abort_unless($usuario, 404, 'Nenhum usuário cadastrado com esse e-mail.');
+
+        return response()->json([
+            'id' => $usuario->id,
+            'nome' => $usuario->nome_completo,
+            'email' => $usuario->email,
+            'conta_ativa' => $usuario->ativo,
+            'ja_super_admin' => (bool) $usuario->superAdmin?->ativo,
+        ]);
+    }
+
+    public function promoverSuperAdmin(Request $request)
+    {
+        $this->autorizarSuperAdmin($request);
+        $dados = $request->validate([
+            'usuario_id' => ['required', 'integer', 'exists:usuarios,id'],
+            'cargo' => ['required', 'string', 'max:50'],
+            'motivo' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $usuario = Usuario::findOrFail($dados['usuario_id']);
+        abort_unless($usuario->ativo, 422, 'Ative a conta do usuário antes de promovê-lo.');
+        abort_if($usuario->superAdmin?->ativo, 422, 'Este usuário já é super administrador.');
+
+        DB::transaction(function () use ($request, $dados, $usuario) {
+            SuperAdmin::updateOrCreate(
+                ['usuarios_id' => $usuario->id],
+                [
+                    'cargo' => $dados['cargo'],
+                    'motivo' => $dados['motivo'] ?? null,
+                    'ativo' => true,
+                    'criado_por' => $request->user()->id,
+                ]
+            );
+
+            Auditoria::create([
+                'usuarios_id' => $request->user()->id,
+                'acao' => 'super_admin_promovido',
+                'descricao' => "{$usuario->nome_completo} foi promovido a super administrador.",
+                'tabela_afetada' => 'super_admins',
+                'registro_id' => $usuario->id,
+                'ip' => $request->ip(),
+            ]);
+        });
+
+        return response()->json(['message' => "{$usuario->nome_completo} agora é super administrador."]);
+    }
+
     private function resumoPorArena()
     {
         $faturamentos = Pagamento::query()

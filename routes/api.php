@@ -53,6 +53,9 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum', 'papel:super_admin'])->prefix('super-admin')->group(function () {
     Route::get('/dashboard', [ArenaCadastroController::class, 'dashboard']);
     Route::get('/arenas', [ArenaCadastroController::class, 'index']);
+    Route::get('/super-administradores', [ArenaCadastroController::class, 'superAdministradores']);
+    Route::get('/usuarios/buscar', [ArenaCadastroController::class, 'buscarUsuarioSuperAdmin']);
+    Route::post('/super-administradores', [ArenaCadastroController::class, 'promoverSuperAdmin']);
     Route::patch('/arenas/{arena}/aprovar', [ArenaCadastroController::class, 'aprovar']);
     Route::patch('/arenas/{arena}/recusar', [ArenaCadastroController::class, 'recusar']);
     Route::patch('/arenas/{arena}/ativacao', [ArenaCadastroController::class, 'alterarAtivacao']);

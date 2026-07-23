@@ -50,6 +50,7 @@
             <button type="button" class="nav-button" data-scroll-target="arenas"><i class="bi bi-buildings"></i> Arenas</button>
             <button type="button" class="nav-button" data-scroll-target="faturamento-arenas"><i class="bi bi-cash-stack"></i> Faturamento por arena</button>
             <button type="button" class="nav-button" data-scroll-target="admins"><i class="bi bi-person-gear"></i> Admins das arenas</button>
+            <button type="button" class="nav-button" data-scroll-target="super-administradores"><i class="bi bi-shield-check"></i> Super administradores</button>
             <button type="button" class="nav-button" data-scroll-target="logs"><i class="bi bi-journal-text"></i> Logs globais</button>
         </nav>
         <a href="/login" class="logout-link"><i class="bi bi-box-arrow-left"></i> Sair</a>
@@ -128,6 +129,30 @@
         <section class="section-card" id="admins">
             <h5 class="fw-bold mb-3">Admins das arenas</h5>
             <div class="row g-3" id="adminsBody"><p class="text-muted mb-0">Carregando administradores...</p></div>
+        </section>
+
+        <section class="section-card" id="super-administradores">
+            <div class="mb-3">
+                <h5 class="fw-bold mb-1">Super administradores</h5>
+                <p class="text-muted mb-0">Busque uma conta já cadastrada pelo e-mail para conceder acesso global à plataforma.</p>
+            </div>
+            <form id="formBuscarSuperAdmin" class="row g-2 align-items-end mb-4">
+                <div class="col-md-8">
+                    <label for="emailBuscaSuperAdmin" class="form-label">E-mail do usuário</label>
+                    <input type="email" class="form-control" id="emailBuscaSuperAdmin" required autocomplete="off" placeholder="usuario@exemplo.com">
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-success w-100" type="submit"><i class="bi bi-search me-2"></i>Buscar usuário</button>
+                </div>
+            </form>
+            <div id="resultadoBuscaSuperAdmin" class="mb-4"></div>
+            <h6 class="fw-bold mb-3">Super administradores cadastrados</h6>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th>Nome</th><th>E-mail</th><th>Cargo</th><th>Promovido por</th><th>Status</th></tr></thead>
+                    <tbody id="superAdminsBody"><tr><td colspan="5" class="text-center text-muted">Carregando...</td></tr></tbody>
+                </table>
+            </div>
         </section>
 
         <section class="section-card" id="logs">
@@ -221,13 +246,75 @@
     }
     async function carregarPainel() {
         try {
-            const [dados, arenas] = await Promise.all([EsporTecApi.request('/api/super-admin/dashboard'), EsporTecApi.request('/api/super-admin/arenas')]);
-            renderizarResumo(dados); renderizarArenas(arenas);
+            const [dados, arenas, superAdmins] = await Promise.all([
+                EsporTecApi.request('/api/super-admin/dashboard'),
+                EsporTecApi.request('/api/super-admin/arenas'),
+                EsporTecApi.request('/api/super-admin/super-administradores')
+            ]);
+            renderizarResumo(dados);
+            renderizarArenas(arenas);
+            renderizarSuperAdmins(superAdmins);
         } catch (erro) {
             document.getElementById('arenasBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">${escapar(erro.message)}</td></tr>`;
             setTimeout(() => window.location.replace('/painel'), 600);
         }
     }
+    function renderizarSuperAdmins(superAdmins) {
+        document.getElementById('superAdminsBody').innerHTML = superAdmins.length
+            ? superAdmins.map(item => `<tr>
+                <td class="fw-semibold">${escapar(item.nome || 'Usuário')}</td>
+                <td>${escapar(item.email || '')}</td>
+                <td>${escapar(item.cargo)}</td>
+                <td>${escapar(item.promovido_por || 'Sistema')}</td>
+                <td><span class="badge ${item.ativo ? 'bg-success' : 'bg-secondary'}">${item.ativo ? 'Ativo' : 'Inativo'}</span></td>
+            </tr>`).join('')
+            : '<tr><td colspan="5" class="text-center text-muted">Nenhum super administrador cadastrado.</td></tr>';
+    }
+    document.getElementById('formBuscarSuperAdmin').addEventListener('submit', async event => {
+        event.preventDefault();
+        const resultado = document.getElementById('resultadoBuscaSuperAdmin');
+        const email = document.getElementById('emailBuscaSuperAdmin').value.trim();
+        resultado.innerHTML = '<div class="text-muted">Buscando usuário...</div>';
+        try {
+            const usuario = await EsporTecApi.request(`/api/super-admin/usuarios/buscar?email=${encodeURIComponent(email)}`);
+            resultado.innerHTML = `<div class="border rounded-3 p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <strong>${escapar(usuario.nome)}</strong>
+                        <small class="d-block text-muted">${escapar(usuario.email)}</small>
+                    </div>
+                    ${usuario.ja_super_admin
+                        ? '<span class="badge bg-success">Já é super administrador</span>'
+                        : usuario.conta_ativa
+                            ? `<button type="button" class="btn btn-success" data-promover-super-admin="${usuario.id}"><i class="bi bi-shield-plus me-2"></i>Promover</button>`
+                            : '<span class="badge bg-warning text-dark">Conta inativa</span>'}
+                </div>
+            </div>`;
+        } catch (erro) {
+            resultado.innerHTML = `<div class="alert alert-warning mb-0">${escapar(erro.message)}</div>`;
+        }
+    });
+    document.addEventListener('click', async event => {
+        const botao = event.target.closest('[data-promover-super-admin]');
+        if (!botao) return;
+        const cargo = prompt('Informe o cargo deste super administrador:', 'Super Administrador');
+        if (!cargo) return;
+        if (!confirm('Confirmar acesso global de super administrador para este usuário?')) return;
+        try {
+            botao.disabled = true;
+            const resposta = await EsporTecApi.request('/api/super-admin/super-administradores', {
+                method: 'POST',
+                body: JSON.stringify({ usuario_id: Number(botao.dataset.promoverSuperAdmin), cargo })
+            });
+            esportecToast(resposta.message, 'success');
+            document.getElementById('resultadoBuscaSuperAdmin').innerHTML = '';
+            document.getElementById('emailBuscaSuperAdmin').value = '';
+            carregarPainel();
+        } catch (erro) {
+            esportecToast(erro.message, 'warning');
+            botao.disabled = false;
+        }
+    });
     document.addEventListener('click', event => {
         const botao = event.target.closest('[data-detalhes-arena]');
         if (!botao) return;
