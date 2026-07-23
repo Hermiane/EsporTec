@@ -405,7 +405,7 @@
             opacity: 1;
         }
 
-        /* ✅ CORREÇÕES RESPONSIVAS */
+    
         @media (max-width: 768px) {
             .hero-title {
                 font-size: 2.5rem;
@@ -439,19 +439,19 @@
                 font-size: 1.8rem;
             }
 
-            /* Tabela responsiva com scroll horizontal */
+            
             .table-responsive {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
 
             .table-custom {
-                min-width: 700px; /* Garante largura mínima para não quebrar */
+                min-width: 700px; 
             }
 
             .table-custom th,
             .table-custom td {
-                white-space: nowrap; /* Impede quebra de linha nas células */
+                white-space: nowrap; 
                 font-size: 0.9rem;
                 padding: 0.75rem;
             }

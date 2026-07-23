@@ -16,7 +16,7 @@
         .auth-card { background: rgba(255,255,255,0.96); border-radius: 18px; box-shadow: 0 18px 50px rgba(15,23,42,0.12); padding: 2.25rem; width: 100%; max-width: 560px; border: 1px solid rgba(45,129,93,0.14); }
         .brand-mark { width: 52px; height: 52px; margin: 0 auto 0.8rem; border-radius: 16px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 10px 24px rgba(45,129,93,0.22); }
         
-        /* Grid de acesso - Desktop: 2 colunas */
+        
         .access-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
         
         .access-option input { display: none; }
@@ -42,10 +42,10 @@
         .login-support { background: #F8FAFC; border-radius: 12px; padding: 0.75rem; font-size: 0.85rem; color: var(--muted); }
         
         
-        /* Mobile (< 576px): 1 coluna - todos empilhados */
+        
         @media (max-width: 576px) {
             .auth-card { padding: 1.5rem; }
-            .access-grid { grid-template-columns: 1fr; } /* 1 coluna */
+            .access-grid { grid-template-columns: 1fr; }
             .access-card { 
                 flex-direction: row; 
                 align-items: center; 
@@ -55,7 +55,7 @@
             .access-card strong, .access-card small { text-align: left; }
         }
         
-        /* Tablet (576px - 768px): 2 colunas (2x2) */
+        
         @media (min-width: 577px) and (max-width: 768px) {
             .access-grid { grid-template-columns: repeat(2, 1fr); }
         }

@@ -178,7 +178,7 @@
         } catch (error) { esportecToast(error.message, 'danger'); }
     });
 
-    //  MARCAR INDIVIDUAL COMO LIDA (ao clicar no card)
+
     document.getElementById('adminNotices').addEventListener('click', async event => {
         const card = event.target.closest('.notice-card');
         if (!card || card.classList.contains('lida')) return;

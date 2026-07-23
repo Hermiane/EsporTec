@@ -499,7 +499,7 @@
         };
     }
 
-    // Reset modal ao fechar
+    
     document.getElementById('modalClienteAdmin').addEventListener('hidden.bs.modal', () => {
         document.getElementById('btnConfirmarClienteModal').disabled = false;
         // Reabilita botões de oferta que foram desabilitados
