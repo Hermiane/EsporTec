@@ -259,79 +259,76 @@
             </div>
         </div>
 
-        <!-- PRÓXIMAS RESERVAS -->
-        <div class="table-custom mb-4">
-            <div class="p-4 border-bottom">
-                <h5 class="fw-bold mb-0"><i class="bi bi-calendar3 me-2"></i>Próximas Reservas</h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Horário</th>
-                            <th>Quadra</th>
-                            <th>Cliente</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>19:00 - 20:00</strong></td>
-                            <td>Futsal Coberta</td>
-                            <td>Aedellen Almeida</td>
-                            <td><span class="badge-status badge-pendente"><i class="bi bi-clock"></i> Pendente</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-success"><i class="bi bi-check"></i> Confirmar</button>
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x"></i> Cancelar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>20:00 - 21:00</strong></td>
-                            <td>Society Premium</td>
-                            <td>Ana Souza</td>
-                            <td><span class="badge-status badge-confirmada"><i class="bi bi-check-circle"></i> Confirmada</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i> Detalhes</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+       <!-- PRÓXIMAS RESERVAS -->
+<div class="table-custom mb-4">
+    <div class="p-4 border-bottom">
+        <h5 class="fw-bold mb-0"><i class="bi bi-calendar3 me-2"></i>Próximas Reservas</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Horário</th>
+                    <th>Quadra</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>19:00 - 20:00</strong></td>
+                    <td>Futsal Coberta</td>
+                    <td class="text-muted">-</td>
+                    <td><span class="badge-status badge-pendente"><i class="bi bi-clock"></i> Pendente</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-success"><i class="bi bi-check"></i> Confirmar</button>
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-x"></i> Cancelar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>20:00 - 21:00</strong></td>
+                    <td>Society Premium</td>
+                    <td>Ana Souza</td>
+                    <td><span class="badge-status badge-confirmada"><i class="bi bi-check-circle"></i> Confirmada</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i> Detalhes</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
         <!-- ATIVIDADE RECENTE -->
-        <div class="table-custom">
+        <div class="card-custom mt-4">
             <div class="p-4 border-bottom">
                 <h5 class="fw-bold mb-0"><i class="bi bi-bell me-2"></i>Atividade Recente</h5>
             </div>
-            <div class="p-4">
-                <div class="d-flex align-items-start mb-3">
-                    <div class="flex-shrink-0">
-                        <div class="bg-success bg-opacity-10 text-success rounded-circle p-2">
-                            <i class="bi bi-check-circle fs-5"></i>
-                        </div>
+            <div class="list-group list-group-flush">
+                
+                <div class="list-group-item d-flex align-items-center gap-3 py-3">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-check-lg"></i>
                     </div>
-                    <div class="flex-grow-1 ms-3">
-                        <p class="mb-1"><strong>Reserva confirmada</strong> - Aedellen Almeida</p>
-                        <small class="text-muted">23/07/2026, 10:42</small>
-                    </div>
-                </div>
-                <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0">
-                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2">
-                            <i class="bi bi-person-plus fs-5"></i>
-                        </div>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <p class="mb-1"><strong>Novo cliente cadastrado</strong> - Carlos Mendes</p>
-                        <small class="text-muted">23/07/2026, 09:15</small>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">Novo cliente cadastrado</div>
+                        <small class="text-muted">Carlos Mendes - 23/07/2026, 09:15</small>
                     </div>
                 </div>
+
+                
+                <div class="list-group-item d-flex align-items-center gap-3 py-3">
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">Pagamento recebido</div>
+                        <small class="text-muted">Reserva 1234 - 22/07/2026, 14:30</small>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </main>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
