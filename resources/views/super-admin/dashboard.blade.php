@@ -32,11 +32,28 @@
         .dot-yellow { background:#F9A825; }
         .dot-red { background:#D32F2F; }
         .btn-success { background:var(--primary); border-color:var(--primary); }
+        
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
         @media (max-width: 992px) {
             .layout { display:block; }
             .sidebar { width:100%; display:block; }
             .main { padding:1rem; }
             .nav-button, .logout-link { display:inline-flex; width:auto; margin-right:.35rem; }
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .action-buttons .btn {
+                width: 100%;
+                margin-bottom: 0.25rem;
+            }
         }
     </style>
 </head>
@@ -208,8 +225,15 @@
         document.getElementById('arenasBody').innerHTML = arenas.length ? arenas.map(arena => {
             const status = !arena.ativo && arena.status_aprovacao === 'aprovada' ? ['dot-red', 'Inativa'] : (statusArena[arena.status_aprovacao] || statusArena.pendente);
             const dono = arena.criado_por?.nome_completo || 'Não informado';
-            const excluir = `<button class="btn btn-sm btn-outline-danger ms-1" data-action="excluir" data-id="${arena.id}">Excluir</button>`;
-            const acoes = arena.status_aprovacao === 'pendente' ? `<button class="btn btn-sm btn-success me-1" data-action="aprovar" data-id="${arena.id}">Aprovar</button><button class="btn btn-sm btn-outline-danger" data-action="recusar" data-id="${arena.id}">Recusar</button>${excluir}` : arena.status_aprovacao === 'aprovada' ? `<button class="btn btn-sm ${arena.ativo ? 'btn-outline-danger' : 'btn-success'}" data-action="ativacao" data-id="${arena.id}" data-ativo="${arena.ativo ? '1' : '0'}">${arena.ativo ? 'Inativar' : 'Ativar'}</button>${excluir}` : excluir;
+            const excluir = `<button class="btn btn-sm btn-outline-danger" data-action="excluir" data-id="${arena.id}">Excluir</button>`;
+            const acoes = arena.status_aprovacao === 'pendente' 
+                ? `<button class="btn btn-sm btn-success" data-action="aprovar" data-id="${arena.id}">Aprovar</button>
+                   <button class="btn btn-sm btn-outline-danger" data-action="recusar" data-id="${arena.id}">Recusar</button>
+                   ${excluir}` 
+                : arena.status_aprovacao === 'aprovada' 
+                    ? `<button class="btn btn-sm ${arena.ativo ? 'btn-outline-danger' : 'btn-success'}" data-action="ativacao" data-id="${arena.id}" data-ativo="${arena.ativo ? '1' : '0'}">${arena.ativo ? 'Inativar' : 'Ativar'}</button>
+                       ${excluir}` 
+                    : excluir;
             const localizacao = [arena.bairro, arena.cidade, arena.estado].filter(Boolean).join(' - ') || 'Não informada';
             return `<tr>
                 <td class="fw-semibold">${escapar(arena.nome)}<small class="d-block text-muted">${arena.quadras_ativas_count || 0} de ${arena.quadras_count || 0} quadra(s) ativa(s)</small></td>
@@ -218,7 +242,10 @@
                 <td>${arena.reservas_count || 0} reserva(s)</td>
                 <td class="fw-semibold text-success">${moeda(arena.faturamento_confirmado)}</td>
                 <td><span class="status-dot ${status[0]}"></span>${status[1]}</td>
-                <td><button class="btn btn-sm btn-outline-success me-1" data-detalhes-arena="${arena.id}">Detalhes</button>${acoes}</td>
+                <td><div class="action-buttons">
+                    <button class="btn btn-sm btn-outline-success" data-detalhes-arena="${arena.id}">Detalhes</button>
+                    ${acoes}
+                </div></td>
             </tr>`;
         }).join('') : '<tr><td colspan="7" class="text-center text-muted">Nenhuma arena cadastrada.</td></tr>';
     }
