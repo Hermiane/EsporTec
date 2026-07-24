@@ -43,6 +43,10 @@
 
         .btn-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 2rem; }
 
+        #perfilLoading { text-align: center; padding: 3rem 0; color: var(--gray); }
+        #perfilConteudo { display: none; }
+        #perfilNaoLogado { display: none; text-align: center; margin-top: 3rem; }
+
         @media (max-width: 576px) {
             .profile-header { flex-direction: column; text-align: center; }
             .btn-actions { flex-direction: column; }
@@ -52,55 +56,57 @@
 </head>
 <body>
 
-@php $user = auth()->user(); @endphp
-
-@if($user)
 <div class="container-perfil">
     <div class="header">
         <a href="/painel" class="btn-back"><i class="bi bi-arrow-left"></i></a>
         <h2 class="fw-bold mb-0">Meu Perfil</h2>
     </div>
 
-    <div class="profile-card">
-        @if(session('success'))
-            <div class="alert" style="background: var(--light); color: var(--primary); border-radius: 10px; margin-bottom: 1rem;">
-                <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-            </div>
-        @endif
+    <div id="perfilLoading">
+        <i class="bi bi-hourglass-split me-2"></i>Carregando seu perfil...
+    </div>
+
+    <div id="perfilNaoLogado">
+        <h3>Você precisa estar logado para ver o perfil.</h3>
+        <a href="/login?redirect=/perfil" class="btn btn-save mt-3">Ir para Login</a>
+    </div>
+
+    <div class="profile-card" id="perfilConteudo">
+        <div id="perfilAlerta" class="alert" style="background: var(--light); color: var(--primary); border-radius: 10px; margin-bottom: 1rem; display:none;">
+            <i class="bi bi-check-circle me-2"></i><span id="perfilAlertaTexto"></span>
+        </div>
 
         <div class="profile-header">
             <div class="avatar-upload">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->nome_completo) }}&background=2D815D&color=fff&size=200" alt="Avatar" class="avatar">
+                <img id="perfilAvatar" src="" alt="Avatar" class="avatar">
                 <button class="avatar-btn" title="Alterar foto"><i class="bi bi-camera"></i></button>
             </div>
             <div class="profile-info">
-                <h3>{{ $user->nome_completo }}</h3>
-                <p>{{ $user->email }}</p>
-                <span class="badge-member"><i class="bi bi-calendar-check me-1"></i>Membro desde {{ $user->created_at->format('Y') }}</span>
+                <h3 id="perfilNome"></h3>
+                <p id="perfilEmail"></p>
+                <span class="badge-member"><i class="bi bi-calendar-check me-1"></i>Membro desde <span id="perfilMembroDesde"></span></span>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('perfil.atualizar') }}">
-            @csrf
-            
+        <form id="formPerfil">
             <div class="form-section">
                 <h4 class="form-section-title">Dados Pessoais</h4>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label fw-medium">Nome Completo</label>
-                        <input type="text" name="nome_completo" class="form-control" value="{{ old('nome_completo', $user->nome_completo) }}">
+                        <input type="text" name="nome_completo" id="inputNomeCompleto" class="form-control" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-medium">Nome de usuário</label>
-                        <input type="text" name="nome_usuario" class="form-control" value="{{ old('nome_usuario', $user->nome_usuario) }}">
+                        <input type="text" name="nome_usuario" id="inputNomeUsuario" class="form-control">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-medium">Data de Nascimento</label>
-                        <input type="date" name="data_nascimento" class="form-control" value="{{ old('data_nascimento', $user->data_nascimento?->format('Y-m-d')) }}">
+                        <input type="date" name="data_nascimento" id="inputDataNascimento" class="form-control">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-medium">Telefone</label>
-                        <input type="tel" name="telefone" class="form-control" value="{{ old('telefone', $user->telefone) }}">
+                        <input type="tel" name="telefone" id="inputTelefone" class="form-control">
                     </div>
                 </div>
             </div>
@@ -110,15 +116,15 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label fw-medium">E-mail</label>
-                        <input type="email" class="form-control" value="{{ $user->email }}" readonly style="background: #f8f9fa;">
+                        <input type="email" id="inputEmailReadonly" class="form-control" readonly style="background: #f8f9fa;">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-medium">Nova Senha</label>
-                        <input type="password" name="nova_senha" class="form-control" placeholder="Deixe em branco para manter a atual">
+                        <input type="password" name="nova_senha" id="inputNovaSenha" class="form-control" placeholder="Deixe em branco para manter a atual">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-medium">Confirmar Nova Senha</label>
-                        <input type="password" name="nova_senha_confirmation" class="form-control" placeholder="Repita a nova senha">
+                        <input type="password" name="nova_senha_confirmation" id="inputNovaSenhaConfirmation" class="form-control" placeholder="Repita a nova senha">
                     </div>
                 </div>
             </div>
@@ -130,7 +136,7 @@
                         <label class="fw-medium d-block">Receber ofertas por e-mail</label>
                         <small class="form-text">Promoções exclusivas e novidades</small>
                     </div>
-                    <input type="checkbox" name="email_marketing" class="form-check-input" {{ $user->email_marketing ? 'checked' : '' }}>
+                    <input type="checkbox" name="email_marketing" id="inputEmailMarketing" class="form-check-input">
                 </div>
                 <div class="alert mt-3" style="background: var(--light); color: var(--primary); border-radius: 10px; font-size: 0.9rem;">
                     <i class="bi bi-shield-check me-2"></i> Seus dados são protegidos pela <strong>LGPD</strong>.
@@ -144,19 +150,102 @@
         </form>
     </div>
 </div>
-@else
-    <div class="container-perfil text-center mt-5">
-        <h3>Você precisa estar logado para ver o perfil.</h3>
-        <a href="/login" class="btn btn-save mt-3">Ir para Login</a>
-    </div>
-@endif
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/esportec-ui.js"></script>
+<script src="/js/esportec-api.js"></script>
 <script>
+    let usuarioAtual = null;
+
+    function preencherFormulario(usuario) {
+        usuarioAtual = usuario;
+
+        document.getElementById('perfilAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(usuario.nome_completo)}&background=2D815D&color=fff&size=200`;
+        document.getElementById('perfilNome').textContent = usuario.nome_completo;
+        document.getElementById('perfilEmail').textContent = usuario.email;
+        document.getElementById('perfilMembroDesde').textContent = usuario.created_at ? new Date(usuario.created_at).getFullYear() : '';
+
+        document.getElementById('inputNomeCompleto').value = usuario.nome_completo || '';
+        document.getElementById('inputNomeUsuario').value = usuario.nome_usuario || '';
+        document.getElementById('inputDataNascimento').value = usuario.data_nascimento ? usuario.data_nascimento.substring(0, 10) : '';
+        document.getElementById('inputTelefone').value = usuario.telefone || '';
+        document.getElementById('inputEmailReadonly').value = usuario.email || '';
+        document.getElementById('inputEmailMarketing').checked = !!usuario.email_marketing;
+    }
+
+    async function carregarPerfil() {
+        if (!EsporTecApi.token()) {
+            document.getElementById('perfilLoading').style.display = 'none';
+            document.getElementById('perfilNaoLogado').style.display = 'block';
+            return;
+        }
+
+        try {
+            const data = await EsporTecApi.request('/api/auth/me');
+            preencherFormulario(data.usuario);
+            document.getElementById('perfilLoading').style.display = 'none';
+            document.getElementById('perfilConteudo').style.display = 'block';
+        } catch (erro) {
+            document.getElementById('perfilLoading').style.display = 'none';
+            document.getElementById('perfilNaoLogado').style.display = 'block';
+        }
+    }
+
+    document.getElementById('formPerfil').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const novaSenha = document.getElementById('inputNovaSenha').value;
+        const novaSenhaConfirmation = document.getElementById('inputNovaSenhaConfirmation').value;
+
+        if (novaSenha && novaSenha !== novaSenhaConfirmation) {
+            esportecToast('As senhas não coincidem.', 'warning');
+            return;
+        }
+
+        const payload = {
+            nome_completo: document.getElementById('inputNomeCompleto').value,
+            nome_usuario: document.getElementById('inputNomeUsuario').value,
+            telefone: document.getElementById('inputTelefone').value,
+            data_nascimento: document.getElementById('inputDataNascimento').value || null,
+            email_marketing: document.getElementById('inputEmailMarketing').checked,
+        };
+
+        if (novaSenha) {
+            payload.nova_senha = novaSenha;
+            payload.nova_senha_confirmation = novaSenhaConfirmation;
+        }
+
+        try {
+            const data = await EsporTecApi.request('/api/auth/perfil', {
+                method: 'PUT',
+                body: JSON.stringify(payload),
+            });
+
+            preencherFormulario(data.usuario);
+
+            // Atualiza o cache local (usado pelo painel, menu, etc) para refletir
+            // as mudanças sem precisar deslogar e logar novamente.
+            const usuarioSalvo = JSON.parse(localStorage.getItem('esportec_user') || '{}');
+            localStorage.setItem('esportec_user', JSON.stringify({ ...usuarioSalvo, ...data.usuario }));
+
+            document.getElementById('inputNovaSenha').value = '';
+            document.getElementById('inputNovaSenhaConfirmation').value = '';
+
+            const alerta = document.getElementById('perfilAlerta');
+            document.getElementById('perfilAlertaTexto').textContent = data.message;
+            alerta.style.display = 'block';
+
+            esportecToast(data.message, 'success');
+        } catch (erro) {
+            esportecToast(erro.message, 'warning');
+        }
+    });
+
     document.querySelector('.avatar-btn')?.addEventListener('click', function() {
         esportecToast('Funcionalidade de upload em desenvolvimento.', 'info');
     });
+
+    carregarPerfil();
 </script>
 </body>
 </html>

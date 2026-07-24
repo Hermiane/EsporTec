@@ -15,19 +15,16 @@
         .btn-back { width: 40px; height: 40px; border-radius: 10px; background: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
         .btn-back:hover { background: var(--light); }
 
-        /* Abas */
         .tabs-container { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; background: white; padding: 0.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .tab-btn { flex: 1; padding: 0.8rem; border: none; background: transparent; border-radius: 8px; font-weight: 600; color: var(--gray); cursor: pointer; transition: all 0.2s; font-family: inherit; }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(45,129,93,0.3); }
 
-        /* Cards de Reserva */
         .reserva-card { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.04); display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
         .reserva-info { flex: 1; min-width: 200px; }
         .reserva-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.3rem; }
         .reserva-meta { font-size: 0.9rem; color: var(--gray); display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
         .reserva-meta i { margin-right: 0.3rem; }
 
-        /* Badges de Status */
         .badge-status { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
         .badge-pendente { background: rgba(249,168,37,0.15); color: #F9A825; }
         .badge-confirmada { background: rgba(45,129,93,0.15); color: var(--primary); }
@@ -66,23 +63,16 @@
         <h2 class="fw-bold mb-0">Minhas Reservas</h2>
     </div>
 
-    <!-- Abas -->
     <div class="tabs-container">
         <button class="tab-btn active" onclick="switchTab('proximas', this)">Próximas</button>
         <button class="tab-btn" onclick="switchTab('passadas', this)">Passadas</button>
         <button class="tab-btn" onclick="switchTab('canceladas', this)">Canceladas</button>
     </div>
 
-    <!-- Conteúdo: Próximas -->
     <div id="proximas" class="tab-content active"></div>
-
-    <!-- Conteúdo: Passadas -->
     <div id="passadas" class="tab-content"></div>
-
-    <!-- Conteúdo: Canceladas -->
     <div id="canceladas" class="tab-content"></div>
 
-    <!-- Estado vazio -->
     <div id="emptyState" class="empty-state d-none">
         <i class="bi bi-calendar-x"></i>
         <p class="mb-0">Nenhuma reserva encontrada nesta categoria.</p>
@@ -245,82 +235,22 @@
 <script src="/js/esportec-api.js"></script>
 <script>
 
-    // INTEGRAÇÃO COM API + FALLBACK
-
     const API_BASE = '/api/cliente';
     let reservaEmRemarcacao = null;
     let reservaEmDetalhe = null;
     let reservaEmAvaliacao = null;
     let botaoAvaliacaoAtual = null;
 
-    // DADOS FICTÍCIOS (FALLBACK) - Datas no futuro para aparecer em "Próximas"
-    const MOCK_RESERVAS = [
-        {
-            id: 101,
-            data: '2026-07-20',
-            hora_inicio: '19:00',
-            hora_fim: '20:30',
-            status: 'confirmada',
-            quadra: { nome: 'Quadra Society Premium' },
-            pagamento: { status: 'pendente', valor: 225.00, metodo: 'Dinheiro' },
-            responsavel: 'João Silva',
-            observacoes: 'Reserva para campeonato interno. Precisamos de 2 bolas extras.'
-        },
-        {
-            id: 102,
-            data: '2026-07-18',
-            hora_inicio: '16:00',
-            hora_fim: '17:00',
-            status: 'confirmada',
-            quadra: { nome: 'Quadra Futsal Arena' },
-            pagamento: { status: 'pago', valor: 120.00, metodo: 'Cartão de débito' },
-            responsavel: 'João Silva',
-            observacoes: 'Reserva individual sem observações adicionais.'
-        },
-        {
-            id: 103,
-            data: '2026-07-10',
-            hora_inicio: '10:00',
-            hora_fim: '11:00',
-            status: 'concluida',
-            quadra: { nome: 'Quadra Society Descoberta' },
-            pagamento: { status: 'pago', valor: 100.00, metodo: 'PIX' },
-            responsavel: 'João Silva',
-            observacoes: 'Partida concluída sem pendências.'
-        },
-        {
-            id: 104,
-            data: '2026-07-05',
-            hora_inicio: '20:00',
-            hora_fim: '21:30',
-            status: 'cancelada',
-            quadra: { nome: 'Quadra Society Premium' },
-            pagamento: { status: 'cancelado', valor: 0, metodo: 'Dinheiro' },
-            responsavel: 'João Silva',
-            observacoes: 'Reserva cancelada pelo cliente.'
-        }
-    ];
-
-    //  FUNÇÃO PRINCIPAL: Carrega reservas da API ou usa fallback
     async function carregarReservas() {
         try {
             const reservas = await EsporTecApi.request(`${API_BASE}/reservas`);
             renderizarTodasReservas(reservas);
-            return;
-            // quando as apis estiverem pronta desconta essas linhas e remover o throw
-            // const response = await fetch(`${API_BASE}/reservas`);
-            // if (!response.ok) throw new Error('Erro na API');
-            // const reservas = await response.json();
-            // renderizarTodasReservas(reservas);
-
-            throw new Error('API ainda não implementada');
         } catch (error) {
-            console.log('Usando dados de teste para reservas.');
+            console.log('Erro ao carregar reservas da API.', error);
             renderizarTodasReservas([]);
         }
     }
 
-    //  Renderiza todas as abas com os dados
     function renderizarTodasReservas(reservas) {
         const agora = new Date();
         const hoje = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
@@ -334,14 +264,12 @@
         ));
         renderizarAba('canceladas', reservas.filter(r => r.status === 'cancelada'));
 
-        // Mostra mensagem se todas as abas estiverem vazias
         const todasVazias = ['proximas', 'passadas', 'canceladas'].every(id =>
             document.getElementById(id).children.length === 0
         );
         document.getElementById('emptyState').classList.toggle('d-none', !todasVazias);
     }
 
-    //  Renderiza uma aba específica
     function renderizarAba(abaId, reservas) {
         const container = document.getElementById(abaId);
         container.innerHTML = '';
@@ -377,7 +305,6 @@
         });
     }
 
-    //  Gera os badges de status
     function getBadgesHTML(reserva) {
         let html = '';
         if (reserva.status === 'confirmada') {
@@ -397,7 +324,6 @@
         return html;
     }
 
-    //  Gera os botões de ação
     function getActionsHTML(reserva, abaId) {
         let html = `<button class="btn-action btn-primary" onclick="abrirDetalhesReserva(this)"><i class="bi bi-eye"></i> Detalhes</button>`;
 
@@ -421,7 +347,6 @@
         return html;
     }
 
-    //  Funções de utilidade
     function formatarData(dataISO) {
         if (!dataISO) return '-';
         const [ano, mes, dia] = String(dataISO).slice(0, 10).split('-');
@@ -437,10 +362,6 @@
         const map = { 'pago': 'pago', 'pendente': 'pagamento pendente', 'cancelado': 'cancelado' };
         return map[status] || 'pendente';
     }
-
-
-    //  FUNÇÕES DE INTERAÇÃO (mantidas do original)
-
 
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -526,31 +447,56 @@
     function abrirRemarcacao(trigger) {
         reservaEmRemarcacao = trigger.closest ? trigger.closest('.reserva-card') : trigger;
         bootstrap.Modal.getInstance(document.getElementById('modalDetalhes'))?.hide();
+        document.getElementById('novaDataReserva').value = '';
+        document.getElementById('novoHorarioReserva').value = '';
+        document.getElementById('motivoRemarcacao').value = '';
         bootstrap.Modal.getOrCreateInstance(document.getElementById('modalRemarcacao')).show();
     }
 
-    function confirmarRemarcacao() {
+    async function confirmarRemarcacao() {
         const data = document.getElementById('novaDataReserva').value;
         const horario = document.getElementById('novoHorarioReserva').value;
+        const motivo = document.getElementById('motivoRemarcacao').value.trim();
+
         if (!data || !horario) {
             if (typeof esportecToast === 'function') esportecToast('Escolha data e horário.', 'warning');
             return;
         }
-        if (reservaEmRemarcacao) {
-            const reserva = JSON.parse(reservaEmRemarcacao.dataset.reserva.replace(/&quot;/g, '"'));
-            reserva.data = data;
-            const [hInicio] = horario.split(' - ');
-            reserva.hora_inicio = hInicio;
-            reservaEmRemarcacao.dataset.reserva = JSON.stringify(reserva).replace(/"/g, '&quot;');
-
-            const metaItems = reservaEmRemarcacao.querySelectorAll('.reserva-meta span');
-            metaItems[0].innerHTML = `<i class="bi bi-calendar3"></i> ${formatarData(data)}`;
-            metaItems[1].innerHTML = `<i class="bi bi-clock"></i> ${horario}`;
-            reservaEmRemarcacao.querySelectorAll('.badge-status').forEach(b => b.remove());
-            reservaEmRemarcacao.querySelector('.reserva-info').insertAdjacentHTML('beforeend', '<span class="badge-status badge-confirmada">Remarcada</span>');
+        if (!reservaEmRemarcacao) {
+            esportecToast('Não foi possível identificar a reserva.', 'warning');
+            return;
         }
-        bootstrap.Modal.getInstance(document.getElementById('modalRemarcacao')).hide();
-        if (typeof esportecToast === 'function') esportecToast('Reserva remarcada.', 'success');
+
+        const reserva = JSON.parse(reservaEmRemarcacao.dataset.reserva.replace(/&quot;/g, '"'));
+        if (!reserva.id) {
+            esportecToast('Não foi possível identificar a reserva.', 'warning');
+            return;
+        }
+
+        const [horaInicio, horaFim] = horario.split(' - ').map(h => h.trim());
+
+        const btnConfirmar = document.querySelector('#modalRemarcacao .btn-success');
+        if (btnConfirmar) btnConfirmar.disabled = true;
+
+        try {
+            await EsporTecApi.request(`/api/cliente/reservas/${reserva.id}/remarcar`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    data: data,
+                    hora_inicio: horaInicio,
+                    hora_fim: horaFim,
+                    motivo: motivo || null
+                })
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('modalRemarcacao')).hide();
+            await carregarReservas();
+            if (typeof esportecToast === 'function') esportecToast('Reserva remarcada com sucesso.', 'success');
+        } catch (erro) {
+            if (typeof esportecToast === 'function') esportecToast(erro.message || 'Não foi possível remarcar a reserva.', 'warning');
+        } finally {
+            if (btnConfirmar) btnConfirmar.disabled = false;
+        }
     }
 
     function prepararAvaliacao(trigger) {
@@ -610,9 +556,6 @@
             enviar.disabled = false;
         }
     }
-
-
-    // INICIALIZAÇÃO
 
     document.addEventListener('DOMContentLoaded', () => {
         carregarReservas();

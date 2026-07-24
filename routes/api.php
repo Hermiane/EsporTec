@@ -30,6 +30,7 @@ Route::middleware('throttle:5,1')->group(function () {
 Route::post('/arenas/solicitacoes', [ArenaCadastroController::class, 'solicitar']);
 Route::middleware('auth:sanctum')->post('/auth/logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->get('/auth/me', [AuthController::class, 'me']);
+Route::middleware('auth:sanctum')->put('/auth/perfil', [AuthController::class, 'atualizarPerfil']);
 Route::get('/publico/arenas', [PublicoController::class, 'arenas']);
 Route::get('/publico/arenas/{id}', [PublicoController::class, 'arena']);
 Route::get('/publico/quadras/{id}', [PublicoController::class, 'quadra']);

@@ -259,6 +259,66 @@ class ReservaController extends Controller
 
         return response()->json(['reserva' => $reserva->fresh(), 'cancelamento' => $resultado]);
     }
+ 
+    public function remarcar(Request $request, $id)
+    {
+        $reserva = Reserva::with('quadra.horariosFuncionamento')->findOrFail($id);
+        $userId = $this->usuarioAutenticado()->id;
+        $isOwner = $reserva->reservas_usuarios_id === $userId;
+        if (!$isOwner && !$this->podeGerirArena($userId, $reserva->quadra->arenas_id)) {
+            abort(403, 'Não autorizado.');
+        }
+        if (!in_array($reserva->status, ['pendente', 'confirmada'], true)) {
+            return response()->json(['message' => 'Esta reserva não pode ser remarcada'], 422);
+        }
+
+        $validated = $request->validate([
+            'data' => ['required', 'date', 'after_or_equal:today'],
+            'hora_inicio' => ['required', 'date_format:H:i'],
+            'hora_fim' => ['required', 'date_format:H:i', 'after:hora_inicio'],
+            'motivo' => ['nullable', 'string'],
+        ]);
+
+        if (!$this->estaNoHorarioFuncionamento($reserva->quadra, $validated['data'], $validated['hora_inicio'], $validated['hora_fim'])) {
+            return response()->json(['message' => 'Horário fora do funcionamento da quadra'], 422);
+        }
+
+        $reservaAtualizada = DB::transaction(function () use ($reserva, $validated, $userId) {
+            Quadra::whereKey($reserva->quadras_id)->lockForUpdate()->firstOrFail();
+
+            $hasConflito = Reserva::where('quadras_id', $reserva->quadras_id)
+                ->where('id', '!=', $reserva->id)
+                ->where('data', $validated['data'])
+                ->whereIn('status', ['pendente', 'confirmada'])
+                ->where('hora_inicio', '<', $validated['hora_fim'])
+                ->where('hora_fim', '>', $validated['hora_inicio'])
+                ->lockForUpdate()
+                ->exists();
+
+            $hasBloqueio = BloqueioQuadra::where('quadras_id', $reserva->quadras_id)
+                ->where('data', $validated['data'])
+                ->where('hora_inicio', '<', $validated['hora_fim'])
+                ->where('hora_fim', '>', $validated['hora_inicio'])
+                ->lockForUpdate()
+                ->exists();
+
+            if ($hasConflito || $hasBloqueio) {
+                abort(409, 'Horário indisponível.');
+            }
+
+            $reserva->update([
+                'data' => $validated['data'],
+                'hora_inicio' => $validated['hora_inicio'],
+                'hora_fim' => $validated['hora_fim'],
+                'observacao' => $validated['motivo'] ?? $reserva->observacao,
+                'alteradas_por' => $userId,
+            ]);
+
+            return $reserva->fresh();
+        });
+
+        return response()->json(['message' => 'Reserva remarcada com sucesso.', 'reserva' => $reservaAtualizada]);
+    }
 
     private function estaNoHorarioFuncionamento(Quadra $quadra, string $data, string $inicio, string $fim): bool
     {

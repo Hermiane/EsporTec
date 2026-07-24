@@ -51,6 +51,32 @@ class AuthController extends Controller
             'acessos' => $this->acessosPermitidos($request->user()),
         ]);
     }
+    public function atualizarPerfil(Request $request)
+    {
+        $usuario = $request->user();
+
+        $dados = $request->validate([
+            'nome_completo' => ['required', 'string', 'max:100'],
+            'nome_usuario' => ['nullable', 'string', 'max:50'],
+            'telefone' => ['nullable', 'string', 'max:20'],
+            'data_nascimento' => ['nullable', 'date', 'before:today'],
+            'email_marketing' => ['nullable', 'boolean'],
+            'nova_senha' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if (!empty($dados['nova_senha'])) {
+            $usuario->senha_hash = Hash::make($dados['nova_senha']);
+        }
+
+        $usuario->nome_completo = $dados['nome_completo'];
+        $usuario->nome_usuario = $dados['nome_usuario'] ?? $usuario->nome_usuario;
+        $usuario->telefone = $dados['telefone'] ?? $usuario->telefone;
+        $usuario->data_nascimento = $dados['data_nascimento'] ?? $usuario->data_nascimento;
+        $usuario->email_marketing = $request->boolean('email_marketing');
+        $usuario->save();
+
+        return response()->json(['message' => 'Perfil atualizado com sucesso!', 'usuario' => $usuario]);
+    }
     public function logout(Request $request) { $request->user()->currentAccessToken()?->delete(); return response()->noContent(); }
     public function solicitarReset(Request $request)
     {
